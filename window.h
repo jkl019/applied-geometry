@@ -32,6 +32,7 @@ signals:
   void      signMousePressed( const QString& name, QMouseEvent* event );
   void      signMouseReleased( const QString& name, QMouseEvent* event );
   void      signMouseDoubleClicked( const QString& name, QMouseEvent* event );
+  void      signMouseMoved( const QString& name, QMouseEvent* event );
   void      signKeyPressed( const QString& name, QKeyEvent* event );
   void      signKeyReleased( const QString& name, QKeyEvent* event );
   void      signWheelEventOccurred( const QString& name, QWheelEvent* event );

@@ -238,6 +238,7 @@ GLSceneRenderer::handleWindowChanged(QQuickWindow* window) {
   connect( this, &GLSceneRenderer::signMousePressed, w, &Window::signMousePressed );
   connect( this, &GLSceneRenderer::signMouseReleased, w, &Window::signMouseReleased);
   connect( this, &GLSceneRenderer::signMouseDoubleClicked, w, &Window::signMouseDoubleClicked);
+  connect( this, &GLSceneRenderer::signMouseMoved, w, &Window::signMouseMoved );
   connect( this, &GLSceneRenderer::signKeyPressed, w, &Window::signKeyPressed );
   connect( this, &GLSceneRenderer::signKeyReleased, w, &Window::signKeyReleased);
   connect( this, &GLSceneRenderer::signWheelEventOccurred, w, &Window::signWheelEventOccurred);
@@ -256,6 +257,12 @@ QSGNode*GLSceneRenderer::updatePaintNode(QSGNode* node, QQuickItem::UpdatePaintN
 
 //  qDebug() << "updatePaintNode; item has content: " << ((flags() & QQuickItem::ItemHasContents) == QQuickItem::ItemHasContents ? "yes" : "no");
   return node;
+}
+
+void GLSceneRenderer::mouseMoveEvent(QMouseEvent* event) {
+
+  setFocus(true,Qt::MouseFocusReason);
+  emit signMouseMoved(_name,event);
 }
 
 void GLSceneRenderer::mousePressEvent(QMouseEvent* event) {
