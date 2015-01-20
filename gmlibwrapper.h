@@ -3,7 +3,7 @@ class TestTorus;
 class GLContextSurfaceWrapper;
 
 // gmlib
-#include "core/gmpoint"
+#include <core/gmpoint>
 
 namespace GMlib {
 
