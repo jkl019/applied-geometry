@@ -17,13 +17,15 @@ Window::Window(QWindow *parent) :
 
   // Setup GLformat
   QSurfaceFormat fmt;
-  fmt.setMajorVersion(4);
+  fmt.setMajorVersion(3);
   fmt.setMinorVersion(3);
   fmt.setDepthBufferSize(24);
   fmt.setStencilBufferSize(1);
   fmt.setSwapBehavior( QSurfaceFormat::DoubleBuffer );
   fmt.setSamples(4);
   fmt.setProfile( QSurfaceFormat::CompatibilityProfile );
+  fmt.setOption(QSurfaceFormat::DeprecatedFunctions);
+//  fmt.setProfile( QSurfaceFormat::CoreProfile );
   setFormat(fmt);
 
   // Set the GLContext and scene graph to be persistent

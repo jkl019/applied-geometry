@@ -265,7 +265,7 @@ void GMlibWrapper::initScene() {
 
     // Curve
     auto curve = new GMlib::PCircle<float>(2.0f);
-//    curve->toggleDefaultVisualizer();
+    curve->toggleDefaultVisualizer();
     curve->insertVisualizer(curve_visualizer);
     curve->replot(100,1);
     _scene->insert(curve);
