@@ -1,13 +1,17 @@
 #include "guiapplication.h"
 
-#include "glcontextsurfacewrapper.h"
-
 // local
+#include "glcontextsurfacewrapper.h"
 #include "window.h"
 #include "gmlibwrapper.h"
 
+// hidmanager
+#include "hidmanager/standardhidmanager.h"
+#include "hidmanager/hidmanagertreemodel.h"
+
 // qt
 #include <QDebug>
+#include <QQmlContext>
 
 // stl
 #include <cassert>
@@ -52,19 +56,36 @@ GuiApplication::onSGInit() {
   connect( _gmlib.get(),  &GMlibWrapper::signFrameReady,   _window.get(), &Window::update );
   connect( _window.get(), &Window::signGuiViewportChanged, _gmlib.get(),  &GMlibWrapper::changeRenderGeometry );
 
+  // Init test scene of the GMlib wrapper
+  _gmlib->initScene();
+
+  // Create hidmanager
+  _hidmanager = std::make_shared<StandardHidManager>( _gmlib->getScene(), _gmlib->getCamera("Projection"), _gmlib->getSelectRenderer() );
+  _window->rootContext()->setContextProperty( "hidmanager_model", _hidmanager->getModel() );
+
+  connect( _window.get(), &Window::signMousePressed,       _hidmanager.get(), &StandardHidManager::registerMousePressEvent );
+  connect( _window.get(), &Window::signMouseReleased,      _hidmanager.get(), &StandardHidManager::registerMouseReleaseEvent );
+  connect( _window.get(), &Window::signMouseDoubleClicked, _hidmanager.get(), &StandardHidManager::registerMouseDoubleClickEvent);
+  connect( _window.get(), &Window::signMouseMoved,         _hidmanager.get(), &StandardHidManager::registerMouseMoveEvent );
+  connect( _window.get(), &Window::signKeyPressed,         _hidmanager.get(), &StandardHidManager::registerKeyPressEvent );
+  connect( _window.get(), &Window::signKeyReleased,        _hidmanager.get(), &StandardHidManager::registerKeyReleaseEvent );
+  connect( _window.get(), &Window::signWheelEventOccurred, _hidmanager.get(), &StandardHidManager::registerWheelEvent );
+
+
+
   // Load gui qml
   _window->setSource( QUrl("qrc:/qml/main.qml") );
 
-  connect( _window.get(), &Window::signMousePressed, _gmlib.get(), &GMlibWrapper::mousePressed );
-  connect( _window.get(), &Window::signMouseReleased, _gmlib.get(), &GMlibWrapper::mouseReleased );
-  connect( _window.get(), &Window::signMouseDoubleClicked, _gmlib.get(), &GMlibWrapper::mouseDoubleClicked);
-  connect( _window.get(), &Window::signMouseMoved, _gmlib.get(), &GMlibWrapper::mouseMoved );
-  connect( _window.get(), &Window::signKeyPressed, _gmlib.get(), &GMlibWrapper::keyPressed );
-  connect( _window.get(), &Window::signKeyReleased, _gmlib.get(), &GMlibWrapper::keyReleased );
-  connect( _window.get(), &Window::signWheelEventOccurred, _gmlib.get(), &GMlibWrapper::wheelEventOccurred );
 
-  // Init test scene of the GMlib wrapper
-  _gmlib->initScene();
+
+
+  // HidManager (must be after initScene)
+  connect( _hidmanager.get(), &StandardHidManager::signBeforeHidAction, _glsurface.get(),  &GLContextSurfaceWrapper::makeCurrent, Qt::DirectConnection );
+  connect( _hidmanager.get(), &StandardHidManager::signAfterHidAction, _glsurface.get(),  &GLContextSurfaceWrapper::doneCurrent );
+  _hidmanager->setupDefaultHidBindings();
+
+
+
 
   // Start simulator
   _gmlib->start();

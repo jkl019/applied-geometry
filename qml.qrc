@@ -4,5 +4,6 @@
         <file>qml/components/DefaultRenderWindow.qml</file>
         <file>qml/components/RelativeSplitView.qml</file>
         <file>qml/components/View.qml</file>
+        <file>qml/components/HidBindingView.qml</file>
     </qresource>
 </RCC>

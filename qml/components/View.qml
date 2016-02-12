@@ -27,17 +27,6 @@ Item {
     paused: false
 //      view_type: root.view_type
 
-    Label {
-      anchors.top: parent.top
-      anchors.left: parent.left
-      anchors.margins: 5
-      text: root.name
-      color: "white"
-      font {
-        bold: true
-        weight: Font.Black
-      }
-    }
   }
 
   onResizingChanged: {

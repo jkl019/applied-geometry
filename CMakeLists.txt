@@ -21,7 +21,6 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 ################################
 # Find the required Qt libraries
-
 find_package(Qt5Core 5.1)
 find_package(Qt5Quick 5.1)
 find_package(Qt5Gui 5.1)
@@ -47,6 +46,9 @@ if(WIN32)
 endif(WIN32)
 
 
+
+
+
 #add_subdirectory(hidmanager)
 #include_directories(hidmanager)
 
@@ -54,6 +56,15 @@ endif(WIN32)
 # Files
 
 set( HDRS
+  hidmanager/hidaction.h
+  hidmanager/hidbinding.h
+  hidmanager/hidinput.h
+  hidmanager/hidinputevent.h
+  hidmanager/hidkbmouseinput.h
+  hidmanager/hidmanager.h
+  hidmanager/hidmanagermodel.h
+  hidmanager/hidmanagertreemodel.h
+  hidmanager/standardhidmanager.h
   glcontextsurfacewrapper.h
   glscenerenderer.h
   gmlibwrapper.h
@@ -64,6 +75,15 @@ set( HDRS
   )
 
 set( SRCS
+  hidmanager/hidaction.cpp
+  hidmanager/hidbinding.cpp
+  hidmanager/hidinput.cpp
+  hidmanager/hidinputevent.cpp
+  hidmanager/hidkbmouseinput.cpp
+  hidmanager/hidmanager.cpp
+  hidmanager/hidmanagermodel.cpp
+  hidmanager/hidmanagertreemodel.cpp
+  hidmanager/standardhidmanager.cpp
   glcontextsurfacewrapper.cpp
   glscenerenderer.cpp
   gmlibwrapper.cpp
@@ -75,6 +95,12 @@ set( SRCS
 #########
 # Moc'ing
 QT5_WRAP_CPP( HDRS_MOC
+  hidmanager/hidaction.h
+  hidmanager/hidmanager.h
+  hidmanager/hidmanagermodel.h
+  hidmanager/hidmanagertreemodel.h
+  hidmanager/standardhidmanager.h
+  glcontextsurfacewrapper.h
   glscenerenderer.h
   gmlibwrapper.h
   guiapplication.h
@@ -94,7 +120,6 @@ add_executable( ${CMAKE_PROJECT_NAME} ${HDRS} ${SRCS} ${HDRS_MOC} ${FORM_HDRS} $
 ######
 # Link
 target_link_libraries( ${CMAKE_PROJECT_NAME}
-#  hidmanager
   ${GMlib_LIBRARIES}
   Qt5::Core
   Qt5::Quick

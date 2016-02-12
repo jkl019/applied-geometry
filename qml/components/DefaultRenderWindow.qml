@@ -14,6 +14,56 @@ Item {
 //    name: "Iso"
   }
 
+  Label {
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.margins: 5
+    text: singleview.name
+    color: "white"
+    font {
+      bold: true
+      weight: Font.Black
+    }
+  }
+
+  Button {
+    text: "B"
+    anchors.top: parent.top
+    anchors.right: parent.right
+    anchors.margins: 5
+
+    width: height
+
+    onClicked: hid_bind_view.toggle()
+
+  }
+
+
+
+  HidBindingView {
+    id: hid_bind_view
+    anchors.fill: parent
+    anchors.margins: 50
+    visible:false
+
+    states: [
+      State{
+        name: "show"
+        PropertyChanges {
+          target: hid_bind_view
+          visible: true
+        }
+      }
+    ]
+
+    function toggle() {
+
+      if(state === "") state = "show"
+      else state = ""
+
+    }
+  }
+
 //  RelativeSplitView {
 //    id: multiview
 //    anchors.fill: parent

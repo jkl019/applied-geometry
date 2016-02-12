@@ -2,6 +2,8 @@
 class TestTorus;
 class GLContextSurfaceWrapper;
 
+class StandardHidManager;
+
 // gmlib
 #include <core/gmpoint>
 
@@ -59,8 +61,20 @@ public:
 
   const std::shared_ptr<GMlib::Scene>&  getScene() const;
   const GMlib::TextureRenderTarget&     getRenderTextureOf( const std::string& name ) const;
+  const std::shared_ptr<GMlib::DefaultSelectRenderer>&         getSelectRenderer() const {
+    return _select_renderer;
+  }
+
+  const std::shared_ptr<GMlib::Camera>&  getCamera( const QString& name ) const {
+
+    return _rc_pairs.at(name.toStdString()).camera;
+
+  }
 
   void                                  initScene();
+
+
+  StandardHidManager                    *_hidmanager;
 
 
 public slots:
@@ -68,14 +82,6 @@ public slots:
                                                               const QRectF &new_geometry );
 
 
-
-  void                                  mousePressed( const QString& name, QMouseEvent* event );
-  void                                  mouseReleased( const QString& name, QMouseEvent* event );
-  void                                  mouseDoubleClicked( const QString& name, QMouseEvent* event );
-  void                                  mouseMoved( const QString& name, QMouseEvent* event );
-  void                                  keyPressed( const QString& name, QKeyEvent* event );
-  void                                  keyReleased( const QString& name, QKeyEvent* event );
-  void                                  wheelEventOccurred( const QString& name, QWheelEvent* event );
 
 protected:
   void                                  timerEvent(QTimerEvent *e);
@@ -85,8 +91,8 @@ private:
   int                                               _timer_id;
 
   std::shared_ptr<GLContextSurfaceWrapper>          _glsurface;
-
   std::shared_ptr<GMlib::Scene>                     _scene;
+
   std::unordered_map<std::string, RenderCamPair>    _rc_pairs;
   std::shared_ptr<GMlib::DefaultSelectRenderer>     _select_renderer;
 
