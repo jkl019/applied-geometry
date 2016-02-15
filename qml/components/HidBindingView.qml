@@ -50,12 +50,12 @@ Item {
                     Item {
                         height: text_name.height;
                         implicitWidth: view.width*2/3;
-                        Text{ id: text_name; text: name ? name : "Name" }
+                        Text{ id: text_name; text: name ? name : "Name N/A" }
                     }
                     Item {
                         height: text_binding.height;
                         Layout.fillWidth: true;
-                        Text{ id: text_binding; text: binding ? binding : "Binding" }
+                        Text{ id: text_binding; text: binding ? binding : "Binding N/A" }
                     }
                   }
                   RowLayout {
@@ -64,7 +64,7 @@ Item {
                     Item {
                         height: text_description.height;
                         Layout.fillWidth: true;
-                        Text{ id: text_description; text: description ? description : "Description";
+                        Text{ id: text_description; text: description ? description : "Description N/A";
                             font.italic: true; color: "gray" }
                     }
                   }
@@ -97,4 +97,5 @@ Item {
     model: visu_group_model
     clip: true
   }
+
 }

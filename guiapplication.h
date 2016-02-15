@@ -34,6 +34,9 @@ private:
 private slots:
   void                                        onSGInit();
 
+  void                                        beforeHidAction();
+  void                                        afterHidAction();
+
 
 
 private:

@@ -1,7 +1,8 @@
 #include "standardhidmanager.h"
-#include "../glcontextsurfacewrapper.h"
 
 // local
+//#include "../glcontextsurfacewrapper.h"
+#include "../gmlibwrapper.h"
 #include "hidinputevent.h"
 #include "hidkbmouseinput.h"
 
@@ -28,81 +29,71 @@ using namespace GMlib;
 
 
 
+StandardHidManager::StandardHidManager( std::shared_ptr<GMlibWrapper> gmlib, QObject* parent )
+  : HidManager(parent), _gmlib{gmlib} {
 
+  // Mutable register
+  _reg_wheel_state = false;
 
-//StandardHidManager::StandardHidManager(Scene* scene, Camera* camera, QObject *parent) :
-//  HidManager( parent ), _scene(scene), _camera(camera) {
-
-//  // Default values
-//  _previous_scene_pos = _current_scene_pos = Vector<int,2>(0.0f);
-
-//  _key_event_type = KEY_NONE;
-//  _mouse_event_type = MOUSE_NONE;
-//  _wheel_state = false;
-
-//  // Init GMWindow states
-////  _move_border = false;
-//}
-
-StandardHidManager::StandardHidManager( std::shared_ptr<Scene> scene, std::shared_ptr<Camera> camera,
-                                        std::shared_ptr<GMlib::DefaultSelectRenderer> select_renderer,
-                                        QObject* parent
-                                        ) :
-  HidManager(parent), _scene{scene}, _camera{camera}, _select_renderer{select_renderer} {
 
   // Default values
-  _previous_scene_pos = _current_scene_pos = Vector<int,2>(0.0f);
+//  _previous_scene_pos = _current_scene_pos = Vector<int,2>(0.0f);
 
-  _key_event_type = KEY_NONE;
-  _mouse_event_type = MOUSE_NONE;
-  _wheel_state = false;
+  _reg_next_key_event_type = KEY_NONE;
+  _reg_next_mouse_event_type = MOUSE_NONE;
 }
 
 void StandardHidManager::registerKeyPressEvent(const QString& name, QKeyEvent *e) {
 
+  registerRCPairName( name );
   registerKey( Qt::Key(e->key()), e->modifiers() );
-  setKeyEventType( KEY_PRESS );
+  registerKeyEventType( KEY_PRESS );
   generateEvent();
 }
 
 void StandardHidManager::registerKeyReleaseEvent(const QString& name, QKeyEvent *e) {
 
+  registerRCPairName( name );
   unregisterKey( Qt::Key(e->key()), e->modifiers() );
-  setKeyEventType( KEY_RELEASE );
+  registerKeyEventType( KEY_RELEASE );
   generateEvent();
 }
 
 void StandardHidManager::registerMouseDoubleClickEvent(const QString& name, QMouseEvent* e ) {
 
-  setPos( e->pos() );
+  registerRCPairName( name );
+  registerWindowPosition( e->pos() );
   registerMouseButtons( e->buttons(), e->modifiers() );
-  setMouseEventType( MOUSE_DBL_CLICK );
+  registerMouseEventType( MOUSE_DBL_CLICK );
 
   generateEvent();
 }
 
 void StandardHidManager::registerMouseMoveEvent(const QString& name, QMouseEvent* e) {
 
-  setPos( e->pos() );
-  setMouseEventType( MOUSE_MOVE );
+  registerRCPairName( name );
+  registerWindowPosition( e->pos() );
+  registerMouseEventType( MOUSE_MOVE );
 
   generateEvent();
 }
 
 void StandardHidManager::registerMousePressEvent(const QString& name, QMouseEvent* e) {
 
-  setPos( e->pos() );
+  registerRCPairName( name );
+  registerWindowPosition( e->pos() );
   registerMouseButtons( e->buttons(), e->modifiers() );
-  setMouseEventType( MOUSE_CLICK );
+  registerMouseEventType( MOUSE_CLICK );
 
   generateEvent();
 }
 
 void StandardHidManager::registerMouseReleaseEvent(const QString& name, QMouseEvent* e){
 
-  setPos( e->pos() );
+  registerRCPairName( name );
+  registerWindowPosition( e->pos() );
   registerMouseButtons( e->buttons(), e->modifiers() );
-  setMouseEventType( MOUSE_RELEASE );
+  registerMouseEventType( MOUSE_RELEASE );
 
   generateEvent();
 }
@@ -110,38 +101,28 @@ void StandardHidManager::registerMouseReleaseEvent(const QString& name, QMouseEv
 
 void StandardHidManager::registerKey(Qt::Key key, Qt::KeyboardModifiers modifiers) {
 
-  _keymods = modifiers;
+  _reg_keymods = modifiers;
 
-  if( isKeyPressed( key ) )
+  if( isKeyRegistered( key ) )
     return;
 
-  _keymap[key] = true;
+  _reg_keymap[key] = true;
 }
 
 void StandardHidManager::registerMouseButtons(Qt::MouseButtons buttons, Qt::KeyboardModifiers modifiers ) {
 
-  _mouse_buttons = buttons;
-  _keymods = modifiers;
+  _reg_mouse_buttons = buttons;
+  _reg_keymods = modifiers;
 }
 
-void StandardHidManager::setKeyEventType(StandardHidManager::KeyEventType type) {
+void StandardHidManager::registerKeyEventType(StandardHidManager::KeyEventType type) {
 
-  _key_event_type = type;
+  _reg_next_key_event_type = type;
 }
 
-void StandardHidManager::setMouseEventType(StandardHidManager::MouseEventType type ) {
+void StandardHidManager::registerMouseEventType(StandardHidManager::MouseEventType type ) {
 
-  _mouse_event_type = type;
-}
-
-void StandardHidManager::setWheelDelta(int delta) {
-
-  _wheel_delta = delta;
-}
-
-void StandardHidManager::setWheelState(bool state) {
-
-  _wheel_state = state;
+  _reg_next_mouse_event_type = type;
 }
 
 void StandardHidManager::setupDefaultHidBindings() {
@@ -161,31 +142,31 @@ void StandardHidManager::setupDefaultHidBindings() {
                         "Move the camera. "
                         "If not locked to the scene, it will pan the camera in the view plane. "
                         "If locked it will rotate the camera about the center of the scene." ,
-                        this, SLOT(heMoveCamera()) );
+                        this, SLOT(heMoveCamera(HidInputEvent::HidInputParams)) );
 
   QString ha_id_view_pan_h =
       registerHidAction("View",
                         "Pan Horizontally",
                         "Pan horizontally",
-                        this, SLOT(hePanHorizontal()) );
+                        this, SLOT(hePanHorizontal(HidInputEvent::HidInputParams)) );
 
   QString ha_id_view_pan_v =
       registerHidAction("View",
                         "Pan Vertically",
                         "Pan vertically",
-                        this, SLOT(hePanVertical()) );
+                        this, SLOT(hePanVertical(HidInputEvent::HidInputParams)) );
 
   QString ha_id_view_zoom=
       registerHidAction("View",
                         "Zoom",
                         "Zoom",
-                        this, SLOT(heZoom()) );
+                        this, SLOT(heZoom(HidInputEvent::HidInputParams)) );
 
   QString ha_id_view_lock_to =
       registerHidAction("View",
                         "Lock To ...",
                         "Lock camera to an object or to the scene.",
-                        this, SLOT(heLockTo()) );
+                        this, SLOT(heLockTo(HidInputEvent::HidInputParams)) );
 
 //  QString ha_id_view_moveborder =
 //      registerHidAction( "View",
@@ -204,7 +185,7 @@ void StandardHidManager::setupDefaultHidBindings() {
       registerHidAction("Object transformation",
                         "Scale Objects",
                         "Scale objects",
-                        this, SLOT(heScaleSelectedObjects()) );
+                        this, SLOT(heScaleSelectedObjects(HidInputEvent::HidInputParams)) );
 
   QString ha_id_objtrans_move =
       registerHidAction("Object transformation",
@@ -216,7 +197,7 @@ void StandardHidManager::setupDefaultHidBindings() {
       registerHidAction("Object transformation",
                         "Rotate Objects",
                         "Rotate objects",
-                        this, SLOT(heRotateSelectedObjects()) );
+                        this, SLOT(heRotateSelectedObjects(HidInputEvent::HidInputParams)) );
 
   // Object Selection
   QString ha_id_objsel_toggle_all =
@@ -229,13 +210,13 @@ void StandardHidManager::setupDefaultHidBindings() {
       registerHidAction("Object selection",
                         "Select Object",
                         "Select object",
-                        this, SLOT(heSelectObject()) );
+                        this, SLOT(heSelectObject(HidInputEvent::HidInputParams)) );
 
   QString ha_id_objsel_select_multi =
       registerHidAction("Object selection",
                         "Select Objects",
                         "Select objects",
-                        this, SLOT(heSelectObjects()) );
+                        this, SLOT(heSelectObjects(HidInputEvent::HidInputParams)) );
 
   // Object Interaction
   QString ha_id_objint_toggle_edit =
@@ -285,6 +266,13 @@ void StandardHidManager::setupDefaultHidBindings() {
                          "Stuff that happens on left mouse release",
                          this, SLOT(heLeftMouseReleaseStuff()) );
 
+  // Open/Close HidBindings view
+  QString ha_id_var_open_close_hbview =
+      registerHidAction( "Various",
+                         "Open/Close Hid help",
+                         "Toggle open/close the Hid bindings help view",
+                         this, SLOT(heOpenCloseHidHelp()) );
+
 
 
   //// Set up initial mapping
@@ -308,132 +296,130 @@ void StandardHidManager::setupDefaultHidBindings() {
   registerHidMapping( ha_id_objtrans_rotate,              new MouseMoveInput( Qt::LeftButton, Qt::ControlModifier ) );
 
   registerHidMapping( ha_id_var_lm_rel,                   new MouseReleaseInput( Qt::LeftButton ) );
+  registerHidMapping( ha_id_var_open_close_hbview,        new KeyPressInput( Qt::Key_Question, Qt::ShiftModifier ) );
 
   registerHidMapping( ha_id_view_pan_h,                   new WheelInput( Qt::ControlModifier ) );
   registerHidMapping( ha_id_view_pan_v,                   new WheelInput( Qt::ShiftModifier ) );
   registerHidMapping( ha_id_view_zoom,                    new WheelInput() );
 }
 
+GMlib::Point<int,2> StandardHidManager::toGMlibPoint(const QPoint& point) {
+
+  return GMlib::Point<int,2>( point.x(), point.y() );
+}
+
 void StandardHidManager::unregisterKey(Qt::Key key, Qt::KeyboardModifiers modifiers) {
 
 
   // Update modifier
-  _keymods       = modifiers;
+  _reg_keymods = modifiers;
 
   // Update keymap
-  if( !isKeyPressed(key) )
+  if( !isKeyRegistered(key) )
     return;
 
-  _keymap.remove( key );
+  _reg_keymap.remove( key );
 }
 
-StandardHidManager::KeyEventType StandardHidManager::getKeyEventType() const {
+void StandardHidManager::registerWheelData(bool state, int delta) {
 
-  return _key_event_type;
-}
-
-StandardHidManager::MouseEventType StandardHidManager::getMouseEventType() const {
-
-  return _mouse_event_type;
+  _reg_wheel_state = state;
+  _reg_wheel_delta = delta;
 }
 
 void StandardHidManager::registerWheelEvent(const QString& name, QWheelEvent *e) {
 
   // Save position and wheel delta
-  setPos( e->pos() );
-  setWheelDelta( e->delta() );
-  setWheelState(true);
+  registerRCPairName( name );
+  registerWindowPosition( e->pos() );
+  registerWheelData( true, e->angleDelta().y() );
 
   generateEvent();
 }
 
-bool StandardHidManager::isKeyPressed(Qt::Key key) const {
+bool StandardHidManager::isKeyRegistered(Qt::Key key) const {
 
-  return _keymap.value(key, false);
+  return _reg_keymap.value(key, false);
 }
 
-bool StandardHidManager::isKeysPressed() const {
+bool StandardHidManager::isAnyKeysRegistered() const {
 
-  return _keymap.size() > 0;
+  return _reg_keymap.size() > 0;
 }
 
-bool StandardHidManager::isModifierPressed(Qt::KeyboardModifier keymod) const {
+bool StandardHidManager::isModKeyRegistered(Qt::KeyboardModifier keymod) const {
 
   // No modifier is a special case
   if( keymod == Qt::NoModifier ) {
-    return _keymods == Qt::NoModifier;
+    return _reg_keymods == Qt::NoModifier;
   }
 
-  return (_keymods & keymod) == keymod;
+  return (_reg_keymods & keymod) == keymod;
 }
 
-bool StandardHidManager::isMouseButtonPressed(Qt::MouseButton button) const {
+bool StandardHidManager::isMouseButtonRegistered(Qt::MouseButton button) const {
 
   // No button is a special case
   if( button == Qt::NoButton ) {
-    return _mouse_buttons == Qt::NoButton;
+    return _reg_mouse_buttons == Qt::NoButton;
   }
 
-  return (_mouse_buttons & button) == button;
-}
-
-
-int StandardHidManager::getWheelDelta() const {
-
-  return _wheel_delta;
-}
-
-bool StandardHidManager::getWheelState() const {
-
-  return _wheel_state;
+  return (_reg_mouse_buttons & button) == button;
 }
 
 void StandardHidManager::generateEvent() {
 
   HidInputEvent::HidInputParams params;
-  params["curr_pos"] = QVariant( getPos2() );
-  params["prev_pos"] = QVariant( getPPos2() );
+  params["view_name"] = QVariant( _reg_rcpair_name );
 
-  if( getMouseEventType() == MOUSE_MOVE ) {
-        QCoreApplication::sendEvent( this, new HidInputEvent( MouseMoveInput( _mouse_buttons, _keymods ), params ) );
-    setMouseEventType( MOUSE_NONE );
-  }
-  else if( getWheelState() ) {
-        QCoreApplication::sendEvent( this, new HidInputEvent( WheelInput( _keymods ) ) );
-    setWheelState(false);
-  }
-  else if( getMouseEventType() != MOUSE_NONE ) {
+  HidInputEvent::HidInputParams key_params {params};
 
-    switch( getMouseEventType() ) {
+  HidInputEvent::HidInputParams mouse_params {params};
+  mouse_params["pos"]      = QVariant( _reg_view_pos );
+  mouse_params["prev_pos"] = QVariant( _reg_view_prev_pos );
+
+  HidInputEvent::HidInputParams wheel_params {params};
+  wheel_params["wheel_delta"] = QVariant(_reg_wheel_delta);
+
+  if( _reg_next_mouse_event_type == MOUSE_MOVE ) {
+    QCoreApplication::sendEvent( this, new HidInputEvent( MouseMoveInput( _reg_mouse_buttons, _reg_keymods ), mouse_params ) );
+    registerMouseEventType( MOUSE_NONE );
+  }
+  else if( _reg_wheel_state ) {
+    QCoreApplication::sendEvent( this, new HidInputEvent( WheelInput( _reg_keymods ), wheel_params ) );
+    registerWheelData(false,0);
+  }
+  else if( _reg_next_mouse_event_type != MOUSE_NONE ) {
+
+    switch( _reg_next_mouse_event_type ) {
       case MOUSE_DBL_CLICK:
-        QCoreApplication::sendEvent( this, new HidInputEvent( MouseDoubleClickInput( _mouse_buttons, _keymods ) ) );
+        QCoreApplication::sendEvent( this, new HidInputEvent( MouseDoubleClickInput( _reg_mouse_buttons, _reg_keymods ), mouse_params ) );
         break;
       case MOUSE_CLICK:
-        QCoreApplication::sendEvent( this, new HidInputEvent( MousePressInput( _mouse_buttons, _keymods ) ) );
+        QCoreApplication::sendEvent( this, new HidInputEvent( MousePressInput( _reg_mouse_buttons, _reg_keymods ), mouse_params ) );
         break;
       case MOUSE_RELEASE:
-        QCoreApplication::sendEvent( this, new HidInputEvent( MouseReleaseInput( _mouse_buttons, _keymods ) ) );
+        QCoreApplication::sendEvent( this, new HidInputEvent( MouseReleaseInput( _reg_mouse_buttons, _reg_keymods ), mouse_params ) );
         break;
     }
 
-    setMouseEventType( MOUSE_NONE );
+    registerMouseEventType( MOUSE_NONE );
   }
-  else if( getKeyEventType() != KEY_NONE ) {
+  else if( _reg_next_key_event_type != KEY_NONE ) {
 
-    switch( getKeyEventType() ) {
+    switch( _reg_next_key_event_type ) {
       case KEY_PRESS: {
-        QCoreApplication::sendEvent( this, new HidInputEvent( KeyPressInput( _keymap, _keymods ) ) );
+        QCoreApplication::sendEvent( this, new HidInputEvent( KeyPressInput( _reg_keymap, _reg_keymods ), key_params ) );
       } break;
       case KEY_RELEASE: {
-        QCoreApplication::sendEvent( this, new HidInputEvent( KeyReleaseInput( _keymap, _keymods ) ) );
+        QCoreApplication::sendEvent( this, new HidInputEvent( KeyReleaseInput( _reg_keymap, _reg_keymods ), key_params ) );
       } break;
     }
 
-    setKeyEventType( KEY_NONE );
+    registerKeyEventType( KEY_NONE );
   }
 
 
-  savePos();
 
 
 
@@ -690,35 +676,17 @@ void StandardHidManager::heEdit() {
   }
 }
 
-void StandardHidManager::heLockTo() {
+void StandardHidManager::heLockTo(const HidInputEvent::HidInputParams& params) {
 
-  SceneObject *sel_obj = activeSelectObject();
+  auto view_name = params["view_name"].toString();
+  auto pos       = params["pos"].toPoint();
+
+  auto cam     = findCamera(view_name);
+  auto sel_obj = findSceneObject(view_name,pos);
+
   if( sel_obj )
-    heLockCameraToObject();
-  else
-    heLockCameraToScene();
-}
-
-void StandardHidManager::heLockCameraToObject() {
-
-  Camera *cam = activeCamera();
-  SceneObject *sel_obj = activeSelectObject();
-  if( !cam || !sel_obj )
-    return;
-
-  // Lock camera to selected object
-  cam->lock( sel_obj );
-}
-
-void StandardHidManager::heLockCameraToScene() {
-
-  Camera *cam = activeCamera();
-  SceneObject *sel_obj = activeSelectObject();
-  if( !cam || sel_obj )
-    return;
-
-  // Lock/unlock camera to scene
-  if( cam->isLocked() )
+    cam->lock( sel_obj );
+  else if(cam->isLocked())
     cam->unLock();
   else {
 
@@ -728,38 +696,17 @@ void StandardHidManager::heLockCameraToScene() {
   }
 }
 
-//void StandardHidManager::heMoveBorderOrCamera() {
+void StandardHidManager::heMoveCamera(const HidInputEvent::HidInputParams& params) {
 
-//  Camera *cam = getActiveCamera();
-//  if( !cam )
-//    heMoveBorder();
-//  else {
-//    if( _move_border )
-//      heMoveBorder();
-//    else
-//      heMoveCamera();
-//  }
-//}
+  auto view_name = params["view_name"].toString();
+  auto pos       = toGMlibPoint(params["pos"].toPoint());
+  auto prev      = toGMlibPoint(params["prev_pos"].toPoint());
 
-//void StandardHidManager::heMoveBorder() {
-
-
-//  _move_border = true;
-
-//  const Vector<int,2> pos = getPos();
-
-//  getWindow()->moveBorder(pos(0),pos(1));
-//}
-
-void StandardHidManager::heMoveCamera() {
-
-  Camera *cam = activeCamera();
+  auto *cam = findCamera(view_name);
   if( !cam )
     return;
 
   const float scale = cameraSpeedScale( cam );
-  const Vector<int,2> pos = cursorPos();
-  const Vector<int,2> prev = previousCursorPos();
   const Vector<float,2> delta (
      (pos(0) - prev(0)) * scale / cam->getViewportW(),
      (prev(1) - pos(1)) * scale / cam->getViewportH()
@@ -769,7 +716,9 @@ void StandardHidManager::heMoveCamera() {
 
 void StandardHidManager::heMoveSelectedObjects( const HidInputEvent::HidInputParams& params ) {
 
-  Camera *cam = activeCamera();
+  QString view_name = params["view_name"].toString();
+
+  Camera *cam = findCamera(view_name);
   if( !cam )
     return;
 
@@ -805,43 +754,33 @@ void StandardHidManager::heMoveSelectedObjects( const HidInputEvent::HidInputPar
   }
 }
 
-void StandardHidManager::hePanHorizontal() {
+void StandardHidManager::hePanHorizontal(const HidInputEvent::HidInputParams& params) {
 
-  Camera *cam = activeCamera();
+  QString view_name   = params["view_name"].toString();
+  int     wheel_delta = params["wheel_delta"].toInt();
+
+  Camera *cam = findCamera(view_name);
   if( cam )
     cam->move(
       Vector<float,2>(
-        getWheelDelta() * cameraSpeedScale(cam) / cam->getViewportH(),
+        wheel_delta * cameraSpeedScale(cam) / cam->getViewportH(),
         0.0f
         ));
 }
 
-void StandardHidManager::hePanVertical() {
+void StandardHidManager::hePanVertical(const HidInputEvent::HidInputParams& params) {
 
-  Camera *cam = activeCamera();
+  QString view_name   = params["view_name"].toString();
+  int     wheel_delta = params["wheel_delta"].toInt();
+
+  Camera *cam = findCamera(view_name);
   if( cam )
     cam->move(
       Vector<float,2>(
         0.0f,
-        getWheelDelta() * cameraSpeedScale(cam) / cam->getViewportW()
+        wheel_delta * cameraSpeedScale(cam) / cam->getViewportW()
             ));
 }
-
-//void StandardHidManager::hePushPopViewSets() {
-
-//  Camera *cam = activeCamera();
-//  if( !cam )
-//    return;
-
-//  GMWindow *window = getWindow();
-
-//  if( window->getViewSetStackSize() > 2 )
-//    window->popViewSet();
-//  else
-//    window->addViewSet( window->getCameraIndex( getActiveCamera() ) );
-
-//  window->prepareViewSets();
-//}
 
 void StandardHidManager::heReplotQuick(int factor) {
 
@@ -896,14 +835,16 @@ void StandardHidManager::heReplotQuickMedium() {
   heReplotQuick(10);
 }
 
-void StandardHidManager::heRotateSelectedObjects() {
+void StandardHidManager::heRotateSelectedObjects(const HidInputEvent::HidInputParams& params) {
 
-  Camera *cam = activeCamera();
+  auto view_name = params["view_name"].toString();
+  auto pos       = toGMlibPoint(params["pos"].toPoint());
+  auto prev      = toGMlibPoint(params["prev_pos"].toPoint());
+
+  Camera *cam = findCamera(view_name);
   if( !cam )
     return;
 
-  const Vector<int,2> pos = cursorPos();
-  const Vector<int,2> prev = previousCursorPos();
   const Array<SceneObject*> &objs = scene()->getSelectedObjects();
 
   // Compute rotation axis and angle in respect to the camera and view.
@@ -930,14 +871,15 @@ void StandardHidManager::heRotateSelectedObjects() {
         no_objs > 1 ? objs(i)->rotate( ang, sphere.getPos(), rot_v) : objs(i)->rotate( ang, rot_v);
 }
 
-void StandardHidManager::heScaleSelectedObjects() {
+void StandardHidManager::heScaleSelectedObjects(const HidInputEvent::HidInputParams& params) {
 
-  Camera *cam = activeCamera();
+  auto view_name = params["view_name"].toString();
+  auto pos       = toGMlibPoint(params["pos"].toPoint());
+  auto prev      = toGMlibPoint(params["prev_pos"].toPoint());
+
+  Camera *cam = findCamera(view_name);
   if( !cam )
     return;
-
-  const Vector<int,2> pos = cursorPos();
-  const Vector<int,2> prev = previousCursorPos();
 
   const Array<SceneObject*> &sel_objs = scene()->getSelectedObjects();
   for( int i = 0; i < sel_objs.getSize(); i++ ) {
@@ -962,27 +904,29 @@ void StandardHidManager::heSelectAllObjects() {
     heSelectObjectTree( (*scene)[i] );
 }
 
-void StandardHidManager::heSelectObject() {
+void StandardHidManager::heSelectObject(const HidInputEvent::HidInputParams& params) {
 
-  SceneObject *sel_obj = activeSelectObject();
-  if( !sel_obj )
+  auto view_name = params["view_name"].toString();
+  auto pos       = params["pos"].toPoint();
+
+  auto obj = findSceneObject(view_name,pos);
+  if( !obj )
     return;
 
-  bool selected = sel_obj->isSelected();
-
+  // Preserver object selection
+  auto selected = obj->isSelected();
   heDeSelectAllObjects();
-
-  sel_obj->setSelected( !selected );
+  obj->setSelected( !selected );
 }
 
-void StandardHidManager::heSelectObjects() {
+void StandardHidManager::heSelectObjects(const HidInputEvent::HidInputParams& params) {
 
-  SceneObject *sel_obj = activeSelectObject();
+  auto view_name = params["view_name"].toString();
+  auto pos       = params["pos"].toPoint();
 
-  if( !sel_obj )
-    return;
+  if( auto obj = findSceneObject(view_name,pos) ) obj->toggleSelected();
 
-  sel_obj->toggleSelected();
+//  if(obj) obj->toggleSelected();
 }
 
 void StandardHidManager::heSelectObjectTree( SceneObject* obj ) {
@@ -1010,7 +954,7 @@ void StandardHidManager::heToggleObjectDisplayMode() {
     GMlib::Array<GMlib::Visualizer*> &visus = obj->getVisualizers();
     for( int i = 0; i < visus.getSize(); i++ ) {
 
-      qDebug() << "  obj: " << obj->getName() << " : " << int(visus[i]);
+      qDebug() << "  obj: " << obj->getName() << " : " << reinterpret_cast<long int>(visus[i]);
 
       visus[i]->toggleDisplayMode();
     }
@@ -1030,22 +974,28 @@ void StandardHidManager::heToggleSelectAllObjects() {
     heSelectAllObjects();
 }
 
-void StandardHidManager::heUnlockCamera() {
+//void StandardHidManager::heUnlockCamera() {
 
-  Camera *cam = activeCamera();
-  if( cam )
-    cam->unLock();
-}
+//  Camera *cam = activeCamera();
+//  if( cam )
+//    cam->unLock();
+//}
 
-void StandardHidManager::heZoom() {
+void StandardHidManager::heZoom(const HidInputEvent::HidInputParams& params) {
 
-  int delta = getWheelDelta();
-  Camera *cam = activeCamera();
+  QString view_name       = params["view_name"].toString();
+  int     wheel_delta     = params["wheel_delta"].toInt();
+
+  // Qt comp scale
+  wheel_delta /= 8;
+
+  Camera *cam = findCamera(view_name);
+
   Camera *isocam = dynamic_cast<IsoCamera*>( cam );
   if( isocam ) {
 
-    if( delta < 0 ) isocam->zoom( 1.05 );
-    if( delta > 0 ) isocam->zoom( 0.95 );
+    if( wheel_delta < 0 ) isocam->zoom( 1.05 );
+    if( wheel_delta > 0 ) isocam->zoom( 0.95 );
   }
   else if( cam ) {
 
@@ -1055,28 +1005,33 @@ void StandardHidManager::heZoom() {
     else
       scale = scene()->getSphere().getRadius();
 
-    cam->move( delta*scale / cam->getViewportH() );
+    cam->move( wheel_delta*scale / cam->getViewportH() );
   }
 }
 
 void StandardHidManager::heLeftMouseReleaseStuff() {
 
-//  _move_border = false;
+  //  _move_border = false;
+}
+
+void StandardHidManager::heOpenCloseHidHelp() {
+
+  emit signOpenCloseHidHelp();
+  qDebug() << "Toggle Hid Help";
+}
+
+void StandardHidManager::registerRCPairName(const QString& name) {
+
+  _reg_rcpair_name = name;
+}
+
+Camera* StandardHidManager::findCamera( const QString& view_name ) const {
+
+  return _gmlib->getCamera(view_name.toStdString()).get();
 }
 
 
-Camera* StandardHidManager::activeCamera() const {
-
-  return _camera.get();
-//  return getWindow()->findCamera( getPos() );
-}
-
-float StandardHidManager::activeCameraSpeedScale() {
-
-  return cameraSpeedScale( activeCamera() );
-}
-
-float StandardHidManager::cameraSpeedScale(Camera *cam) {
+float StandardHidManager::cameraSpeedScale(Camera *cam) const {
 
   if( !cam )
     return 1.0f;
@@ -1088,88 +1043,26 @@ float StandardHidManager::cameraSpeedScale(Camera *cam) {
 }
 
 
-const Vector<int,2>& StandardHidManager::cursorPos() const {
-
-  return _current_scene_pos;
-}
-
-const Vector<int,2>& StandardHidManager::previousCursorPos() const {
-
-  return _previous_scene_pos;
-}
-
-QPointF StandardHidManager::getPos2() const {
-
-  return QPointF( _current_scene_pos(0), _current_scene_pos(1) );
-}
-
-QPointF StandardHidManager::getPPos2() const {
-
-  return QPointF( _previous_scene_pos(0), _previous_scene_pos(1) );
-}
 
 Scene* StandardHidManager::scene() const {
 
-  return _scene.get();
+  return _gmlib->getScene().get();
 }
 
-SceneObject* StandardHidManager::activeSelectObject() {
-
-  Camera *cam = activeCamera();
-  if( !cam )
-    return 0x0;
-
-  SceneObject *sel_obj = nullptr;
+SceneObject* StandardHidManager::findSceneObject( const QString& view_name, const QPoint& pos  ) {
 
 
-  _select_renderer->setCamera(cam);
-
-  auto pos = cursorPos();
-  auto size = cam->getViewport();
-
-
-  qDebug() << "------ Find active sel object";
-  qDebug() << "  sel renderer: " << int(_select_renderer.get());
-  qDebug() << "  cursor pos: " << cursorPos();
-  qDebug() << "  cam: " << int(cam);
-  qDebug() << "  viewport: " << size;
-
-
-  _select_renderer->reshape( size );
-  _select_renderer->prepare();
-
-  _select_renderer->select( GM_SO_TYPE_SELECTOR );
-
-  sel_obj = _select_renderer->findObject(pos(0),size(1)-pos(1)-1);
-
-  if(!sel_obj) {
-
-    _select_renderer->select( -GM_SO_TYPE_SELECTOR );
-    sel_obj = _select_renderer->findObject(pos(0),size(1)-pos(1)-1);
-  }
-
-  return sel_obj;
+  return _gmlib->findSceneObject( view_name, toGMlibViewPosition(view_name,pos) );
 }
 
+GMlib::Point<int,2> StandardHidManager::toGMlibViewPosition(const QString& view_name, const QPoint &pos) {
 
-//GMWindow* StandardHidManager::getWindow() const {
-
-//  return _gmwindow;
-//}
-
-
-
-
-
-
-void StandardHidManager::savePos() {
-
-  _previous_scene_pos = _current_scene_pos;
+  auto cam = findCamera(view_name);
+  return Vector<int,2>( int(pos.x()), cam->getViewportH() - int(pos.y()) - 1 );
 }
 
+void StandardHidManager::registerWindowPosition( const QPoint& pos ) {
 
-void StandardHidManager::setPos( const QPointF& pos ) {
-
-//  _state.setPos( Vector<int,2>( int(pos.x()), _gmwindow->getViewportHeight() - int(pos.y()) - 1 ) );
-  _current_scene_pos = Vector<int,2>( int(pos.x()), activeCamera()->getViewportH() - int(pos.y()) - 1 );
+  _reg_view_prev_pos = _reg_view_pos;
+  _reg_view_pos = pos;
 }

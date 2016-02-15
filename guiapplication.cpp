@@ -12,6 +12,7 @@
 // qt
 #include <QDebug>
 #include <QQmlContext>
+#include <QQuickItem>
 
 // stl
 #include <cassert>
@@ -59,8 +60,8 @@ GuiApplication::onSGInit() {
   // Init test scene of the GMlib wrapper
   _gmlib->initScene();
 
-  // Create hidmanager
-  _hidmanager = std::make_shared<StandardHidManager>( _gmlib->getScene(), _gmlib->getCamera("Projection"), _gmlib->getSelectRenderer() );
+  // Create hidmanager (must be after initScene)
+  _hidmanager = std::make_shared<StandardHidManager>( _gmlib );
   _window->rootContext()->setContextProperty( "hidmanager_model", _hidmanager->getModel() );
 
   connect( _window.get(), &Window::signMousePressed,       _hidmanager.get(), &StandardHidManager::registerMousePressEvent );
@@ -75,23 +76,32 @@ GuiApplication::onSGInit() {
   connect( _hidmanager.get(), &StandardHidManager::signToggleSimulation,
            _gmlib.get(),      &GMlibWrapper::toggleSimulation );
 
+  connect( _hidmanager.get(), &StandardHidManager::signBeforeHidAction, this,  &GuiApplication::beforeHidAction, Qt::DirectConnection );
+  connect( _hidmanager.get(), &StandardHidManager::signAfterHidAction,  this,  &GuiApplication::afterHidAction );
+
+  _hidmanager->setupDefaultHidBindings();
 
   // Load gui qml
   _window->setSource( QUrl("qrc:/qml/main.qml") );
 
-
-
-
-  // HidManager (must be after initScene)
-  connect( _hidmanager.get(), &StandardHidManager::signBeforeHidAction, _glsurface.get(),  &GLContextSurfaceWrapper::makeCurrent, Qt::DirectConnection );
-  connect( _hidmanager.get(), &StandardHidManager::signAfterHidAction, _glsurface.get(),  &GLContextSurfaceWrapper::doneCurrent );
-  _hidmanager->setupDefaultHidBindings();
-
+  connect( _hidmanager.get(), SIGNAL(signOpenCloseHidHelp()), _window->rootObject(), SIGNAL(toggleHidBindView()) );
 
 
 
   // Start simulator
   _gmlib->start();
+}
+
+void GuiApplication::beforeHidAction() {
+
+  qDebug() << "BeforeHidAction:";
+  _glsurface->makeCurrent();
+}
+
+void GuiApplication::afterHidAction() {
+
+  qDebug() << "AfterHidAction:";
+  _glsurface->doneCurrent();
 }
 
 const GuiApplication&

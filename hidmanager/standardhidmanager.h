@@ -7,15 +7,7 @@
 #include "hidkbmouseinput.h"
 #include "hidinputevent.h"
 
-class GLContextSurfaceWrapper;
-
-// gmlib
-namespace GMlib {
-
-  class Camera;
-  class Scene;
-  class DefaultSelectRenderer;
-}
+class GMlibWrapper;
 
 // Qt
 class QMouseEvent;
@@ -30,9 +22,7 @@ class QWheelEvent;
 class StandardHidManager : public HidManager {
   Q_OBJECT
 public:
-  explicit StandardHidManager( std::shared_ptr<GMlib::Scene> scene,  std::shared_ptr<GMlib::Camera>,
-                               std::shared_ptr<GMlib::DefaultSelectRenderer> select_renderer,
-                               QObject* parent = 0x0 );
+  explicit StandardHidManager( std::shared_ptr<GMlibWrapper> gmlib, QObject* parent = 0x0 );
 
 
 
@@ -55,31 +45,13 @@ public:
   };
 
 
-  bool                        isKeyPressed( Qt::Key key ) const;
-  bool                        isKeysPressed() const;
-  bool                        isModifierPressed( Qt::KeyboardModifier keymod ) const;
-  bool                        isMouseButtonDoublePressed() const;
-  bool                        isMouseButtonPressed( Qt::MouseButton button ) const;
-
-  virtual void                generateEvent();
-
-
-  KeyEventType                getKeyEventType() const;
-  void                        setKeyEventType( KeyEventType type );
-
-  MouseEventType              getMouseEventType() const;
-  void                        setMouseEventType( MouseEventType type );
-
-
-  int                         getWheelDelta() const;
-  void                        setWheelDelta( int delta );
-
-  bool                        getWheelState() const;
-  void                        setWheelState( bool state );
-
 
 
   void                        setupDefaultHidBindings();
+
+
+  static GMlib::Point<int,2>  toGMlibPoint( const QPoint& point );
+
 
 
 public slots:
@@ -93,24 +65,75 @@ public slots:
 
 
 private:
+  void                        registerKeyEventType( KeyEventType type );
+  void                        registerMouseEventType( MouseEventType type );
+  virtual void                generateEvent();
+
   void                        registerKey( Qt::Key key,
                                            Qt::KeyboardModifiers modifiers );
-
-  void                        registerMouseButtons( Qt::MouseButtons buttons,
-                                                    Qt::KeyboardModifiers modifiers );
   void                        unregisterKey( Qt::Key key,
                                              Qt::KeyboardModifiers modifiers );
 
-  KeyInput::Keymap            _keymap;
-  Qt::KeyboardModifiers       _keymods;
+  void                        registerMouseButtons( Qt::MouseButtons buttons,
+                                                    Qt::KeyboardModifiers modifiers );
 
-  Qt::MouseButtons            _mouse_buttons;
+  void                        registerWheelData( bool state, int delta );
 
-  KeyEventType                _key_event_type;
-  MouseEventType              _mouse_event_type;
 
-  bool                        _wheel_state;
-  int                         _wheel_delta;
+  void                        registerWindowPosition(const QPoint& pos );
+  void                        registerRCPairName( const QString& name );
+
+
+  KeyInput::Keymap            _reg_keymap;
+  Qt::KeyboardModifiers       _reg_keymods;
+
+  Qt::MouseButtons            _reg_mouse_buttons;
+
+  bool                        _reg_wheel_state;
+  int                         _reg_wheel_delta;
+
+  QString                     _reg_rcpair_name    = {""};    // Current view name
+  QPoint                      _reg_view_pos       = {0,0};
+  QPoint                      _reg_view_prev_pos  = {0,0};
+
+
+
+  bool                        isKeyRegistered( Qt::Key key ) const;
+  bool                        isAnyKeysRegistered() const;
+  bool                        isModKeyRegistered( Qt::KeyboardModifier keymod ) const;
+  bool                        isMouseButtonRegistered( Qt::MouseButton button ) const;
+
+
+
+
+
+
+
+
+
+  KeyEventType                _reg_next_key_event_type;
+  MouseEventType              _reg_next_mouse_event_type;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -119,60 +142,47 @@ private:
   //
   // GMlib scene control setup
 
-public slots:
+private slots:
   virtual void                      heDeSelectAllObjects();
   virtual void                      heEdit();
-  virtual void                      heLockTo();
-  virtual void                      heLockCameraToObject();
-  virtual void                      heLockCameraToScene();
-//  virtual void                      heMoveBorderOrCamera();
-//  virtual void                      heMoveBorder();
-  virtual void                      heMoveCamera();
-  virtual void                      heMoveSelectedObjects(  const HidInputEvent::HidInputParams& params );
-  virtual void                      hePanHorizontal();
-  virtual void                      hePanVertical();
-//  virtual void                      hePushPopViewSets();
+  virtual void                      heLockTo( const HidInputEvent::HidInputParams& params );
+  virtual void                      heMoveCamera( const HidInputEvent::HidInputParams& params );
+  virtual void                      heMoveSelectedObjects( const HidInputEvent::HidInputParams& params );
+  virtual void                      hePanHorizontal( const HidInputEvent::HidInputParams& params );
+  virtual void                      hePanVertical( const HidInputEvent::HidInputParams& params );
   virtual void                      heReplotQuick( int factor );
   virtual void                      heReplotQuickHigh();
   virtual void                      heReplotQuickLow();
   virtual void                      heReplotQuickMedium();
-  virtual void                      heRotateSelectedObjects();
-  virtual void                      heScaleSelectedObjects();
+  virtual void                      heRotateSelectedObjects( const HidInputEvent::HidInputParams& params );
+  virtual void                      heScaleSelectedObjects( const HidInputEvent::HidInputParams& params );
   virtual void                      heSelectAllObjects();
-  virtual void                      heSelectObject();
-  virtual void                      heSelectObjects();
+  virtual void                      heSelectObject( const HidInputEvent::HidInputParams& params );
+  virtual void                      heSelectObjects( const HidInputEvent::HidInputParams& params );
   virtual void                      heSelectObjectTree( GMlib::SceneObject* obj );
   virtual void                      heToggleObjectDisplayMode();
   virtual void                      heToggleSimulation();
   virtual void                      heToggleSelectAllObjects();
-  virtual void                      heUnlockCamera();
-  virtual void                      heZoom();
+//  virtual void                      heUnlockCamera();
+  virtual void                      heZoom( const HidInputEvent::HidInputParams& params );
 
   virtual void                      heLeftMouseReleaseStuff();
+  virtual void                      heOpenCloseHidHelp();
 
 private:
-  GMlib::Camera*                    activeCamera() const;
-  float                             activeCameraSpeedScale();
-  float                             cameraSpeedScale( GMlib::Camera* cam );
-  const GMlib::Vector<int,2>&       cursorPos() const;
-  const GMlib::Vector<int,2>&       previousCursorPos() const;
-  QPointF       getPos2() const;
-  QPointF       getPPos2() const;
+  GMlib::Camera*                    findCamera( const QString& view_name ) const;
+  float                             cameraSpeedScale( GMlib::Camera* cam ) const;
   GMlib::Scene*                     scene() const;
-  GMlib::SceneObject*               activeSelectObject();
+  GMlib::SceneObject*               findSceneObject(const QString& view_name, const QPoint& pos);
 
-  void                              savePos();
-  void                              setPos( const QPointF& pos );
+  GMlib::Point<int,2>               toGMlibViewPosition(const QString& view_name, const QPoint& pos);
 
-  std::shared_ptr<GMlib::Scene>     _scene;
-  std::shared_ptr<GMlib::Camera>    _camera;
-  std::shared_ptr<GMlib::DefaultSelectRenderer>     _select_renderer;
+  std::shared_ptr<GMlibWrapper>     _gmlib;
 
-  GMlib::Vector<int,2>              _current_scene_pos;   // Current mouse scene pos
-  GMlib::Vector<int,2>              _previous_scene_pos;  // Previous mouse scene pos
 
 signals:
   void signToggleSimulation();
+  void signOpenCloseHidHelp();
 
 };
 

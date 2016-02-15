@@ -26,7 +26,9 @@ Window::Window(QWindow *parent) :
   fmt.setProfile( QSurfaceFormat::CompatibilityProfile );
   fmt.setOption(QSurfaceFormat::DeprecatedFunctions);
 //  fmt.setProfile( QSurfaceFormat::CoreProfile );
+  QSurfaceFormat::setDefaultFormat(fmt);
   setFormat(fmt);
+
 
   // Set the GLContext and scene graph to be persistent
   setPersistentOpenGLContext(true);

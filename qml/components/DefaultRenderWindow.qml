@@ -7,6 +7,10 @@ import "qrc:/qml/components"
 Item {
   id: root
 
+  signal toggleHidBindView
+
+  onToggleHidBindView: hid_bind_view.toggle()
+
   View {
     id: singleview; anchors.fill: parent;
     visible: true;

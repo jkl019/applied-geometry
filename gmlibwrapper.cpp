@@ -287,20 +287,18 @@ void GMlibWrapper::initScene() {
 
     // Surface visualizers
 //    auto surface_visualizer = new GMlib::PSurfDerivativesVisualizer<float,3>;
-//    auto surface_visualizer = new GMlib::PSurfNormalsVisualizer<float,3>;
+    auto surface_visualizer = new GMlib::PSurfNormalsVisualizer<float,3>;
 //    auto surface_visualizer = new GMlib::PSurfParamLinesVisualizer<float,3>;
 //    auto surface_visualizer = new GMlib::PSurfPointsVisualizer<float,3>;
 
     // Surface
     auto surface = new TestTorus;
     surface->toggleDefaultVisualizer();
-//    surface->insertVisualizer(surface_visualizer);
+    surface->insertVisualizer(surface_visualizer);
     surface->replot(200,200,1,1);
     _scene->insert(surface);
 
     surface->test01();
-    surface->setSelected(true);
-    surface->getDefaultVisualizer()->toggleDisplayMode();
 
 #endif
 
@@ -308,6 +306,43 @@ void GMlibWrapper::initScene() {
 
 
   } _glsurface->doneCurrent();
+}
+
+GMlib::SceneObject*
+GMlibWrapper::findSceneObject(const QString& rc_name, const GMlib::Vector<int,2>& pos) {
+
+  if(!_rc_pairs.count(rc_name.toStdString()))
+    throw std::invalid_argument("[][]Render/Camera pair '" + rc_name.toStdString() + "'  does not exist!");
+
+  auto cam = _rc_pairs.at(rc_name.toStdString()).camera;
+
+  _select_renderer->setCamera(cam.get());
+
+  auto size = cam->getViewport();
+
+
+  qDebug() << "------ Find active sel object";
+  qDebug() << "  sel renderer: " << reinterpret_cast<long int>(_select_renderer.get());
+  qDebug() << "  cursor pos: " << pos;
+  qDebug() << "  cam: " << reinterpret_cast<long int>(cam.get());
+  qDebug() << "  viewport: " << size;
+
+
+  _select_renderer->reshape( size );
+  _select_renderer->prepare();
+
+  _select_renderer->select( GMlib::GM_SO_TYPE_SELECTOR );
+
+  auto sel_obj = _select_renderer->findObject(pos(0),size(1)-pos(1)-1);
+
+  if(!sel_obj) {
+
+    _select_renderer->select( -GMlib::GM_SO_TYPE_SELECTOR );
+    sel_obj = _select_renderer->findObject(pos(0),size(1)-pos(1)-1);
+  }
+
+  return sel_obj;
+
 }
 
 const std::shared_ptr<GMlib::Scene>&
@@ -322,4 +357,11 @@ GMlibWrapper::getRenderTextureOf(const std::string& name) const {
   if(!_rc_pairs.count(name)) throw std::invalid_argument("[][]Render/Camera pair '" + name + "'  does not exist!");
 
   return _rc_pairs.at(name).render->getFrontRenderTarget();
+}
+
+const std::shared_ptr<GMlib::Camera>&GMlibWrapper::getCamera(const std::string& name) const {
+
+  if(!_rc_pairs.count(name)) throw std::invalid_argument("[][]Render/Camera pair '" + name + "'  does not exist!");
+
+  return _rc_pairs.at(name).camera;
 }

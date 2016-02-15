@@ -10,6 +10,7 @@ class StandardHidManager;
 namespace GMlib {
 
   class Scene;
+  class SceneObject;
   class Camera;
   class PointLight;
   class DefaultRenderer;
@@ -61,17 +62,16 @@ public:
 
   const std::shared_ptr<GMlib::Scene>&  getScene() const;
   const GMlib::TextureRenderTarget&     getRenderTextureOf( const std::string& name ) const;
+  const std::shared_ptr<GMlib::Camera>&  getCamera( const std::string& name ) const;
+
   std::shared_ptr<GMlib::DefaultSelectRenderer>&         getSelectRenderer() {
     return _select_renderer;
   }
 
-  const std::shared_ptr<GMlib::Camera>&  getCamera( const QString& name ) const {
-
-    return _rc_pairs.at(name.toStdString()).camera;
-
-  }
 
   void                                  initScene();
+
+  GMlib::SceneObject*                   findSceneObject( const QString& rc_name, const GMlib::Vector<int,2>& pos );
 
 
   StandardHidManager                    *_hidmanager;
