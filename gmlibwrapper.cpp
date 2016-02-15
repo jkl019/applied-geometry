@@ -4,7 +4,6 @@
 
 #include "testtorus.h"
 #include "utils.h"
-#include "hidmanager/standardhidmanager.h"
 
 
 // GMlib
@@ -261,6 +260,7 @@ void GMlibWrapper::initScene() {
 
 
 
+
 //#define TEST_CURVE
 #define TEST_SURFACE
 
@@ -328,18 +328,26 @@ GMlibWrapper::findSceneObject(const QString& rc_name, const GMlib::Vector<int,2>
   qDebug() << "  viewport: " << size;
 
 
-  _select_renderer->reshape( size );
-  _select_renderer->prepare();
+  GMlib::SceneObject* sel_obj = nullptr;
 
-  _select_renderer->select( GMlib::GM_SO_TYPE_SELECTOR );
+  _glsurface->makeCurrent(); {
 
-  auto sel_obj = _select_renderer->findObject(pos(0),size(1)-pos(1)-1);
+    _select_renderer->printFboId();
 
-  if(!sel_obj) {
+    _select_renderer->reshape( size );
+    _select_renderer->prepare();
 
-    _select_renderer->select( -GMlib::GM_SO_TYPE_SELECTOR );
+    _select_renderer->select( GMlib::GM_SO_TYPE_SELECTOR );
+
     sel_obj = _select_renderer->findObject(pos(0),size(1)-pos(1)-1);
-  }
+
+    if(!sel_obj) {
+
+      _select_renderer->select( -GMlib::GM_SO_TYPE_SELECTOR );
+      sel_obj = _select_renderer->findObject(pos(0),size(1)-pos(1)-1);
+    }
+
+  } _glsurface->doneCurrent();
 
   return sel_obj;
 

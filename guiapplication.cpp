@@ -6,7 +6,7 @@
 #include "gmlibwrapper.h"
 
 // hidmanager
-#include "hidmanager/standardhidmanager.h"
+#include "hidmanager/defaulthidmanager.h"
 #include "hidmanager/hidmanagertreemodel.h"
 
 // qt
@@ -61,7 +61,7 @@ GuiApplication::onSGInit() {
   _gmlib->initScene();
 
   // Create hidmanager (must be after initScene)
-  _hidmanager = std::make_shared<StandardHidManager>( _gmlib );
+  _hidmanager = std::make_shared<DefaultHidManager>( _gmlib );
   _window->rootContext()->setContextProperty( "hidmanager_model", _hidmanager->getModel() );
 
   connect( _window.get(), &Window::signMousePressed,       _hidmanager.get(), &StandardHidManager::registerMousePressEvent );
@@ -73,7 +73,7 @@ GuiApplication::onSGInit() {
   connect( _window.get(), &Window::signWheelEventOccurred, _hidmanager.get(), &StandardHidManager::registerWheelEvent );
 
 
-  connect( _hidmanager.get(), &StandardHidManager::signToggleSimulation,
+  connect( _hidmanager.get(), &DefaultHidManager::signToggleSimulation,
            _gmlib.get(),      &GMlibWrapper::toggleSimulation );
 
   connect( _hidmanager.get(), &StandardHidManager::signBeforeHidAction, this,  &GuiApplication::beforeHidAction, Qt::DirectConnection );
@@ -94,14 +94,14 @@ GuiApplication::onSGInit() {
 
 void GuiApplication::beforeHidAction() {
 
-  qDebug() << "BeforeHidAction:";
-  _glsurface->makeCurrent();
+//  qDebug() << "BeforeHidAction:";
+//  _glsurface->makeCurrent();
 }
 
 void GuiApplication::afterHidAction() {
 
-  qDebug() << "AfterHidAction:";
-  _glsurface->doneCurrent();
+//  qDebug() << "AfterHidAction:";
+//  _glsurface->doneCurrent();
 }
 
 const GuiApplication&

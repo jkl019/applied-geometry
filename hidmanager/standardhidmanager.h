@@ -7,8 +7,6 @@
 #include "hidkbmouseinput.h"
 #include "hidinputevent.h"
 
-class GMlibWrapper;
-
 // Qt
 class QMouseEvent;
 class QKeyEvent;
@@ -22,7 +20,7 @@ class QWheelEvent;
 class StandardHidManager : public HidManager {
   Q_OBJECT
 public:
-  explicit StandardHidManager( std::shared_ptr<GMlibWrapper> gmlib, QObject* parent = 0x0 );
+  explicit StandardHidManager( QObject* parent = 0x0 );
 
 
 
@@ -30,6 +28,18 @@ public:
   //
   // Standard Hid manager setup
 
+
+public slots:
+  virtual void                registerMousePressEvent( const QString& name, QMouseEvent* event );
+  virtual void                registerMouseReleaseEvent( const QString& name, QMouseEvent* event );
+  virtual void                registerMouseDoubleClickEvent(  const QString& name, QMouseEvent* event );
+  virtual void                registerMouseMoveEvent( const QString& name, QMouseEvent* event );
+  virtual void                registerKeyPressEvent( const QString& name, QKeyEvent* event );
+  virtual void                registerKeyReleaseEvent( const QString& name,  QKeyEvent* event );
+  virtual void                registerWheelEvent( const QString& name, QWheelEvent* event );
+
+
+private:
   enum MouseEventType {
     MOUSE_NONE,
     MOUSE_CLICK,
@@ -44,27 +54,6 @@ public:
     KEY_RELEASE
   };
 
-
-
-
-  void                        setupDefaultHidBindings();
-
-
-  static GMlib::Point<int,2>  toGMlibPoint( const QPoint& point );
-
-
-
-public slots:
-  virtual void                registerMousePressEvent( const QString& name, QMouseEvent* event );
-  virtual void                registerMouseReleaseEvent( const QString& name, QMouseEvent* event );
-  virtual void                registerMouseDoubleClickEvent(  const QString& name, QMouseEvent* event );
-  virtual void                registerMouseMoveEvent( const QString& name, QMouseEvent* event );
-  virtual void                registerKeyPressEvent( const QString& name, QKeyEvent* event );
-  virtual void                registerKeyReleaseEvent( const QString& name,  QKeyEvent* event );
-  virtual void                registerWheelEvent( const QString& name, QWheelEvent* event );
-
-
-private:
   void                        registerKeyEventType( KeyEventType type );
   void                        registerMouseEventType( MouseEventType type );
   virtual void                generateEvent();
@@ -133,56 +122,6 @@ private:
 
 
 
-
-
-
-
-
-  //**********************************
-  //
-  // GMlib scene control setup
-
-private slots:
-  virtual void                      heDeSelectAllObjects();
-  virtual void                      heEdit();
-  virtual void                      heLockTo( const HidInputEvent::HidInputParams& params );
-  virtual void                      heMoveCamera( const HidInputEvent::HidInputParams& params );
-  virtual void                      heMoveSelectedObjects( const HidInputEvent::HidInputParams& params );
-  virtual void                      hePanHorizontal( const HidInputEvent::HidInputParams& params );
-  virtual void                      hePanVertical( const HidInputEvent::HidInputParams& params );
-  virtual void                      heReplotQuick( int factor );
-  virtual void                      heReplotQuickHigh();
-  virtual void                      heReplotQuickLow();
-  virtual void                      heReplotQuickMedium();
-  virtual void                      heRotateSelectedObjects( const HidInputEvent::HidInputParams& params );
-  virtual void                      heScaleSelectedObjects( const HidInputEvent::HidInputParams& params );
-  virtual void                      heSelectAllObjects();
-  virtual void                      heSelectObject( const HidInputEvent::HidInputParams& params );
-  virtual void                      heSelectObjects( const HidInputEvent::HidInputParams& params );
-  virtual void                      heSelectObjectTree( GMlib::SceneObject* obj );
-  virtual void                      heToggleObjectDisplayMode();
-  virtual void                      heToggleSimulation();
-  virtual void                      heToggleSelectAllObjects();
-//  virtual void                      heUnlockCamera();
-  virtual void                      heZoom( const HidInputEvent::HidInputParams& params );
-
-  virtual void                      heLeftMouseReleaseStuff();
-  virtual void                      heOpenCloseHidHelp();
-
-private:
-  GMlib::Camera*                    findCamera( const QString& view_name ) const;
-  float                             cameraSpeedScale( GMlib::Camera* cam ) const;
-  GMlib::Scene*                     scene() const;
-  GMlib::SceneObject*               findSceneObject(const QString& view_name, const QPoint& pos);
-
-  GMlib::Point<int,2>               toGMlibViewPosition(const QString& view_name, const QPoint& pos);
-
-  std::shared_ptr<GMlibWrapper>     _gmlib;
-
-
-signals:
-  void signToggleSimulation();
-  void signOpenCloseHidHelp();
 
 };
 

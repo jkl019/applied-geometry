@@ -3,6 +3,7 @@
 #include "utils.h"
 
 // qt
+#include <QGuiApplication>
 #include <QOpenGLContext>
 #include <QOffscreenSurface>
 #include <QDebug>
@@ -30,6 +31,7 @@ GLContextSurfaceWrapper::GLContextSurfaceWrapper(QOpenGLContext* context) {
 
 void GLContextSurfaceWrapper::makeCurrent() {
 
+//  _context->moveToThread(QGuiApplication::instance()->thread());
   _context->makeCurrent(_surface.get());
 }
 

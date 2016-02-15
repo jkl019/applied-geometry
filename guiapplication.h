@@ -3,7 +3,7 @@
 
 
 class GLContextSurfaceWrapper;
-class StandardHidManager;
+class DefaultHidManager;
 
 // qt
 #include <QGuiApplication>
@@ -27,7 +27,7 @@ private:
   std::shared_ptr<GMlibWrapper>               _gmlib;
   std::shared_ptr<GLContextSurfaceWrapper>    _glsurface;
 
-  std::shared_ptr<StandardHidManager>         _hidmanager;
+  std::shared_ptr<DefaultHidManager>         _hidmanager;
 
   void                                        setupScene();
 

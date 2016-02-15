@@ -2,8 +2,6 @@
 class TestTorus;
 class GLContextSurfaceWrapper;
 
-class StandardHidManager;
-
 // gmlib
 #include <core/gmpoint>
 
@@ -72,9 +70,6 @@ public:
   void                                  initScene();
 
   GMlib::SceneObject*                   findSceneObject( const QString& rc_name, const GMlib::Vector<int,2>& pos );
-
-
-  StandardHidManager                    *_hidmanager;
 
 
 public slots:

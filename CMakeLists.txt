@@ -65,6 +65,7 @@ set( HDRS
   hidmanager/hidmanagermodel.h
   hidmanager/hidmanagertreemodel.h
   hidmanager/standardhidmanager.h
+  hidmanager/defaulthidmanager.h
   glcontextsurfacewrapper.h
   glscenerenderer.h
   gmlibwrapper.h
@@ -84,6 +85,7 @@ set( SRCS
   hidmanager/hidmanagermodel.cpp
   hidmanager/hidmanagertreemodel.cpp
   hidmanager/standardhidmanager.cpp
+  hidmanager/defaulthidmanager.cpp
   glcontextsurfacewrapper.cpp
   glscenerenderer.cpp
   gmlibwrapper.cpp
@@ -100,6 +102,7 @@ QT5_WRAP_CPP( HDRS_MOC
   hidmanager/hidmanagermodel.h
   hidmanager/hidmanagertreemodel.h
   hidmanager/standardhidmanager.h
+  hidmanager/defaulthidmanager.h
   glcontextsurfacewrapper.h
   glscenerenderer.h
   gmlibwrapper.h
