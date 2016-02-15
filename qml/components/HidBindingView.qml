@@ -13,7 +13,7 @@ Item {
         ColumnLayout {
           id: group_column
           spacing: 0
-          width: view.width - side_margins
+          anchors.margins: side_margins
 
           Text { text: name; font.bold: true; font.underline: true}
 
@@ -29,8 +29,11 @@ Item {
                 implicitHeight: col.height
                 implicitWidth: view.width
 
+                opacity: 0.8
+                anchors.margins: 10
+
                 Rectangle {
-                  id: backg
+                  id: hvr_backg
                   anchors.fill: parent
                   visible: false
                   color: "gray"
@@ -43,14 +46,27 @@ Item {
                   id: col
                   spacing: 0
                   RowLayout {
-                    Item { width: side_margins }
-                    Item { height: text_name.height; implicitWidth: view.width/2; Text{ id: text_name; text: name ? name : "" } }
-                    Item { height: text_binding.height; width: group_column - 300; Text{ id: text_binding; text: binding ? binding : "" } }
+                    Item { width: side_margins;}
+                    Item {
+                        height: text_name.height;
+                        implicitWidth: view.width*2/3;
+                        Text{ id: text_name; text: name ? name : "Name" }
+                    }
+                    Item {
+                        height: text_binding.height;
+                        Layout.fillWidth: true;
+                        Text{ id: text_binding; text: binding ? binding : "Binding" }
+                    }
                   }
                   RowLayout {
                     visible: show_description
                     Item { width: side_margins }
-                    Item { height: text_description.height; Layout.fillWidth: true; Text{ id: text_description; text: description ? description : ""; font.italic: true; color: "gray" } }
+                    Item {
+                        height: text_description.height;
+                        Layout.fillWidth: true;
+                        Text{ id: text_description; text: description ? description : "Description";
+                            font.italic: true; color: "gray" }
+                    }
                   }
                   Item { height: 5 }
                 }
@@ -60,8 +76,8 @@ Item {
 
                   hoverEnabled: true
                   onClicked: show_description = !show_description
-                  onEntered: backg.visible = true
-                  onExited: backg.visible = false
+                  onEntered: hvr_backg.visible = true
+                  onExited: hvr_backg.visible = false
                 }
               }
             }

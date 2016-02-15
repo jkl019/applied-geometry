@@ -96,6 +96,12 @@ void GMlibWrapper::changeRenderGeometry(const QString& name, const QRectF& geome
   rc_pair.viewport.changed = true;
 }
 
+void GMlibWrapper::toggleSimulation() {
+
+  if(_scene->isRunning()) stop();
+  else                    start();
+}
+
 void GMlibWrapper::timerEvent(QTimerEvent* e) {
 
   e->accept();
@@ -283,16 +289,18 @@ void GMlibWrapper::initScene() {
 //    auto surface_visualizer = new GMlib::PSurfDerivativesVisualizer<float,3>;
 //    auto surface_visualizer = new GMlib::PSurfNormalsVisualizer<float,3>;
 //    auto surface_visualizer = new GMlib::PSurfParamLinesVisualizer<float,3>;
-    auto surface_visualizer = new GMlib::PSurfPointsVisualizer<float,3>;
+//    auto surface_visualizer = new GMlib::PSurfPointsVisualizer<float,3>;
 
     // Surface
     auto surface = new TestTorus;
-//    surface->toggleDefaultVisualizer();
-    surface->insertVisualizer(surface_visualizer);
+    surface->toggleDefaultVisualizer();
+//    surface->insertVisualizer(surface_visualizer);
     surface->replot(200,200,1,1);
     _scene->insert(surface);
 
     surface->test01();
+    surface->setSelected(true);
+    surface->getDefaultVisualizer()->toggleDisplayMode();
 
 #endif
 

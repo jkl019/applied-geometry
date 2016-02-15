@@ -61,7 +61,7 @@ public:
 
   const std::shared_ptr<GMlib::Scene>&  getScene() const;
   const GMlib::TextureRenderTarget&     getRenderTextureOf( const std::string& name ) const;
-  const std::shared_ptr<GMlib::DefaultSelectRenderer>&         getSelectRenderer() const {
+  std::shared_ptr<GMlib::DefaultSelectRenderer>&         getSelectRenderer() {
     return _select_renderer;
   }
 
@@ -81,7 +81,7 @@ public slots:
   void                                  changeRenderGeometry( const QString& name,
                                                               const QRectF &new_geometry );
 
-
+  void                                  toggleSimulation();
 
 protected:
   void                                  timerEvent(QTimerEvent *e);

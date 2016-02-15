@@ -848,6 +848,7 @@ void StandardHidManager::heReplotQuick(int factor) {
   const Array<SceneObject*> &sel_objs = scene()->getSelectedObjects();
 
   for( int i = 0; i < sel_objs.getSize(); i++ ) {
+    std::cout << "Selected object: " << sel_objs(i)->getIdentity() << std::endl;
 
     GMlib::SceneObject *sel_obj = sel_objs(i);
 
@@ -872,8 +873,10 @@ void StandardHidManager::heReplotQuick(int factor) {
           (erbs->getLocalPatches().getDim1()-1)*factor + 1,
           (erbs->getLocalPatches().getDim2()-1)*factor + 1,
           2, 2 );
-      else
+      else {
+        std::cout << "Replot psruf" << std::endl;
         surf->replot( 10 * factor, 10 * factor, 2, 2 );
+      }
     }
   }
 }
@@ -998,12 +1001,16 @@ void StandardHidManager::heSelectObjectTree( SceneObject* obj ) {
 void StandardHidManager::heToggleObjectDisplayMode() {
 
   const Array<SceneObject*> &sel_objs = scene()->getSelectedObjects();
+
+  qDebug() << "Toggling object display mode: " << sel_objs.getSize();
   for( int i = 0; i < sel_objs.getSize(); i++ ) {
 
 
     auto obj = sel_objs(i);
     GMlib::Array<GMlib::Visualizer*> &visus = obj->getVisualizers();
     for( int i = 0; i < visus.getSize(); i++ ) {
+
+      qDebug() << "  obj: " << obj->getName() << " : " << int(visus[i]);
 
       visus[i]->toggleDisplayMode();
     }
@@ -1112,7 +1119,7 @@ SceneObject* StandardHidManager::activeSelectObject() {
   if( !cam )
     return 0x0;
 
-  SceneObject *sel_obj;
+  SceneObject *sel_obj = nullptr;
 
 
   _select_renderer->setCamera(cam);
@@ -1120,16 +1127,24 @@ SceneObject* StandardHidManager::activeSelectObject() {
   auto pos = cursorPos();
   auto size = cam->getViewport();
 
+
+  qDebug() << "------ Find active sel object";
+  qDebug() << "  sel renderer: " << int(_select_renderer.get());
+  qDebug() << "  cursor pos: " << cursorPos();
+  qDebug() << "  cam: " << int(cam);
+  qDebug() << "  viewport: " << size;
+
+
   _select_renderer->reshape( size );
+  _select_renderer->prepare();
 
   _select_renderer->select( GM_SO_TYPE_SELECTOR );
-  _select_renderer->prepare();
+
   sel_obj = _select_renderer->findObject(pos(0),size(1)-pos(1)-1);
 
   if(!sel_obj) {
 
     _select_renderer->select( -GM_SO_TYPE_SELECTOR );
-    _select_renderer->prepare();
     sel_obj = _select_renderer->findObject(pos(0),size(1)-pos(1)-1);
   }
 

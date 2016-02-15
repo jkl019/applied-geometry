@@ -72,6 +72,9 @@ GuiApplication::onSGInit() {
   connect( _window.get(), &Window::signWheelEventOccurred, _hidmanager.get(), &StandardHidManager::registerWheelEvent );
 
 
+  connect( _hidmanager.get(), &StandardHidManager::signToggleSimulation,
+           _gmlib.get(),      &GMlibWrapper::toggleSimulation );
+
 
   // Load gui qml
   _window->setSource( QUrl("qrc:/qml/main.qml") );

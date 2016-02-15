@@ -27,12 +27,13 @@ Item {
   }
 
   Button {
-    text: "B"
+    text: "?"
     anchors.top: parent.top
     anchors.right: parent.right
     anchors.margins: 5
 
     width: height
+    opacity: 0.4
 
     onClicked: hid_bind_view.toggle()
 
