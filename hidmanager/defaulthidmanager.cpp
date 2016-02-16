@@ -613,7 +613,7 @@ void DefaultHidManager::setupDefaultHidBindings() {
 
 
   //// Set up initial mapping
-  registerHidMapping( ha_id_objsel_toggle_all,            new KeyPressInput( Qt::Key_F ) );
+  registerHidMapping( ha_id_objsel_toggle_all,            new KeyPressInput( Qt::Key_A ) );
   registerHidMapping( ha_id_objint_toggle_edit,           new KeyPressInput( Qt::Key_E ) );
   registerHidMapping( ha_id_objint_replot_high,           new KeyPressInput( Qt::Key_P, Qt::ShiftModifier ) );
   registerHidMapping( ha_id_objint_replot_med,            new KeyPressInput( Qt::Key_P ) );
