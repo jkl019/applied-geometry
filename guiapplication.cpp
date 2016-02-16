@@ -10,7 +10,6 @@
 #include "hidmanager/hidmanagertreemodel.h"
 
 // qt
-#include <QDebug>
 #include <QQmlContext>
 #include <QQuickItem>
 
@@ -95,13 +94,13 @@ GuiApplication::onSGInit() {
 void GuiApplication::beforeHidAction() {
 
 //  qDebug() << "BeforeHidAction:";
-//  _glsurface->makeCurrent();
+  _glsurface->makeCurrent();
 }
 
 void GuiApplication::afterHidAction() {
 
 //  qDebug() << "AfterHidAction:";
-//  _glsurface->doneCurrent();
+  _glsurface->doneCurrent();
 }
 
 const GuiApplication&

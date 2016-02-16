@@ -56,6 +56,7 @@ endif(WIN32)
 # Files
 
 set( HDRS
+  private/gltexturerenderer.h
   hidmanager/hidaction.h
   hidmanager/hidbinding.h
   hidmanager/hidinput.h
@@ -76,6 +77,7 @@ set( HDRS
   )
 
 set( SRCS
+  private/gltexturerenderer.cpp
   hidmanager/hidaction.cpp
   hidmanager/hidbinding.cpp
   hidmanager/hidinput.cpp
@@ -97,6 +99,7 @@ set( SRCS
 #########
 # Moc'ing
 QT5_WRAP_CPP( HDRS_MOC
+  private/gltexturerenderer.h
   hidmanager/hidaction.h
   hidmanager/hidmanager.h
   hidmanager/hidmanagermodel.h

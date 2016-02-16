@@ -39,6 +39,16 @@ public slots:
   virtual void                registerWheelEvent( const QString& name, QWheelEvent* event );
 
 
+
+
+protected:
+  static QString              viewNameFromParams( const HidInputEvent::HidInputParams& params );
+  static QPoint               posFromParams( const HidInputEvent::HidInputParams& params );
+  static QPoint               prevPosFromParams( const HidInputEvent::HidInputParams& params );
+  static int                  wheelDeltaFromParams( const HidInputEvent::HidInputParams& params );
+
+
+
 private:
   enum MouseEventType {
     MOUSE_NONE,

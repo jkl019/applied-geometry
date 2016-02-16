@@ -3,10 +3,10 @@
 #include "utils.h"
 
 // qt
+#include <QDebug>
 #include <QGuiApplication>
 #include <QOpenGLContext>
 #include <QOffscreenSurface>
-#include <QDebug>
 
 // stl
 #include <stdexcept>

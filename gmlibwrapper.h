@@ -1,3 +1,5 @@
+#ifndef GMLIBWRAPPER_H
+#define GMLIBWRAPPER_H
 
 class TestTorus;
 class GLContextSurfaceWrapper;
@@ -64,7 +66,7 @@ public:
 
   void                                  initScene();
 
-  GMlib::SceneObject*                   findSceneObject( const QString& rc_name, const GMlib::Vector<int,2>& pos );
+  GMlib::SceneObject*                   findSceneObject( const QString& rc_name, const GMlib::Point<int,2>& pos );
 
 
 public slots:
@@ -104,3 +106,7 @@ private:
 public:
   static const GMlibWrapper&                getInstance();
 };
+
+
+
+#endif // GMLIBWRAPPER_H

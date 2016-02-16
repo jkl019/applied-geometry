@@ -4,6 +4,7 @@
 #include <QQuickItem>
 
 
+#include "private/gltexturerenderer.h"
 #include "gmlibwrapper.h"
 
 
@@ -28,39 +29,6 @@ class GLContextSurfaceWrapper;
 #include <mutex>
 
 
-namespace Private {
-
-
-
-
-  // Invariants
-  // Name must be valid!
-  class Renderer: public QObject {
-    Q_OBJECT
-  public:
-    Renderer( const std::string& name );
-    ~Renderer();
-
-    void      setName( const std::string& name );
-
-  public slots:
-    void      paint();
-    void      setViewport( const QRectF& rect );
-    void      setViewport( int x, int y, int w, int h );
-
-  private:
-    QRectF                          _viewport;
-
-    GMlib::GL::VertexBufferObject   _vbo;
-    std::string                     _name;
-
-    GMlib::GL::Program              _prog;
-    GMlib::GL::VertexShader         _vs;
-    GMlib::GL::FragmentShader       _fs;
-
-  }; // END namespace Renderer
-
-}
 
 
 class GLSceneRenderer : public QQuickItem {
@@ -80,7 +48,7 @@ public:
   void                  setPaused( bool paused );
 
 private:
-  std::shared_ptr<Private::Renderer>          _renderer;
+  std::shared_ptr<Private::GLTextureRenderer> _renderer;
   std::shared_ptr<GLContextSurfaceWrapper>    _glsurface;
   QString                                     _name;
   bool                                        _paused;

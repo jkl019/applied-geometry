@@ -145,6 +145,26 @@ void StandardHidManager::registerWheelEvent(const QString& name, QWheelEvent *e)
   generateEvent();
 }
 
+QString
+StandardHidManager::viewNameFromParams(const HidInputEvent::HidInputParams& params) {
+  return params["view_name"].toString();
+}
+
+QPoint
+StandardHidManager::posFromParams(const HidInputEvent::HidInputParams& params) {
+  return params["pos"].toPoint();
+}
+
+QPoint
+StandardHidManager::prevPosFromParams(const HidInputEvent::HidInputParams& params) {
+  return params["prev_pos"].toPoint();
+}
+
+int
+StandardHidManager::wheelDeltaFromParams(const HidInputEvent::HidInputParams& params) {
+  return params["wheel_delta"].toInt();
+}
+
 bool StandardHidManager::isKeyRegistered(Qt::Key key) const {
 
   return _reg_keymap.value(key, false);
@@ -227,147 +247,7 @@ void StandardHidManager::generateEvent() {
     registerKeyEventType( KEY_NONE );
   }
 
-
-
-
-
-
-//  qDebug() << "HidManager::processEvents()";
-//  qDebug() << "  Keys:                  " << _no_keys_pressed;
-//  qDebug() << "  Mouse buttons:         " << _mouse_buttons;
-//  qDebug() << "  Modifiers:             " << _keymod;
-//  qDebug() << "  Mouse move:            " << _mouse_move;
-//  qDebug() << "  Mouse double click:    " << _mouse_dc;
-
-
-  ///////////////////////
-  // Mouse input handling
-  ///////////////////////
-//  if( getMouseMoveState() ) {
-
-//    if( isMouseButtonPressed( Qt::LeftButton ) ) {
-//      if( isModifierPressed( Qt::NoModifier ) ) {
-//        if( _move_border )
-//          heMoveBorder();
-//        else
-//          heMoveCamera();
-//      }
-//      else if( isModifierPressed( Qt::ControlModifier ) && isModifierPressed( Qt::AltModifier ) ) {
-//        heScaleSelectedObjects();
-//      }
-//      else if( isModifierPressed( Qt::ShiftModifier ) ) {
-//        heMoveSelectedObjects();
-//      }
-//      else if( isModifierPressed(Qt::ControlModifier ) ) {
-//        heRotateSelectedObjects();
-//      }
-//    }
-//    setMouseMoveState(false);
-//  }
-//  else if( getWheelState() ) {
-
-//    // Pan "x" direction
-//    if( isModifierPressed( Qt::ControlModifier ) )
-//      hePanHorizontal();
-
-//    // Pan "y" direction
-//    else if( isModifierPressed( Qt::ShiftModifier ) )
-//      hePanVertical();
-
-//    // Zoom
-//    else if( isModifierPressed( Qt::NoModifier ) )
-//      heZoom();
-
-//    setWheelState(false);
-//  }
-//  else {
-
-//    if( getMouseDoubleClickState() && isMouseButtonPressed( Qt::LeftButton ) ) {
-
-//      hePushPopViewSets();
-//    }
-//    else {
-
-//      if( isMouseButtonPressed( Qt::LeftButton ) ) {
-
-//        if( isModifierPressed( Qt::NoModifier ) ) {
-
-//          Camera *cam = getActiveCamera();
-//          if( !cam )
-//            _move_border = true;
-//        }
-//      }
-//      else if( isMouseButtonPressed( Qt::RightButton ) ) {
-
-//        if( isModifierPressed( Qt::ShiftModifier ) ) {
-
-//          heSelectObject();
-//        }
-//        else if( isModifierPressed( Qt::ControlModifier ) ) {
-
-//          heLockCameraToObject();
-//        }
-//        else {
-
-//          if( getSelectObject() )
-//            heSelectObject();
-//          else
-//            heLockCameraToScene();
-//        }
-//      }
-//      else {
-
-//        if( _move_border )
-//          _move_border = false;
-//      }
-//    }
-
-
-//    /////////////////////
-//    // Key input handling
-//    /////////////////////
-//    if( isKeysPressed() ) {
-
-//      // Select/deselect all
-//      if( isKeyPressed(Qt::Key_A ) )
-//        heToggleSelectAllObjects();
-
-//      // Edit
-//      else if( isKeyPressed(Qt::Key_E) )
-//        heEdit();
-
-//      // Replot
-//      else if( isKeyPressed(Qt::Key_P) ) {
-
-
-//        if( isModifierPressed(Qt::ShiftModifier) )
-//          heReplotQuickHigh();
-//        else if( isModifierPressed(Qt::NoModifier) )
-//          heReplotQuickLow();
-//      }
-
-//      // Quit
-//      else if( isKeyPressed(Qt::Key_Q) )
-//        heQuit();
-
-//      // Toggle run
-//      else if( isKeyPressed(Qt::Key_R) )
-//        heToggleSimulation();
-
-//      // Toggle shade mode for an object
-//      else if( isKeyPressed(Qt::Key_Z) )
-//        heToggleObjectDisplayMode();
-
-//      // Grab framebuffer
-//      else if( isKeyPressed(Qt::Key_F) )
-//        emit signGrabFrameBuffer();
-//    }
-//  }
-
-  // Save coords
-//  savePos();
 }
-
 
 
 void StandardHidManager::registerRCPairName(const QString& name) {

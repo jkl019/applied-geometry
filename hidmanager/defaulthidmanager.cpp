@@ -127,8 +127,8 @@ void DefaultHidManager::heEdit() {
 
 void DefaultHidManager::heLockTo(const HidInputEvent::HidInputParams& params) {
 
-  auto view_name = params["view_name"].toString();
-  auto pos       = params["pos"].toPoint();
+  auto view_name = viewNameFromParams(params);
+  auto pos       = toGMlibViewPoint(view_name, posFromParams(params));
 
   auto cam     = findCamera(view_name);
   auto sel_obj = findSceneObject(view_name,pos);
@@ -147,9 +147,9 @@ void DefaultHidManager::heLockTo(const HidInputEvent::HidInputParams& params) {
 
 void DefaultHidManager::heMoveCamera(const HidInputEvent::HidInputParams& params) {
 
-  auto view_name = params["view_name"].toString();
-  auto pos       = toGMlibViewPoint(view_name, params["pos"].toPoint());
-  auto prev      = toGMlibViewPoint(view_name, params["prev_pos"].toPoint());
+  auto view_name = viewNameFromParams(params);
+  auto pos       = toGMlibViewPoint(view_name, posFromParams(params));
+  auto prev      = toGMlibViewPoint(view_name, prevPosFromParams(params));
 
   auto *cam = findCamera(view_name);
   if( !cam )
@@ -165,23 +165,14 @@ void DefaultHidManager::heMoveCamera(const HidInputEvent::HidInputParams& params
 
 void DefaultHidManager::heMoveSelectedObjects( const HidInputEvent::HidInputParams& params ) {
 
-  QString view_name = params["view_name"].toString();
+  auto view_name = viewNameFromParams(params);
+  auto pos       = toGMlibViewPoint(view_name, posFromParams(params));
+  auto prev      = toGMlibViewPoint(view_name, prevPosFromParams(params));
 
   Camera *cam = findCamera(view_name);
   if( !cam )
     return;
 
-  QPointF q_pos       = params["curr_pos"].toPointF();
-  QPointF q_prev_pos  = params["prev_pos"].toPointF();
-
-//  qDebug() << "//////////////////////";
-//  qDebug() << "Pos: " << q_pos;
-//  qDebug() << "Pos: " << q_prev_pos;
-
-  const Vector<int,2> pos( q_pos.x(), q_pos.y() );
-  const Vector<int,2> prev( q_prev_pos.x(), q_prev_pos.y() );
-//  const Vector<int,2> pos = getPos();
-//  const Vector<int,2> prev = getPPos();
 
   const Array<SceneObject*> &sel_objs = scene()->getSelectedObjects();
   for( int i = 0; i < sel_objs.getSize(); i++ ) {
@@ -205,8 +196,8 @@ void DefaultHidManager::heMoveSelectedObjects( const HidInputEvent::HidInputPara
 
 void DefaultHidManager::hePanHorizontal(const HidInputEvent::HidInputParams& params) {
 
-  QString view_name   = params["view_name"].toString();
-  int     wheel_delta = params["wheel_delta"].toInt();
+  auto view_name   = viewNameFromParams(params);
+  auto wheel_delta = wheelDeltaFromParams(params);
 
   Camera *cam = findCamera(view_name);
   if( cam )
@@ -219,8 +210,8 @@ void DefaultHidManager::hePanHorizontal(const HidInputEvent::HidInputParams& par
 
 void DefaultHidManager::hePanVertical(const HidInputEvent::HidInputParams& params) {
 
-  QString view_name   = params["view_name"].toString();
-  int     wheel_delta = params["wheel_delta"].toInt();
+  auto view_name   = viewNameFromParams(params);
+  auto wheel_delta = wheelDeltaFromParams(params);
 
   Camera *cam = findCamera(view_name);
   if( cam )
@@ -236,7 +227,6 @@ void DefaultHidManager::heReplotQuick(int factor) {
   const Array<SceneObject*> &sel_objs = scene()->getSelectedObjects();
 
   for( int i = 0; i < sel_objs.getSize(); i++ ) {
-    std::cout << "Selected object: " << sel_objs(i)->getIdentity() << std::endl;
 
     GMlib::SceneObject *sel_obj = sel_objs(i);
 
@@ -262,7 +252,6 @@ void DefaultHidManager::heReplotQuick(int factor) {
           (erbs->getLocalPatches().getDim2()-1)*factor + 1,
           2, 2 );
       else {
-        std::cout << "Replot psruf" << std::endl;
         surf->replot( 10 * factor, 10 * factor, 2, 2 );
       }
     }
@@ -286,9 +275,9 @@ void DefaultHidManager::heReplotQuickMedium() {
 
 void DefaultHidManager::heRotateSelectedObjects(const HidInputEvent::HidInputParams& params) {
 
-  auto view_name = params["view_name"].toString();
-  auto pos       = toGMlibViewPoint(view_name, params["pos"].toPoint());
-  auto prev      = toGMlibViewPoint(view_name, params["prev_pos"].toPoint());
+  auto view_name = viewNameFromParams(params);
+  auto pos       = toGMlibViewPoint(view_name, posFromParams(params));
+  auto prev      = toGMlibViewPoint(view_name, prevPosFromParams(params));
 
   Camera *cam = findCamera(view_name);
   if( !cam )
@@ -322,9 +311,9 @@ void DefaultHidManager::heRotateSelectedObjects(const HidInputEvent::HidInputPar
 
 void DefaultHidManager::heScaleSelectedObjects(const HidInputEvent::HidInputParams& params) {
 
-  auto view_name = params["view_name"].toString();
-  auto pos       = toGMlibViewPoint(view_name, params["pos"].toPoint());
-  auto prev      = toGMlibViewPoint(view_name, params["prev_pos"].toPoint());
+  auto view_name = viewNameFromParams(params);
+  auto pos       = toGMlibViewPoint(view_name, posFromParams(params));
+  auto prev      = toGMlibViewPoint(view_name, prevPosFromParams(params));
 
   Camera *cam = findCamera(view_name);
   if( !cam )
@@ -355,8 +344,8 @@ void DefaultHidManager::heSelectAllObjects() {
 
 void DefaultHidManager::heSelectObject(const HidInputEvent::HidInputParams& params) {
 
-  auto view_name = params["view_name"].toString();
-  auto pos       = params["pos"].toPoint();
+  auto view_name = viewNameFromParams(params);
+  auto pos       = toGMlibViewPoint(view_name, posFromParams(params));
 
   auto obj = findSceneObject(view_name,pos);
   if( !obj )
@@ -370,8 +359,8 @@ void DefaultHidManager::heSelectObject(const HidInputEvent::HidInputParams& para
 
 void DefaultHidManager::heSelectObjects(const HidInputEvent::HidInputParams& params) {
 
-  auto view_name = params["view_name"].toString();
-  auto pos       = params["pos"].toPoint();
+  auto view_name = viewNameFromParams(params);
+  auto pos       = toGMlibViewPoint(view_name, posFromParams(params));
 
   if( auto obj = findSceneObject(view_name,pos) ) obj->toggleSelected();
 
@@ -395,18 +384,12 @@ void DefaultHidManager::heToggleObjectDisplayMode() {
 
   const Array<SceneObject*> &sel_objs = scene()->getSelectedObjects();
 
-  qDebug() << "Toggling object display mode: " << sel_objs.getSize();
   for( int i = 0; i < sel_objs.getSize(); i++ ) {
 
 
     auto obj = sel_objs(i);
     GMlib::Array<GMlib::Visualizer*> &visus = obj->getVisualizers();
-    for( int i = 0; i < visus.getSize(); i++ ) {
-
-      qDebug() << "  obj: " << obj->getName() << " : " << reinterpret_cast<long int>(visus[i]);
-
-      visus[i]->toggleDisplayMode();
-    }
+    for( int i = 0; i < visus.getSize(); i++ ) visus[i]->toggleDisplayMode();
   }
 }
 
@@ -425,15 +408,15 @@ void DefaultHidManager::heToggleSelectAllObjects() {
 
 void DefaultHidManager::heZoom(const HidInputEvent::HidInputParams& params) {
 
-  QString view_name       = params["view_name"].toString();
-  int     wheel_delta     = params["wheel_delta"].toInt();
+  auto view_name   = viewNameFromParams(params);
+  auto wheel_delta = wheelDeltaFromParams(params);
 
   // Qt comp scale
   wheel_delta /= 8;
 
-  Camera *cam = findCamera(view_name);
-
+  Camera *cam    = findCamera(view_name);
   Camera *isocam = dynamic_cast<IsoCamera*>( cam );
+
   if( isocam ) {
 
     if( wheel_delta < 0 ) isocam->zoom( 1.05 );
@@ -459,7 +442,6 @@ void DefaultHidManager::heLeftMouseReleaseStuff() {
 void DefaultHidManager::heOpenCloseHidHelp() {
 
   emit signOpenCloseHidHelp();
-  qDebug() << "Toggle Hid Help";
 }
 
 Camera* DefaultHidManager::findCamera( const QString& view_name ) const {
@@ -486,10 +468,10 @@ Scene* DefaultHidManager::scene() const {
   return _gmlib->getScene().get();
 }
 
-SceneObject* DefaultHidManager::findSceneObject( const QString& view_name, const QPoint& pos  ) {
+SceneObject* DefaultHidManager::findSceneObject( const QString& view_name, const GMlib::Point<int,2>& pos  ) {
 
 
-  return _gmlib->findSceneObject( view_name, toGMlibViewPoint(view_name,pos) );
+  return _gmlib->findSceneObject( view_name, pos );
 }
 
 GMlib::Point<int,2> DefaultHidManager::toGMlibViewPoint(const QString& view_name, const QPoint &pos) {
@@ -631,7 +613,7 @@ void DefaultHidManager::setupDefaultHidBindings() {
 
 
   //// Set up initial mapping
-  registerHidMapping( ha_id_objsel_toggle_all,            new KeyPressInput( Qt::Key_A ) );
+  registerHidMapping( ha_id_objsel_toggle_all,            new KeyPressInput( Qt::Key_F ) );
   registerHidMapping( ha_id_objint_toggle_edit,           new KeyPressInput( Qt::Key_E ) );
   registerHidMapping( ha_id_objint_replot_high,           new KeyPressInput( Qt::Key_P, Qt::ShiftModifier ) );
   registerHidMapping( ha_id_objint_replot_med,            new KeyPressInput( Qt::Key_P ) );

@@ -49,7 +49,7 @@ private:
   GMlib::Camera*                    findCamera( const QString& view_name ) const;
   float                             cameraSpeedScale( GMlib::Camera* cam ) const;
   GMlib::Scene*                     scene() const;
-  GMlib::SceneObject*               findSceneObject(const QString& view_name, const QPoint& pos);
+  GMlib::SceneObject*               findSceneObject(const QString& view_name, const GMlib::Point<int,2>& pos);
 
   GMlib::Point<int,2>               toGMlibViewPoint(const QString& view_name, const QPoint& pos);
 

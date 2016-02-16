@@ -15,7 +15,6 @@
 #include <QTimerEvent>
 #include <QRectF>
 #include <QMouseEvent>
-#include <QDebug>
 
 // stl
 #include <stdexcept>
@@ -261,6 +260,7 @@ void GMlibWrapper::initScene() {
 
     // Setup Select Renderer
     _select_renderer = std::make_shared<GMlib::DefaultSelectRenderer>();
+    _select_renderer->setSelectRboName("select_render_color_rbo");
 
 
 
@@ -313,7 +313,7 @@ void GMlibWrapper::initScene() {
 }
 
 GMlib::SceneObject*
-GMlibWrapper::findSceneObject(const QString& rc_name, const GMlib::Vector<int,2>& pos) {
+GMlibWrapper::findSceneObject(const QString& rc_name, const GMlib::Point<int,2>& pos) {
 
   if(!_rc_pairs.count(rc_name.toStdString()))
     throw std::invalid_argument("[][]Render/Camera pair '" + rc_name.toStdString() + "'  does not exist in [" + __FILE__ + " on line " + std::to_string(__LINE__) + "]!");
@@ -322,12 +322,6 @@ GMlibWrapper::findSceneObject(const QString& rc_name, const GMlib::Vector<int,2>
   auto cam = rc_pair.camera;
   auto viewport = rc_pair.viewport.geometry.size();
   GMlib::Vector<int,2> size( viewport.width(), viewport.height() );
-
-  qDebug() << "------ Find active sel object";
-  qDebug() << "  sel renderer: " << reinterpret_cast<long int>(_select_renderer.get());
-  qDebug() << "  cursor pos: " << pos;
-  qDebug() << "  cam: " << reinterpret_cast<long int>(cam.get());
-  qDebug() << "  viewport: " << size;
 
 
   GMlib::SceneObject* sel_obj = nullptr;
