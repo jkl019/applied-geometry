@@ -62,11 +62,6 @@ public:
   const GMlib::TextureRenderTarget&     getRenderTextureOf( const std::string& name ) const;
   const std::shared_ptr<GMlib::Camera>&  getCamera( const std::string& name ) const;
 
-  std::shared_ptr<GMlib::DefaultSelectRenderer>&         getSelectRenderer() {
-    return _select_renderer;
-  }
-
-
   void                                  initScene();
 
   GMlib::SceneObject*                   findSceneObject( const QString& rc_name, const GMlib::Vector<int,2>& pos );

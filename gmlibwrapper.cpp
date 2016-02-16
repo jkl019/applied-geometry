@@ -145,6 +145,10 @@ void GMlibWrapper::timerEvent(QTimerEvent* e) {
 //    for( auto& thread : threads )
 //      thread.join();
 
+
+//    auto so = findSceneObject("Projection", GMlib::Point<int,2>(0,0) );
+//    std::cout << "SceneObject: " << so << std::endl;
+
   } _glsurface->doneCurrent();
 
   emit signFrameReady();
@@ -312,14 +316,12 @@ GMlib::SceneObject*
 GMlibWrapper::findSceneObject(const QString& rc_name, const GMlib::Vector<int,2>& pos) {
 
   if(!_rc_pairs.count(rc_name.toStdString()))
-    throw std::invalid_argument("[][]Render/Camera pair '" + rc_name.toStdString() + "'  does not exist!");
+    throw std::invalid_argument("[][]Render/Camera pair '" + rc_name.toStdString() + "'  does not exist in [" + __FILE__ + " on line " + std::to_string(__LINE__) + "]!");
 
-  auto cam = _rc_pairs.at(rc_name.toStdString()).camera;
-
-  _select_renderer->setCamera(cam.get());
-
-  auto size = cam->getViewport();
-
+  auto rc_pair = _rc_pairs.at(rc_name.toStdString());
+  auto cam = rc_pair.camera;
+  auto viewport = rc_pair.viewport.geometry.size();
+  GMlib::Vector<int,2> size( viewport.width(), viewport.height() );
 
   qDebug() << "------ Find active sel object";
   qDebug() << "  sel renderer: " << reinterpret_cast<long int>(_select_renderer.get());
@@ -330,27 +332,24 @@ GMlibWrapper::findSceneObject(const QString& rc_name, const GMlib::Vector<int,2>
 
   GMlib::SceneObject* sel_obj = nullptr;
 
-  _glsurface->makeCurrent(); {
+  // Setup select renderer to match current view and prepare
+  _select_renderer->setCamera(cam.get());
+  _select_renderer->reshape( size );
+  _select_renderer->prepare();
 
-    _select_renderer->printFboId();
+  // Render selectors and find object ad pos
+  _select_renderer->select( GMlib::GM_SO_TYPE_SELECTOR );
+  sel_obj = _select_renderer->findObject(pos(0),size(1)-pos(1)-1);
 
-    _select_renderer->reshape( size );
-    _select_renderer->prepare();
 
-    _select_renderer->select( GMlib::GM_SO_TYPE_SELECTOR );
+  // Render other objects and find object ad pos
+  if(!sel_obj) {
 
+    _select_renderer->select( -GMlib::GM_SO_TYPE_SELECTOR );
     sel_obj = _select_renderer->findObject(pos(0),size(1)-pos(1)-1);
-
-    if(!sel_obj) {
-
-      _select_renderer->select( -GMlib::GM_SO_TYPE_SELECTOR );
-      sel_obj = _select_renderer->findObject(pos(0),size(1)-pos(1)-1);
-    }
-
-  } _glsurface->doneCurrent();
+  }
 
   return sel_obj;
-
 }
 
 const std::shared_ptr<GMlib::Scene>&
