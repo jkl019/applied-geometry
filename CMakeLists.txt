@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION 2.8.11)
 
 # Global name of the project
-project(QMLGMlibTest)
+project(GMlibQmlDemo)
 
 # Version
 set(VERSION_MAJOR 0)
@@ -48,15 +48,10 @@ endif(WIN32)
 
 
 
-
-#add_subdirectory(hidmanager)
-#include_directories(hidmanager)
-
 #######
 # Files
 
 set( HDRS
-  private/gltexturerenderer.h
   hidmanager/hidaction.h
   hidmanager/hidbinding.h
   hidmanager/hidinput.h
@@ -67,8 +62,11 @@ set( HDRS
   hidmanager/hidmanagertreemodel.h
   hidmanager/standardhidmanager.h
   hidmanager/defaulthidmanager.h
+
+  quick/gltexturerenderer.h
+  quick/glscenerenderer.h
+
   glcontextsurfacewrapper.h
-  glscenerenderer.h
   gmlibwrapper.h
   guiapplication.h
   window.h
@@ -77,7 +75,6 @@ set( HDRS
   )
 
 set( SRCS
-  private/gltexturerenderer.cpp
   hidmanager/hidaction.cpp
   hidmanager/hidbinding.cpp
   hidmanager/hidinput.cpp
@@ -88,8 +85,11 @@ set( SRCS
   hidmanager/hidmanagertreemodel.cpp
   hidmanager/standardhidmanager.cpp
   hidmanager/defaulthidmanager.cpp
+
+  quick/gltexturerenderer.cpp
+  quick/glscenerenderer.cpp
+
   glcontextsurfacewrapper.cpp
-  glscenerenderer.cpp
   gmlibwrapper.cpp
   guiapplication.cpp
   main.cpp
@@ -99,15 +99,17 @@ set( SRCS
 #########
 # Moc'ing
 QT5_WRAP_CPP( HDRS_MOC
-  private/gltexturerenderer.h
   hidmanager/hidaction.h
   hidmanager/hidmanager.h
   hidmanager/hidmanagermodel.h
   hidmanager/hidmanagertreemodel.h
   hidmanager/standardhidmanager.h
   hidmanager/defaulthidmanager.h
+
+  quick/gltexturerenderer.h
+  quick/glscenerenderer.h
+
   glcontextsurfacewrapper.h
-  glscenerenderer.h
   gmlibwrapper.h
   guiapplication.h
   window.h
@@ -118,6 +120,9 @@ set( RCCS
 )
 
 QT5_ADD_RESOURCES( RCCS_MOC ${RCCS} )
+
+
+
 
 #########
 # Compile
@@ -134,4 +139,5 @@ target_link_libraries( ${CMAKE_PROJECT_NAME}
   ${OPENGL_LIBRARIES}
   )
 
-set_target_properties( ${CMAKE_PROJECT_NAME} PROPERTIES COMPILE_FLAGS "--std=c++11" )
+set_target_properties( ${CMAKE_PROJECT_NAME} PROPERTIES COMPILE_FLAGS "--std=c++11 --pedantic" )
+

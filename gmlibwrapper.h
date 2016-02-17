@@ -25,6 +25,7 @@ namespace GMlib {
 #include <QObject>
 #include <QSize>
 #include <QRectF>
+#include <QStringListModel>
 class QOpenGLContext;
 class QOpenGLFramebufferObject;
 class QMouseEvent;
@@ -60,13 +61,14 @@ public:
   void                                  start();
   void                                  stop();
 
-  const std::shared_ptr<GMlib::Scene>&  getScene() const;
-  const GMlib::TextureRenderTarget&     getRenderTextureOf( const std::string& name ) const;
-  const std::shared_ptr<GMlib::Camera>&  getCamera( const std::string& name ) const;
+  const std::shared_ptr<GMlib::Scene>&  scene() const;
+  const GMlib::TextureRenderTarget&     renderTextureOf( const std::string& name ) const;
+  const std::shared_ptr<GMlib::Camera>& camera( const std::string& name ) const;
 
   void                                  initScene();
 
   GMlib::SceneObject*                   findSceneObject( const QString& rc_name, const GMlib::Point<int,2>& pos );
+  QStringListModel&                     rcNameModel();
 
 
 public slots:
@@ -80,6 +82,10 @@ protected:
 
 
 private:
+  RenderCamPair&                        rcPair(const QString& name);
+  RenderCamPair&                        createRCPair( const QString& name );
+
+
   int                                               _timer_id;
 
   std::shared_ptr<GLContextSurfaceWrapper>          _glsurface;
@@ -95,6 +101,7 @@ private:
   GMlib::Point<int,2>                               _current_mouse_pos;
   GMlib::Point<int,2>                               _prev_mouse_pos;
 
+  QStringListModel                                  _rc_name_model;
 signals:
   void                                              signFrameReady();
 

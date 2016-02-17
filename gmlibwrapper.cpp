@@ -198,21 +198,9 @@ void GMlibWrapper::initScene() {
     GMlib::Vector<float,3> init_cam_dir( 0.0f, 1.0f, 0.0f );
     GMlib::Vector<float,3> init_cam_up(  0.0f, 0.0f, 1.0f );
 
-    _rc_pairs.reserve(4);
-    _rc_pairs["Projection"] = RenderCamPair {};
-    _rc_pairs["Front"]      = RenderCamPair {};
-    _rc_pairs["Side"]       = RenderCamPair {};
-    _rc_pairs["Top"]        = RenderCamPair {};
-
-    for( auto& rcpair : _rc_pairs ) {
-
-      rcpair.second.render = std::make_shared<GMlib::DefaultRenderer>();
-      rcpair.second.camera = std::make_shared<GMlib::Camera>();
-      rcpair.second.render->setCamera(rcpair.second.camera.get());
-    }
 
     // Projection cam
-    auto& proj_rcpair = _rc_pairs["Projection"];
+    auto proj_rcpair = createRCPair("Projection");
     proj_rcpair.camera->set(init_cam_pos,init_cam_dir,init_cam_up);
     proj_rcpair.camera->setCuttingPlanes( 1.0f, 8000.0f );
     proj_rcpair.camera->rotateGlobal( GMlib::Angle(-45), GMlib::Vector<float,3>( 1.0f, 0.0f, 0.0f ) );
@@ -221,41 +209,25 @@ void GMlibWrapper::initScene() {
     proj_rcpair.render->reshape( GMlib::Vector<int,2>(init_viewport_size, init_viewport_size) );
 
     // Front cam
-    auto& front_rcpair = _rc_pairs["Front"];
+    auto front_rcpair = createRCPair("Front");
     front_rcpair.camera->set( init_cam_pos + GMlib::Vector<float,3>( 0.0f, -50.0f, 0.0f ), init_cam_dir, init_cam_up );
     front_rcpair.camera->setCuttingPlanes( 1.0f, 8000.0f );
     _scene->insertCamera( front_rcpair.camera.get() );
     front_rcpair.render->reshape( GMlib::Vector<int,2>(init_viewport_size, init_viewport_size) );
 
     // Side cam
-    auto& side_rcpair = _rc_pairs["Side"];
+    auto side_rcpair = createRCPair("Side");
     side_rcpair.camera->set( init_cam_pos + GMlib::Vector<float,3>( -50.0f, 0.0f, 0.0f ), GMlib::Vector<float,3>( 1.0f, 0.0f, 0.0f ), init_cam_up );
     side_rcpair.camera->setCuttingPlanes( 1.0f, 8000.0f );
     _scene->insertCamera( side_rcpair.camera.get() );
     side_rcpair.render->reshape( GMlib::Vector<int,2>(init_viewport_size, init_viewport_size) );
 
     // Top cam
-    auto& top_rcpair = _rc_pairs["Top"];
+    auto top_rcpair = createRCPair("Top");
     top_rcpair.camera->set( init_cam_pos + GMlib::Vector<float,3>( 0.0f, 0.0f, 50.0f ), -init_cam_up, init_cam_dir );
     top_rcpair.camera->setCuttingPlanes( 1.0f, 8000.0f );
     _scene->insertCamera( top_rcpair.camera.get() );
     top_rcpair.render->reshape( GMlib::Vector<int,2>(init_viewport_size, init_viewport_size) );
-
-
-
-
-
-//    // Iso Camera
-//    auto& isorcpair = (_rc_pairs["Iso"] = RenderCamPair {});
-//    isorcpair.render = std::make_shared<GMlib::DefaultRenderer>();
-//    isorcpair.camera = std::make_shared<GMlib::IsoCamera>();
-//    isorcpair.render->setCamera(isorcpair.camera.get());
-//    _scene->insertCamera( isorcpair.camera.get() );
-//    isorcpair.camera->set(init_cam_pos,init_cam_dir,init_cam_up);
-//    isorcpair.camera->setCuttingPlanes( 1.0f, 8000.0f );
-//    isorcpair.camera->rotateGlobal( GMlib::Angle(-45), GMlib::Vector<float,3>( 1.0f, 0.0f, 0.0f ) );
-//    isorcpair.camera->translate( GMlib::Vector<float,3>( 0.0f, -20.0f, 20.0f ) );
-//    isorcpair.render->reshape( GMlib::Vector<int,2>(init_viewport_size, init_viewport_size) );
 
 
     // Setup Select Renderer
@@ -346,21 +318,55 @@ GMlibWrapper::findSceneObject(const QString& rc_name, const GMlib::Point<int,2>&
   return sel_obj;
 }
 
+RenderCamPair&GMlibWrapper::rcPair(const QString& name) {
+
+  if(!_rc_pairs.count(name.toStdString())) throw std::invalid_argument("[][]Render/Camera pair '" + name.toStdString() + "'  does not exist!");
+  return _rc_pairs.at(name.toStdString());
+}
+
+RenderCamPair& GMlibWrapper::createRCPair(const QString& name) {
+
+  GMlib::Vector<int,2> init_viewport { 800, 600};
+  auto rc_pair = RenderCamPair {};
+
+  rc_pair.render = std::make_shared<GMlib::DefaultRenderer>();
+  rc_pair.camera = std::make_shared<GMlib::Camera>();
+  rc_pair.render->setCamera(rc_pair.camera.get());
+
+  auto rc_names = _rc_name_model.stringList();
+  rc_names << name;
+  _rc_name_model.setStringList(rc_names);
+
+
+//  QStringList test;
+//  test << "One" << "Two" << "Three";
+//  _rc_name_model.setStringList(test);
+
+  return _rc_pairs[name.toStdString()] = rc_pair;
+}
+
+QStringListModel&
+GMlibWrapper::rcNameModel() {
+
+  return _rc_name_model;
+}
+
 const std::shared_ptr<GMlib::Scene>&
-GMlibWrapper::getScene() const {
+GMlibWrapper::scene() const {
 
   return _scene;
 }
 
 const GMlib::TextureRenderTarget&
-GMlibWrapper::getRenderTextureOf(const std::string& name) const {
+GMlibWrapper::renderTextureOf(const std::string& name) const {
 
   if(!_rc_pairs.count(name)) throw std::invalid_argument("[][]Render/Camera pair '" + name + "'  does not exist!");
 
   return _rc_pairs.at(name).render->getFrontRenderTarget();
 }
 
-const std::shared_ptr<GMlib::Camera>&GMlibWrapper::getCamera(const std::string& name) const {
+const std::shared_ptr<GMlib::Camera>&
+GMlibWrapper::camera(const std::string& name) const {
 
   if(!_rc_pairs.count(name)) throw std::invalid_argument("[][]Render/Camera pair '" + name + "'  does not exist!");
 

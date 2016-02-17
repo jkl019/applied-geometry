@@ -4,8 +4,8 @@
 #include <QQuickItem>
 
 
-#include "private/gltexturerenderer.h"
-#include "gmlibwrapper.h"
+#include "gltexturerenderer.h"
+#include "../gmlibwrapper.h"
 
 
 class GLContextSurfaceWrapper;
@@ -33,25 +33,19 @@ class GLContextSurfaceWrapper;
 
 class GLSceneRenderer : public QQuickItem {
   Q_OBJECT
-  Q_PROPERTY(QString name     READ getTexName WRITE setTexName)
-  Q_PROPERTY(bool    paused   READ isPaused   WRITE setPaused)
+  Q_PROPERTY(QString name     READ textureName WRITE setTextureName)
 
 
 public:
   explicit GLSceneRenderer();
   ~GLSceneRenderer();
 
-  const QString&        getTexName() const;
-  void                  setTexName( const QString& tex_name );
+  const QString&        textureName() const;
+  void                  setTextureName( const QString& tex_name );
 
-  bool                  isPaused() const;
-  void                  setPaused( bool paused );
-
-private:
-  std::shared_ptr<Private::GLTextureRenderer> _renderer;
-  std::shared_ptr<GLContextSurfaceWrapper>    _glsurface;
-  QString                                     _name;
-  bool                                        _paused;
+public slots:
+  void                  sync();
+  void                  cleanup();
 
 signals:
   void                  signViewportChanged( const QString& name, const QRectF& size );
@@ -63,11 +57,12 @@ signals:
   void                  signKeyReleased( const QString& name, QKeyEvent* event );
   void                  signWheelEventOccurred( const QString& name, QWheelEvent* event);
 
-public slots:
-  void                  sync();
-  void                  cleanup();
+private:
+  std::shared_ptr<GLTextureRenderer>          _renderer;
+  std::shared_ptr<GLContextSurfaceWrapper>    _glsurface;
+  QString                                     _name;
 
-protected slots:
+private slots:
   void                  itemChange(ItemChange change, const ItemChangeData& value ) override;
   QSGNode*              updatePaintNode(QSGNode *, UpdatePaintNodeData *) override;
 
@@ -78,13 +73,10 @@ protected slots:
   void                  keyPressEvent(QKeyEvent *event) override;
   void                  keyReleaseEvent(QKeyEvent *event) override;
   void                  wheelEvent(QWheelEvent *event) override;
-
-private slots:
   void                  handleWindowChanged( QQuickWindow * window );
-
 
 };
 
 
 
-#endif // __GLSCENERENDERER2_H__
+#endif // __GLSCENERENDERER_H__

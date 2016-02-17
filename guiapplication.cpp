@@ -12,6 +12,7 @@
 // qt
 #include <QQmlContext>
 #include <QQuickItem>
+#include <QStringListModel>
 
 // stl
 #include <cassert>
@@ -28,7 +29,8 @@ GuiApplication::GuiApplication(int& argc, char *argv[])
   assert(!_instance);
   _instance = std::unique_ptr<GuiApplication>(this);
 
-  connect( _window.get(), &Window::sceneGraphInitialized, this, &GuiApplication::onSGInit );
+  connect( _window.get(), &Window::sceneGraphInitialized,     this, &GuiApplication::onSGInit );
+  connect( this,          &QGuiApplication::lastWindowClosed, this, &QGuiApplication::quit );
 
   _window->show();
 }
@@ -50,9 +52,8 @@ GuiApplication::onSGInit() {
   _window->initGLSurface();
 
   // Init GMlibWrapper
-  _glsurface = _window->getGLSurface();
+  _glsurface = _window->glSurface();
   _gmlib = std::make_shared<GMlibWrapper>(_glsurface);
-//  connect( _gmlib.get(),  &GMlibWrapper::signFrameReady,   _window.get(), &Window::signFrameReady );
   connect( _gmlib.get(),  &GMlibWrapper::signFrameReady,   _window.get(), &Window::update );
   connect( _window.get(), &Window::signGuiViewportChanged, _gmlib.get(),  &GMlibWrapper::changeRenderGeometry );
 
@@ -62,6 +63,7 @@ GuiApplication::onSGInit() {
   // Create hidmanager (must be after initScene)
   _hidmanager = std::make_shared<DefaultHidManager>( _gmlib );
   _window->rootContext()->setContextProperty( "hidmanager_model", _hidmanager->getModel() );
+  _window->rootContext()->setContextProperty( "rc_name_model", &_gmlib->rcNameModel() );
 
   connect( _window.get(), &Window::signMousePressed,       _hidmanager.get(), &StandardHidManager::registerMousePressEvent );
   connect( _window.get(), &Window::signMouseReleased,      _hidmanager.get(), &StandardHidManager::registerMouseReleaseEvent );
@@ -80,12 +82,11 @@ GuiApplication::onSGInit() {
 
   _hidmanager->setupDefaultHidBindings();
 
-  // Load gui qml
+  // Load QML
   _window->setSource( QUrl("qrc:/qml/main.qml") );
 
+  // Set up QML object connections
   connect( _hidmanager.get(), SIGNAL(signOpenCloseHidHelp()), _window->rootObject(), SIGNAL(toggleHidBindView()) );
-
-
 
   // Start simulator
   _gmlib->start();
@@ -104,7 +105,7 @@ void GuiApplication::afterHidAction() {
 }
 
 const GuiApplication&
-GuiApplication::getInstance() {
+GuiApplication::instance() {
 
   return *_instance;
 }

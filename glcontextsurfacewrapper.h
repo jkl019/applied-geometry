@@ -2,20 +2,18 @@
 #define __GLCONTEXTWRAPPER_H__
 
 
-
 // qt
 #include <QObject>
 class QOpenGLContext;
 class QOffscreenSurface;
 
-
 // stl
 #include <memory>
 
 
-
 class GLContextSurfaceWrapper : public QObject {
   Q_OBJECT
+
 public:
   explicit GLContextSurfaceWrapper(QOpenGLContext* context );
 

@@ -8,6 +8,9 @@
 #include <gmParametricsModule>
 using namespace GMlib;
 
+// qt
+#include <QGuiApplication>
+
 // Local Defines
 #define SNAP 0.01
 
@@ -446,7 +449,7 @@ void DefaultHidManager::heOpenCloseHidHelp() {
 
 Camera* DefaultHidManager::findCamera( const QString& view_name ) const {
 
-  return _gmlib->getCamera(view_name.toStdString()).get();
+  return _gmlib->camera(view_name.toStdString()).get();
 }
 
 
@@ -465,7 +468,7 @@ float DefaultHidManager::cameraSpeedScale(Camera *cam) const {
 
 Scene* DefaultHidManager::scene() const {
 
-  return _gmlib->getScene().get();
+  return _gmlib->scene().get();
 }
 
 SceneObject* DefaultHidManager::findSceneObject( const QString& view_name, const GMlib::Point<int,2>& pos  ) {
@@ -603,6 +606,12 @@ void DefaultHidManager::setupDefaultHidBindings() {
                          "Stuff that happens on left mouse release",
                          this, SLOT(heLeftMouseReleaseStuff()) );
 
+  QString ha_id_var_close_app =
+      registerHidAction( "Various",
+                         "Quit",
+                         "Close application!",
+                         qApp, SLOT(quit()) );
+
   // Open/Close HidBindings view
   QString ha_id_var_open_close_hbview =
       registerHidAction( "Various",
@@ -618,6 +627,7 @@ void DefaultHidManager::setupDefaultHidBindings() {
   registerHidMapping( ha_id_objint_replot_high,           new KeyPressInput( Qt::Key_P, Qt::ShiftModifier ) );
   registerHidMapping( ha_id_objint_replot_med,            new KeyPressInput( Qt::Key_P ) );
   registerHidMapping( ha_id_objint_replot_low,            new KeyPressInput( Qt::Key_P, Qt::ControlModifier) );
+  registerHidMapping( ha_id_var_close_app,                new KeyPressInput( Qt::Key_Q, Qt::ControlModifier) );
   registerHidMapping( ha_id_sim_toggle,                   new KeyPressInput( Qt::Key_R ) );
   registerHidMapping( ha_id_render_toggle_shademode,      new KeyPressInput( Qt::Key_Z ) );
 

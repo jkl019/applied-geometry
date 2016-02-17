@@ -1,6 +1,6 @@
 // local
 #include "guiapplication.h"
-#include "glscenerenderer.h"
+#include "quick/glscenerenderer.h"
 
 // gmlib
 #include <core/gmglobal>
@@ -41,7 +41,7 @@ int main(int argc, char *argv[]) try {
     qDebug() << QString( "GMlib version: %1" ).arg( GM_VERSION_STR ).toStdString().c_str();
 
   // Register modules
-  qmlRegisterType<GLSceneRenderer>( "MyCustomQuick", 1, 0, "GLSceneRenderer" );
+  qmlRegisterType<GLSceneRenderer>( "MyCppComponents", 1, 0, "GLSceneRenderer" );
 
   // Create the application object
   GuiApplication a(argc, argv);

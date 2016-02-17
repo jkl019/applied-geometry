@@ -42,6 +42,12 @@ Window::Window(QWindow *parent) :
   create();
 }
 
+std::shared_ptr<GLContextSurfaceWrapper>
+Window::glSurface() const {
+
+  return _glsurface;
+}
+
 void Window::initGLSurface() {
   _glsurface = std::make_shared<GLContextSurfaceWrapper>(openglContext());
 }

@@ -16,8 +16,7 @@ public:
   explicit Window(QWindow *parent = 0);
 
 
-  std::shared_ptr<GLContextSurfaceWrapper>    getGLSurface() const { return _glsurface; }
-
+  std::shared_ptr<GLContextSurfaceWrapper>    glSurface() const;
   void      initGLSurface();
 
 private:

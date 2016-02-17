@@ -26,8 +26,7 @@ private:
   std::shared_ptr<Window>                     _window;
   std::shared_ptr<GMlibWrapper>               _gmlib;
   std::shared_ptr<GLContextSurfaceWrapper>    _glsurface;
-
-  std::shared_ptr<DefaultHidManager>         _hidmanager;
+  std::shared_ptr<DefaultHidManager>          _hidmanager;
 
   void                                        setupScene();
 
@@ -37,12 +36,10 @@ private slots:
   void                                        beforeHidAction();
   void                                        afterHidAction();
 
-
-
 private:
-  static std::unique_ptr<GuiApplication>    _instance;
+  static std::unique_ptr<GuiApplication>      _instance;
 public:
-  static const GuiApplication&            getInstance();
+  static const GuiApplication&                instance();
 };
 
 #endif // GUIAPPLICATION_H
