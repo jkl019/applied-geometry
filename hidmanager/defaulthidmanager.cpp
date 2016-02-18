@@ -1,7 +1,7 @@
 #include "defaulthidmanager.h"
 
 // local
-#include "../gmlibwrapper.h"
+#include "../application/gmlibwrapper.h"
 
 // gmlib
 #include <gmSceneModule>

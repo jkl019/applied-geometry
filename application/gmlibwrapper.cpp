@@ -2,7 +2,7 @@
 #include "glcontextsurfacewrapper.h"
 
 
-#include "testtorus.h"
+#include "../testtorus.h"
 #include "utils.h"
 
 

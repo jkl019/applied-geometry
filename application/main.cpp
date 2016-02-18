@@ -1,6 +1,6 @@
 // local
 #include "guiapplication.h"
-#include "quick/glscenerenderer.h"
+#include "glscenerenderer.h"
 
 // gmlib
 #include <core/gmglobal>

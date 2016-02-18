@@ -6,8 +6,8 @@
 #include "gmlibwrapper.h"
 
 // hidmanager
-#include "hidmanager/defaulthidmanager.h"
-#include "hidmanager/hidmanagertreemodel.h"
+#include "../hidmanager/defaulthidmanager.h"
+#include "../hidmanager/hidmanagertreemodel.h"
 
 // qt
 #include <QQmlContext>

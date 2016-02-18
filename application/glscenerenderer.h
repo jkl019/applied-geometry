@@ -5,7 +5,7 @@
 
 
 #include "gltexturerenderer.h"
-#include "../gmlibwrapper.h"
+#include "gmlibwrapper.h"
 
 
 class GLContextSurfaceWrapper;

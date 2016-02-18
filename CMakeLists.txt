@@ -63,15 +63,15 @@ set( HDRS
   hidmanager/standardhidmanager.h
   hidmanager/defaulthidmanager.h
 
-  quick/gltexturerenderer.h
-  quick/glscenerenderer.h
+  application/gltexturerenderer.h
+  application/glscenerenderer.h
+  application/glcontextsurfacewrapper.h
+  application/gmlibwrapper.h
+  application/guiapplication.h
+  application/window.h
+  application/utils.h
 
-  glcontextsurfacewrapper.h
-  gmlibwrapper.h
-  guiapplication.h
-  window.h
   testtorus.h
-  utils.h
   )
 
 set( SRCS
@@ -86,14 +86,14 @@ set( SRCS
   hidmanager/standardhidmanager.cpp
   hidmanager/defaulthidmanager.cpp
 
-  quick/gltexturerenderer.cpp
-  quick/glscenerenderer.cpp
+  application/gltexturerenderer.cpp
+  application/glscenerenderer.cpp
+  application/glcontextsurfacewrapper.cpp
+  application/gmlibwrapper.cpp
+  application/guiapplication.cpp
+  application/window.cpp
 
-  glcontextsurfacewrapper.cpp
-  gmlibwrapper.cpp
-  guiapplication.cpp
-  main.cpp
-  window.cpp
+  application/main.cpp
   )
 
 #########
@@ -106,17 +106,16 @@ QT5_WRAP_CPP( HDRS_MOC
   hidmanager/standardhidmanager.h
   hidmanager/defaulthidmanager.h
 
-  quick/gltexturerenderer.h
-  quick/glscenerenderer.h
-
-  glcontextsurfacewrapper.h
-  gmlibwrapper.h
-  guiapplication.h
-  window.h
+  application/gltexturerenderer.h
+  application/glscenerenderer.h
+  application/glcontextsurfacewrapper.h
+  application/gmlibwrapper.h
+  application/guiapplication.h
+  application/window.h
   )
 
 set( RCCS
- qml.qrc
+ application/qml.qrc
 )
 
 QT5_ADD_RESOURCES( RCCS_MOC ${RCCS} )
@@ -139,5 +138,5 @@ target_link_libraries( ${CMAKE_PROJECT_NAME}
   ${OPENGL_LIBRARIES}
   )
 
-set_target_properties( ${CMAKE_PROJECT_NAME} PROPERTIES COMPILE_FLAGS "--std=c++11 --pedantic" )
+set_target_properties( ${CMAKE_PROJECT_NAME} PROPERTIES COMPILE_FLAGS "--std=c++11" )
 

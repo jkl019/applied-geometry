@@ -4,7 +4,7 @@
 #include <QQuickItem>
 
 
-#include "../gmlibwrapper.h"
+#include "gmlibwrapper.h"
 
 
 class GLContextSurfaceWrapper;

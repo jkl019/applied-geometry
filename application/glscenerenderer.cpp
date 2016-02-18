@@ -1,6 +1,6 @@
 #include "glscenerenderer.h"
-#include "../window.h"
-#include "../glcontextsurfacewrapper.h"
+#include "window.h"
+#include "glcontextsurfacewrapper.h"
 
 // Qt
 #include <QQuickWindow>
