@@ -2,8 +2,15 @@
 #define GUIAPPLICATION_H
 
 
+class Window;
+class GMlibWrapper;
 class GLContextSurfaceWrapper;
 class DefaultHidManager;
+
+// gmlib
+namespace GMlib {
+  class Scene;
+}
 
 // qt
 #include <QGuiApplication>
@@ -12,8 +19,6 @@ class DefaultHidManager;
 #include <memory>
 
 
-class Window;
-class GMlibWrapper;
 
 
 class GuiApplication : public QGuiApplication {
@@ -30,11 +35,26 @@ private:
 
   void                                        setupScene();
 
+  virtual void                                initializeScenario() = 0;
+  virtual void                                cleanupScenario() = 0;
+
 private slots:
-  void                                        onSGInit();
+
+  // Void waranty on re-implementation
+  virtual void                                onSGInit();
 
   void                                        beforeHidAction();
   void                                        afterHidAction();
+
+protected:
+
+  std::shared_ptr<Window>                     window();
+  std::shared_ptr<GMlibWrapper>               gmlib();
+  std::shared_ptr<GLContextSurfaceWrapper>    glsurface();
+  std::shared_ptr<DefaultHidManager>          hidmanager();
+  std::shared_ptr<GMlib::Scene>               scene();
+
+
 
 private:
   static std::unique_ptr<GuiApplication>      _instance;

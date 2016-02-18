@@ -9,7 +9,7 @@ class TestTorus : public GMlib::PTorus<float> {
 public:
   using PTorus::PTorus;
 
-  ~TestTorus() {
+  ~TestTorus() override {
 
     if(m_test01)
       remove(test_01_torus.get());

@@ -60,6 +60,8 @@ public:
 
   HidManagerTreeModel*      getModel() const;
 
+  void                      forceUpdate();         // Needs to go
+
 protected:
   void                      customEvent( QEvent* event );
 

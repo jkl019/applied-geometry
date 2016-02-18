@@ -17,7 +17,7 @@ public:
 
 
   std::shared_ptr<GLContextSurfaceWrapper>    glSurface() const;
-  void      initGLSurface();
+  void                                        initGLSurface();
 
 private:
   std::shared_ptr<GLContextSurfaceWrapper>    _glsurface;

@@ -58,33 +58,36 @@ public:
   explicit GMlibWrapper(std::shared_ptr<GLContextSurfaceWrapper> wrapper );
   ~GMlibWrapper();
 
-  void                                  start();
-  void                                  stop();
+  void                                              start();
+  void                                              stop();
 
-  const std::shared_ptr<GMlib::Scene>&  scene() const;
-  const GMlib::TextureRenderTarget&     renderTextureOf( const std::string& name ) const;
-  const std::shared_ptr<GMlib::Camera>& camera( const std::string& name ) const;
+  const std::shared_ptr<GMlib::Scene>&              scene() const;
+  const GMlib::TextureRenderTarget&                 renderTextureOf( const std::string& name ) const;
+  const std::shared_ptr<GMlib::Camera>&             camera( const std::string& name ) const;
 
-  void                                  initScene();
+  void                                              init();
 
-  GMlib::SceneObject*                   findSceneObject( const QString& rc_name, const GMlib::Point<int,2>& pos );
-  QStringListModel&                     rcNameModel();
+  GMlib::SceneObject*                               findSceneObject( const QString& rc_name, const GMlib::Point<int,2>& pos );
+  QStringListModel&                                 rcNameModel();
+
+  RenderCamPair&                                    rcPair(const QString& name);
+  RenderCamPair&                                    createRCPair( const QString& name );
+
+  std::shared_ptr<GMlib::DefaultSelectRenderer>     defaultSelectRenderer() const;
+
 
 
 public slots:
-  void                                  changeRenderGeometry( const QString& name,
-                                                              const QRectF &new_geometry );
+  void                                              changeRenderGeometry( const QString& name,
+                                                                          const QRectF &new_geometry );
 
-  void                                  toggleSimulation();
+  void                                              toggleSimulation();
 
 protected:
-  void                                  timerEvent(QTimerEvent *e);
+  void                                              timerEvent(QTimerEvent *e);
 
 
 private:
-  RenderCamPair&                        rcPair(const QString& name);
-  RenderCamPair&                        createRCPair( const QString& name );
-
 
   int                                               _timer_id;
 
@@ -109,9 +112,9 @@ signals:
 
   // "Singleton instance"
 private:
-  static std::unique_ptr<GMlibWrapper>      _instance;
+  static std::unique_ptr<GMlibWrapper>              _instance;
 public:
-  static const GMlibWrapper&                getInstance();
+  static const GMlibWrapper&                        getInstance();
 };
 
 

@@ -127,3 +127,9 @@ HidManagerTreeModel *HidManager::getModel() const {
   return _model;
 }
 
+void HidManager::forceUpdate() {
+
+  _model->update(_hid_actions);
+  _model->update(_hid_bindings);
+}
+

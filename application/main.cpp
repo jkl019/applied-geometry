@@ -1,5 +1,5 @@
 // local
-#include "guiapplication.h"
+#include "../scenario.h"
 #include "glscenerenderer.h"
 
 // gmlib
@@ -44,7 +44,7 @@ int main(int argc, char *argv[]) try {
   qmlRegisterType<GLSceneRenderer>( "MyCppComponents", 1, 0, "GLSceneRenderer" );
 
   // Create the application object
-  GuiApplication a(argc, argv);
+  Scenario a(argc, argv);
 
   // Start the app, and return control to the Qt system.
   return a.exec();

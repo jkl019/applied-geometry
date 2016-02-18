@@ -72,6 +72,7 @@ set( HDRS
   application/utils.h
 
   testtorus.h
+  scenario.h
   )
 
 set( SRCS
@@ -94,6 +95,8 @@ set( SRCS
   application/window.cpp
 
   application/main.cpp
+
+  scenario.cpp
   )
 
 #########
@@ -112,10 +115,12 @@ QT5_WRAP_CPP( HDRS_MOC
   application/gmlibwrapper.h
   application/guiapplication.h
   application/window.h
+
+  scenario.h
   )
 
 set( RCCS
- application/qml.qrc
+ application/application.qrc
 )
 
 QT5_ADD_RESOURCES( RCCS_MOC ${RCCS} )

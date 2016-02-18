@@ -50,17 +50,15 @@ GuiApplication::onSGInit() {
 
   // Init GLSurface
   _window->initGLSurface();
+  _glsurface = _window->glSurface();
 
   // Init GMlibWrapper
-  _glsurface = _window->glSurface();
   _gmlib = std::make_shared<GMlibWrapper>(_glsurface);
+  _gmlib->init();
   connect( _gmlib.get(),  &GMlibWrapper::signFrameReady,   _window.get(), &Window::update );
   connect( _window.get(), &Window::signGuiViewportChanged, _gmlib.get(),  &GMlibWrapper::changeRenderGeometry );
 
-  // Init test scene of the GMlib wrapper
-  _gmlib->initScene();
-
-  // Create hidmanager (must be after initScene)
+  // Create hidmanager
   _hidmanager = std::make_shared<DefaultHidManager>( _gmlib );
   _window->rootContext()->setContextProperty( "hidmanager_model", _hidmanager->getModel() );
   _window->rootContext()->setContextProperty( "rc_name_model", &_gmlib->rcNameModel() );
@@ -73,20 +71,13 @@ GuiApplication::onSGInit() {
   connect( _window.get(), &Window::signKeyReleased,        _hidmanager.get(), &StandardHidManager::registerKeyReleaseEvent );
   connect( _window.get(), &Window::signWheelEventOccurred, _hidmanager.get(), &StandardHidManager::registerWheelEvent );
 
-
-  connect( _hidmanager.get(), &DefaultHidManager::signToggleSimulation,
-           _gmlib.get(),      &GMlibWrapper::toggleSimulation );
-
   connect( _hidmanager.get(), &StandardHidManager::signBeforeHidAction, this,  &GuiApplication::beforeHidAction, Qt::DirectConnection );
   connect( _hidmanager.get(), &StandardHidManager::signAfterHidAction,  this,  &GuiApplication::afterHidAction );
 
-  _hidmanager->setupDefaultHidBindings();
-
-  // Load QML
-  _window->setSource( QUrl("qrc:/qml/main.qml") );
-
-  // Set up QML object connections
-  connect( _hidmanager.get(), SIGNAL(signOpenCloseHidHelp()), _window->rootObject(), SIGNAL(toggleHidBindView()) );
+  // Init test scene of the GMlib wrapper
+  _glsurface->makeCurrent(); {
+    initializeScenario();
+  } _glsurface->doneCurrent();
 
   // Start simulator
   _gmlib->start();
@@ -102,6 +93,31 @@ void GuiApplication::afterHidAction() {
 
 //  qDebug() << "AfterHidAction:";
   _glsurface->doneCurrent();
+}
+
+std::shared_ptr<Window> GuiApplication::window() {
+
+  return _window;
+}
+
+std::shared_ptr<GMlibWrapper> GuiApplication::gmlib() {
+
+  return _gmlib;
+}
+
+std::shared_ptr<GLContextSurfaceWrapper> GuiApplication::glsurface() {
+
+  return _glsurface;
+}
+
+std::shared_ptr<DefaultHidManager> GuiApplication::hidmanager() {
+
+  return _hidmanager;
+}
+
+std::shared_ptr<GMlib::Scene> GuiApplication::scene() {
+
+  return _gmlib->scene();
 }
 
 const GuiApplication&
