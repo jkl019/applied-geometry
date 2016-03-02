@@ -63,8 +63,9 @@ set( HDRS
   hidmanager/standardhidmanager.h
   hidmanager/defaulthidmanager.h
 
-  application/gltexturerenderer.h
-  application/glscenerenderer.h
+  application/renderer.h
+  application/rcpairrenderer.h
+  application/texturerenderer.h
   application/glcontextsurfacewrapper.h
   application/gmlibwrapper.h
   application/guiapplication.h
@@ -87,8 +88,9 @@ set( SRCS
   hidmanager/standardhidmanager.cpp
   hidmanager/defaulthidmanager.cpp
 
-  application/gltexturerenderer.cpp
-  application/glscenerenderer.cpp
+  application/renderer.cpp
+  application/rcpairrenderer.cpp
+  application/texturerenderer.cpp
   application/glcontextsurfacewrapper.cpp
   application/gmlibwrapper.cpp
   application/guiapplication.cpp
@@ -109,8 +111,9 @@ QT5_WRAP_CPP( HDRS_MOC
   hidmanager/standardhidmanager.h
   hidmanager/defaulthidmanager.h
 
-  application/gltexturerenderer.h
-  application/glscenerenderer.h
+  application/renderer.h
+  application/rcpairrenderer.h
+  application/texturerenderer.h
   application/glcontextsurfacewrapper.h
   application/gmlibwrapper.h
   application/guiapplication.h

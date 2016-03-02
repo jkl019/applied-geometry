@@ -1,10 +1,9 @@
-#ifndef __GLSCENERENDERER_H__
-#define __GLSCENERENDERER_H__
-
-#include <QQuickItem>
+#ifndef __RCPAIRRENDERER_H__
+#define __RCPAIRRENDERER_H__
 
 
-#include "gltexturerenderer.h"
+#include "renderer.h"
+
 #include "gmlibwrapper.h"
 
 
@@ -31,14 +30,14 @@ class GLContextSurfaceWrapper;
 
 
 
-class GLSceneRenderer : public QQuickItem {
+class RCPairRenderer : public Renderer {
   Q_OBJECT
   Q_PROPERTY(QString name     READ textureName WRITE setTextureName)
 
 
 public:
-  explicit GLSceneRenderer();
-  ~GLSceneRenderer();
+  explicit RCPairRenderer();
+  ~RCPairRenderer();
 
   const QString&        textureName() const;
   void                  setTextureName( const QString& tex_name );
@@ -58,9 +57,10 @@ signals:
   void                  signWheelEventOccurred( const QString& name, QWheelEvent* event);
 
 private:
-  std::shared_ptr<GLTextureRenderer>          _renderer;
   std::shared_ptr<GLContextSurfaceWrapper>    _glsurface;
   QString                                     _name;
+
+  QRectF                                      _viewport;
 
 private slots:
   void                  itemChange(ItemChange change, const ItemChangeData& value ) override;
@@ -75,8 +75,11 @@ private slots:
   void                  wheelEvent(QWheelEvent *event) override;
   void                  handleWindowChanged( QQuickWindow * window );
 
+
+  void                  paint();
+
 };
 
 
 
-#endif // __GLSCENERENDERER_H__
+#endif // __RCPAIRRENDERER_H__

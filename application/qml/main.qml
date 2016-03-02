@@ -13,9 +13,11 @@ Item {
 
   onToggleHidBindView: hid_bind_view.toggle()
 
-  GLSceneRenderer{
+  RCPairRenderer{
     id: renderer
+
     anchors.fill: parent
+
     name: rc_pair_cb.currentText
 
     ComboBox {
@@ -67,6 +69,16 @@ Item {
 
       }
     }
+
+//    TextureViewer {
+
+//      width:  256
+//      height: 144
+
+//      anchors.right:  parent.right
+//      anchors.bottom: parent.bottom
+//    }
+
   }
 
 }
