@@ -35,4 +35,18 @@ TextureRenderer {
 
     onCurrentTextChanged: disp_mode.currentText === "byId" ? root.setTextureId(currentText) : root.setTextureName(currentText);
   }
+
+  ComboBox {
+    anchors.bottom: parent.bottom
+    anchors.right: parent.right
+    anchors.margins: 5
+
+    width: 72
+
+    opacity: 0.7
+
+    model: [1,10,100,1000];
+
+    onCurrentTextChanged: root.setColorMagnification(currentText)
+  }
 }

@@ -42,6 +42,7 @@ public:
 
   Q_INVOKABLE void        setTextureName( const QString& tex_name );
   Q_INVOKABLE void        setTextureId( const QVariant& id );
+  Q_INVOKABLE void        setColorMagnification( int magn );
 
 
   QStringList             textureIds() const;
@@ -57,6 +58,10 @@ private:
 
   QStringListModel        _textureid_model;
   GMlib::GL::Texture      _tex;
+  GMlib::GL::Program      _prog;
+  int                     _color_magn {1};
+
+  void                    initTexMagnProg();
 
 private slots:
   void                    itemChange(ItemChange change, const ItemChangeData& value ) override;

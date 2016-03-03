@@ -34,6 +34,12 @@ TextureRenderer::setTextureId(const QVariant& id) {
   _tex.acquire(id.toUInt());
 }
 
+void
+TextureRenderer::setColorMagnification(int magn) {
+
+  _color_magn = magn;
+}
+
 QStringList
 TextureRenderer::textureIds() const {
 
@@ -55,7 +61,7 @@ TextureRenderer::textureNames() const {
 void
 TextureRenderer::sync() {
 
-  auto prog_valid = prog().isValid();
+  auto prog_valid = prog().isValid() and _prog.isValid();
 
   if(!prog_valid && _tex.isValid() > 0) {
 
@@ -79,6 +85,69 @@ TextureRenderer::cleanup() {
 }
 
 void
+TextureRenderer::initTexMagnProg() {
+
+  const std::string unique_name = "qt_qml_renderer_magn";
+
+  // Check wether prog is initialized
+  if( _prog.isValid() )
+    return;
+
+  // Check if prog and canvas can be acquired, if not; create them
+  auto prog_ok = _prog.acquire(unique_name);
+
+  if(prog_ok)
+    return;
+
+
+  GMlib::GL::VertexShader   vs;
+  GMlib::GL::FragmentShader fs;
+  vs.create();
+  fs.create();
+
+  vs.setSource(
+        "#version 150 compatibility \n"
+        "layout(std140) uniform; \n"
+        "in  vec4 vertices; \n"
+        "out vec2 coords; \n"
+        "out vec4 gl_Position; \n"
+        "void main() { \n"
+        "    gl_Position = vertices; \n"
+        "    coords = (vertices.xy + vec2(1.0,1.0))*0.5; \n"
+        "}"
+        );
+
+  fs.setSource(
+        "#version 150 compatibility \n"
+        "layout(std140) uniform; \n"
+        "\n"
+        "uniform int u_magn; \n"
+        "uniform sampler2D u_tex0; \n"
+        "in vec2 coords; \n"
+        "void main() { \n"
+        "    gl_FragColor = texture( u_tex0, coords.st ) * u_magn; \n"
+        "}"
+        );
+
+  if( !vs.compile() ) {
+    std::cout << "Vertex shader compile error: " << vs.getCompilerLog() << std::endl;
+    exit(-666);
+  }
+  if(!fs.compile()) {
+    std::cout << "Fragment shader compile error: " << fs.getCompilerLog() << std::endl;
+    exit(-666);
+  }
+
+  _prog.create(unique_name);
+  _prog.attachShader(vs);
+  _prog.attachShader(fs);
+  if( _prog.link() != GL_TRUE ) {
+    std::cout << "Render prog link error: " << _prog.getLinkerLog() << std::endl;
+    exit(-666);
+  }
+}
+
+void
 TextureRenderer::handleWindowChanged(QQuickWindow* window) {
 
   if( !window ) return;
@@ -91,22 +160,22 @@ TextureRenderer::handleWindowChanged(QQuickWindow* window) {
   connect( w, &Window::signFrameReady, this, &QQuickItem::update );
 }
 
-void TextureRenderer::paint() {
-
-//  GMlib::GL::Texture tex;
-////  if(!tex.acquire(_name.toStdString())) return;
-//  if(!tex.acquire(_id)) return;
+void
+TextureRenderer::paint() {
 
   if(!_tex.isValid()) return;
 
   initCanvasAndProg();
+  initTexMagnProg();
 
   GL_CHECK(::glViewport(_viewport.x(), _viewport.y(), _viewport.width(), _viewport.height()));
 
   GL_CHECK(::glDisable(GL_BLEND));
-  prog().bind(); {
+  _prog.bind(); {
 
-    prog().setUniform( "u_tex0", _tex, GL_TEXTURE0, GLuint(0) );
+    _prog.setUniform( "u_tex0", _tex, GL_TEXTURE0, GLuint(0) );
+    _prog.setUniform( "u_magn", _color_magn );
+
 
     GMlib::GL::AttributeLocation vert_loc = prog().getAttributeLocation("vertices");
 
@@ -116,7 +185,7 @@ void TextureRenderer::paint() {
     canvas().disable(vert_loc);
     canvas().unbind();
 
-  } prog().unbind();
+  } _prog.unbind();
 
 }
 
