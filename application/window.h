@@ -24,7 +24,8 @@ private:
 
 
 signals:
-  void      signGuiViewportChanged( const QString& name, const QRectF& new_geometry );
+  void      signRcPairActiveStateChanged( const QString& name, bool state );
+  void      signRcPairViewportChanged( const QString& name, const QRectF& geometry );
   void      signFrameReady();
 
   // Relay singals from qml side

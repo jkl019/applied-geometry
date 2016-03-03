@@ -32,22 +32,24 @@ class GLContextSurfaceWrapper;
 
 class RCPairRenderer : public Renderer {
   Q_OBJECT
-  Q_PROPERTY(QString name     READ textureName WRITE setTextureName)
+  Q_PROPERTY(QString name     READ rcPairName WRITE setRcPairName)
 
 
 public:
   explicit RCPairRenderer();
   ~RCPairRenderer();
 
-  const QString&        textureName() const;
-  void                  setTextureName( const QString& tex_name );
+  const QString&        rcPairName() const;
+  void                  setRcPairName( const QString& tex_name );
 
 public slots:
   void                  sync();
   void                  cleanup();
 
 signals:
-  void                  signViewportChanged( const QString& name, const QRectF& size );
+  void                  signRcPairActiveStateChanged( const QString& name, bool state );
+  void                  signRcPairViewportChanged( const QString& name, const QRectF& geometry );
+
   void                  signMousePressed( const QString& name, QMouseEvent* event );
   void                  signMouseReleased( const QString& name, QMouseEvent* event );
   void                  signMouseDoubleClicked( const QString& name, QMouseEvent* event );
@@ -63,7 +65,7 @@ private:
   QRectF                                      _viewport;
 
 private slots:
-  void                  itemChange(ItemChange change, const ItemChangeData& value ) override;
+//  void                  itemChange(ItemChange change, const ItemChangeData& value ) override;
   QSGNode*              updatePaintNode(QSGNode *, UpdatePaintNodeData *) override;
 
   void                  mousePressEvent(QMouseEvent *event) override;

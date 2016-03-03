@@ -55,8 +55,9 @@ GuiApplication::onSGInit() {
   // Init GMlibWrapper
   _gmlib = std::make_shared<GMlibWrapper>(_glsurface);
   _gmlib->init();
-  connect( _gmlib.get(),  &GMlibWrapper::signFrameReady,   _window.get(), &Window::update );
-  connect( _window.get(), &Window::signGuiViewportChanged, _gmlib.get(),  &GMlibWrapper::changeRenderGeometry );
+  connect( _gmlib.get(),  &GMlibWrapper::signFrameReady,         _window.get(), &Window::update );
+  connect( _window.get(), &Window::signRcPairViewportChanged,    _gmlib.get(),  &GMlibWrapper::changeRcPairViewport );
+  connect( _window.get(), &Window::signRcPairActiveStateChanged, _gmlib.get(),  &GMlibWrapper::changeRcPairActiveState );
 
   // Create hidmanager
   _hidmanager = std::make_shared<DefaultHidManager>( _gmlib );

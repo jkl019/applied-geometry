@@ -15,6 +15,7 @@
 #include <QTimerEvent>
 #include <QRectF>
 #include <QMouseEvent>
+#include <QDebug>
 
 // stl
 #include <stdexcept>
@@ -64,10 +65,10 @@ GMlibWrapper::~GMlibWrapper() {
 
     for( auto& rc_pair : _rc_pairs ) {
 
-      rc_pair.second.render->releaseCamera();
+      rc_pair.second.renderer->releaseCamera();
       _scene->removeCamera( rc_pair.second.camera.get() );
 
-      rc_pair.second.render.reset();
+      rc_pair.second.renderer.reset();
       rc_pair.second.camera.reset();
     }
 
@@ -76,7 +77,7 @@ GMlibWrapper::~GMlibWrapper() {
   } _glsurface->doneCurrent();
 }
 
-void GMlibWrapper::changeRenderGeometry(const QString& name, const QRectF& geometry) {
+void GMlibWrapper::changeRcPairViewport(const QString& name, const QRectF& geometry) {
 
   const QSize size = geometry.size().toSize();
 
@@ -86,12 +87,12 @@ void GMlibWrapper::changeRenderGeometry(const QString& name, const QRectF& geome
   if( _rc_pairs.count(name.toStdString()) <= 0 )
     return;
 
-  auto& rc_pair = _rc_pairs[name.toStdString()];
-  if(rc_pair.viewport.geometry == geometry )
+  auto& viewport = _rc_pairs[name.toStdString()].viewport;
+  if(viewport.geometry == geometry )
     return;
 
-  rc_pair.viewport.geometry = geometry;
-  rc_pair.viewport.changed = true;
+  viewport.geometry = geometry;
+  viewport.changed = true;
 }
 
 void GMlibWrapper::toggleSimulation() {
@@ -112,41 +113,33 @@ void GMlibWrapper::timerEvent(QTimerEvent* e) {
   // Grab and activate GL context
   _glsurface->makeCurrent(); {
 
-    // 1)
     _scene->prepare();
-
 
     _scene->simulate();
 
-//    std::vector<std::thread> threads;
-
-    // Add simulation thread
-//    threads.push_back(std::thread(&GMlib::Scene::simulate,_scene));
-
-    // Add Render threads
     for( auto& rc_pair : _rc_pairs ) {
-  //      qDebug() << "About to render: " << rc_pair.first.c_str();
-  //      qDebug() << "  Viewport: ";
-  //      qDebug() << "    Changed: " << rc_pair.second.viewport.changed;
-  //      qDebug() << "    Geometry: " << rc_pair.second.viewport.geometry;
 
-      if(rc_pair.second.viewport.changed) {
-        const QSizeF size = rc_pair.second.viewport.geometry.size();
-        rc_pair.second.render->reshape( GMlib::Vector<int,2>(size.width(),size.height()));
-        rc_pair.second.camera->reshape( 0, 0, size.width(), size.height() );
-        rc_pair.second.viewport.changed = false;
+      const auto&   active  = rc_pair.second.active;
+      auto&         camera  = rc_pair.second.camera;
+      auto&       renderer  = rc_pair.second.renderer;
+      auto&       viewport  = rc_pair.second.viewport;
+
+      // Continue with next pair if not active
+      if(!active) continue;
+
+      // Update viewport
+      if(viewport.changed) {
+
+        const auto& size = viewport.geometry.size();
+        renderer->reshape( GMlib::Vector<int,2>(size.width(),size.height()));
+        camera->reshape( 0, 0, size.width(), size.height() );
+        viewport.changed = false;
       }
 
-      rc_pair.second.render->render();
-      rc_pair.second.render->swap();
+      // Render and swap buffers
+      renderer->render();
+      renderer->swap();
     }
-
-//    for( auto& thread : threads )
-//      thread.join();
-
-
-//    auto so = findSceneObject("Projection", GMlib::Point<int,2>(0,0) );
-//    std::cout << "SceneObject: " << so << std::endl;
 
   } _glsurface->doneCurrent();
 
@@ -223,7 +216,15 @@ GMlibWrapper::findSceneObject(const QString& rc_name, const GMlib::Point<int,2>&
   return sel_obj;
 }
 
-RenderCamPair&GMlibWrapper::rcPair(const QString& name) {
+RenderCamPair&
+GMlibWrapper::rcPair(const QString& name) {
+
+  if(!_rc_pairs.count(name.toStdString())) throw std::invalid_argument("[][]Render/Camera pair '" + name.toStdString() + "'  does not exist!");
+  return _rc_pairs.at(name.toStdString());
+}
+
+const RenderCamPair&
+GMlibWrapper::rcPair(const QString& name) const {
 
   if(!_rc_pairs.count(name.toStdString())) throw std::invalid_argument("[][]Render/Camera pair '" + name.toStdString() + "'  does not exist!");
   return _rc_pairs.at(name.toStdString());
@@ -231,28 +232,29 @@ RenderCamPair&GMlibWrapper::rcPair(const QString& name) {
 
 RenderCamPair& GMlibWrapper::createRCPair(const QString& name) {
 
-  GMlib::Vector<int,2> init_viewport { 800, 600};
   auto rc_pair = RenderCamPair {};
 
-  rc_pair.render = std::make_shared<GMlib::DefaultRenderer>();
+  rc_pair.renderer = std::make_shared<GMlib::DefaultRenderer>();
   rc_pair.camera = std::make_shared<GMlib::Camera>();
-  rc_pair.render->setCamera(rc_pair.camera.get());
+  rc_pair.renderer->setCamera(rc_pair.camera.get());
 
   auto rc_names = _rc_name_model.stringList();
   rc_names << name;
   _rc_name_model.setStringList(rc_names);
 
-
-//  QStringList test;
-//  test << "One" << "Two" << "Three";
-//  _rc_name_model.setStringList(test);
-
   return _rc_pairs[name.toStdString()] = rc_pair;
 }
 
-std::shared_ptr<GMlib::DefaultSelectRenderer> GMlibWrapper::defaultSelectRenderer() const {
+std::shared_ptr<GMlib::DefaultSelectRenderer>
+GMlibWrapper::defaultSelectRenderer() const {
 
   return _select_renderer;
+}
+
+void
+GMlibWrapper::changeRcPairActiveState(const QString& name, bool state) {
+
+  rcPair(name).active = state;
 }
 
 QStringListModel&
@@ -268,17 +270,13 @@ GMlibWrapper::scene() const {
 }
 
 const GMlib::TextureRenderTarget&
-GMlibWrapper::renderTextureOf(const std::string& name) const {
+GMlibWrapper::renderTextureOf(const QString& name) const {
 
-  if(!_rc_pairs.count(name)) throw std::invalid_argument("[][]Render/Camera pair '" + name + "'  does not exist!");
-
-  return _rc_pairs.at(name).render->getFrontRenderTarget();
+  return rcPair(name).renderer->getFrontRenderTarget();
 }
 
 const std::shared_ptr<GMlib::Camera>&
-GMlibWrapper::camera(const std::string& name) const {
+GMlibWrapper::camera(const QString& name) const {
 
-  if(!_rc_pairs.count(name)) throw std::invalid_argument("[][]Render/Camera pair '" + name + "'  does not exist!");
-
-  return _rc_pairs.at(name).camera;
+  return rcPair(name).camera;
 }

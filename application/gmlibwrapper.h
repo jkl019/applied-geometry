@@ -39,13 +39,14 @@ class QWheelEvent;
 
 
 struct RenderCamPair {
-  RenderCamPair() : render{nullptr}, camera{nullptr} {}
-  std::shared_ptr<GMlib::DefaultRenderer>     render;
-  std::shared_ptr<GMlib::Camera>              camera;
+  RenderCamPair() {}
+  std::shared_ptr<GMlib::DefaultRenderer>     renderer {nullptr};
+  std::shared_ptr<GMlib::Camera>              camera {nullptr};
   struct {
     QRectF                      geometry { QRectF(0,0,200,200) };
     bool                        changed {true};
   } viewport;
+  bool                                        active {false};
 };
 
 
@@ -62,8 +63,8 @@ public:
   void                                              stop();
 
   const std::shared_ptr<GMlib::Scene>&              scene() const;
-  const GMlib::TextureRenderTarget&                 renderTextureOf( const std::string& name ) const;
-  const std::shared_ptr<GMlib::Camera>&             camera( const std::string& name ) const;
+  const GMlib::TextureRenderTarget&                 renderTextureOf(const QString& name ) const;
+  const std::shared_ptr<GMlib::Camera>&             camera(const QString& name ) const;
 
   void                                              init();
 
@@ -71,6 +72,7 @@ public:
   QStringListModel&                                 rcNameModel();
 
   RenderCamPair&                                    rcPair(const QString& name);
+  const RenderCamPair&                              rcPair(const QString& name) const;
   RenderCamPair&                                    createRCPair( const QString& name );
 
   std::shared_ptr<GMlib::DefaultSelectRenderer>     defaultSelectRenderer() const;
@@ -78,8 +80,8 @@ public:
 
 
 public slots:
-  void                                              changeRenderGeometry( const QString& name,
-                                                                          const QRectF &new_geometry );
+  void                                              changeRcPairActiveState( const QString& name, bool state );
+  void                                              changeRcPairViewport( const QString& name, const QRectF& geometry);
 
   void                                              toggleSimulation();
 
@@ -88,7 +90,6 @@ protected:
 
 
 private:
-
   int                                               _timer_id;
 
   std::shared_ptr<GLContextSurfaceWrapper>          _glsurface;
@@ -105,6 +106,8 @@ private:
   GMlib::Point<int,2>                               _prev_mouse_pos;
 
   QStringListModel                                  _rc_name_model;
+
+
 signals:
   void                                              signFrameReady();
 

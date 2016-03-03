@@ -449,7 +449,7 @@ void DefaultHidManager::heOpenCloseHidHelp() {
 
 Camera* DefaultHidManager::findCamera( const QString& view_name ) const {
 
-  return _gmlib->camera(view_name.toStdString()).get();
+  return _gmlib->camera(view_name).get();
 }
 
 
