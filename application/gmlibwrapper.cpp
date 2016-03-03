@@ -97,8 +97,7 @@ void GMlibWrapper::changeRcPairViewport(const QString& name, const QRectF& geome
 
 void GMlibWrapper::toggleSimulation() {
 
-  if(_scene->isRunning()) stop();
-  else                    start();
+  _scene->toggleRun();
 }
 
 void GMlibWrapper::timerEvent(QTimerEvent* e) {
