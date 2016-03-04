@@ -31,8 +31,6 @@ GuiApplication::GuiApplication(int& argc, char *argv[])
 
   connect( _window.get(), &Window::sceneGraphInitialized,     this, &GuiApplication::onSGInit );
   connect( this,          &QGuiApplication::lastWindowClosed, this, &QGuiApplication::quit );
-
-  _window->show();
 }
 
 GuiApplication::~GuiApplication() {
@@ -43,6 +41,11 @@ GuiApplication::~GuiApplication() {
     _window.reset();
 
   } _glsurface->doneCurrent();
+}
+
+void GuiApplication::show() {
+
+  _window->show();
 }
 
 void

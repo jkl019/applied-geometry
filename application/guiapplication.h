@@ -27,6 +27,8 @@ public:
   explicit GuiApplication(int& argc, char* argv[]);
   ~GuiApplication();
 
+    void      show();               // Need this as QT is difficult, just like a little bratt!!!
+
 private:
   std::shared_ptr<Window>                     _window;
   std::shared_ptr<GMlibWrapper>               _gmlib;

@@ -49,6 +49,8 @@ int main(int argc, char *argv[]) try {
   // Create the application object
   Scenario a(argc, argv);
 
+  a.show();
+
   // Start the app, and return control to the Qt system.
   return a.exec();
 }
