@@ -202,14 +202,14 @@ GMlibWrapper::findSceneObject(const QString& rc_name, const GMlib::Point<int,2>&
 
   // Render selectors and find object ad pos
   _select_renderer->select( GMlib::GM_SO_TYPE_SELECTOR );
-  sel_obj = _select_renderer->findObject(pos(0),size(1)-pos(1)-1);
+  sel_obj = _select_renderer->findObject(pos(0),pos(1));
 
 
   // Render other objects and find object ad pos
   if(!sel_obj) {
 
     _select_renderer->select( -GMlib::GM_SO_TYPE_SELECTOR );
-    sel_obj = _select_renderer->findObject(pos(0),size(1)-pos(1)-1);
+    sel_obj = _select_renderer->findObject(pos(0),pos(1));
   }
 
   return sel_obj;
