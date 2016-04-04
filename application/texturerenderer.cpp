@@ -173,8 +173,8 @@ TextureRenderer::paint() {
   GL_CHECK(::glDisable(GL_BLEND));
   _prog.bind(); {
 
-    _prog.setUniform( "u_tex0", _tex, GL_TEXTURE0, GLuint(0) );
-    _prog.setUniform( "u_magn", _color_magn );
+    _prog.uniform( "u_tex0", _tex, GL_TEXTURE0, GLuint(0) );
+    _prog.uniform( "u_magn", _color_magn );
 
 
     GMlib::GL::AttributeLocation vert_loc = prog().getAttributeLocation("vertices");

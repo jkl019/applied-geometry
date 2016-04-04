@@ -108,7 +108,7 @@ void RCPairRenderer::paint() {
 
   prog().bind(); {
 
-    prog().setUniform( "u_tex0", tex, GL_TEXTURE0, GLuint(0) );
+    prog().uniform( "u_tex0", tex, GL_TEXTURE0, GLuint(0) );
 
     GMlib::GL::AttributeLocation vert_loc = prog().getAttributeLocation("vertices");
 
