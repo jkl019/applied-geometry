@@ -4,7 +4,7 @@ import QtQuick.Controls 1.1
 
 import "qrc:/qml/components"
 
-import MyCppComponents 1.0
+import SceneGraphRendering 1.0
 
 Item {
   id: root
@@ -13,12 +13,12 @@ Item {
 
   onToggleHidBindView: hid_bind_view.toggle()
 
-  RCPairRenderer{
+  Renderer {
     id: renderer
 
     anchors.fill: parent
 
-    name: rc_pair_cb.currentText
+//    name: rc_pair_cb.currentText
 
     ComboBox {
       id: rc_pair_cb
@@ -34,49 +34,40 @@ Item {
       textRole: "display"
     }
 
-    Button {
-      text: "?"
-      anchors.top: parent.top
-      anchors.right: parent.right
-      anchors.margins: 5
+//    Button {
+//      text: "?"
+//      anchors.top: parent.top
+//      anchors.right: parent.right
+//      anchors.margins: 5
 
-      width: height
-      opacity: 0.7
+//      width: height
+//      opacity: 0.7
 
-      onClicked: hid_bind_view.toggle()
-    }
+//      onClicked: hid_bind_view.toggle()
+//    }
 
-    HidBindingView {
-      id: hid_bind_view
-      anchors.fill: parent
-      anchors.margins: 50
-      visible:false
+//    HidBindingView {
+//      id: hid_bind_view
+//      anchors.fill: parent
+//      anchors.margins: 50
+//      visible:false
 
-      states: [
-        State{
-          name: "show"
-          PropertyChanges {
-            target: hid_bind_view
-            visible: true
-          }
-        }
-      ]
+//      states: [
+//        State{
+//          name: "show"
+//          PropertyChanges {
+//            target: hid_bind_view
+//            visible: true
+//          }
+//        }
+//      ]
 
-      function toggle() {
+//      function toggle() {
 
-        if(state === "") state = "show"
-        else state = ""
+//        if(state === "") state = "show"
+//        else state = ""
 
-      }
-    }
-
-//    TextureViewer {
-
-//      width:  256
-//      height: 144
-
-//      anchors.right:  parent.right
-//      anchors.bottom: parent.bottom
+//      }
 //    }
 
   }

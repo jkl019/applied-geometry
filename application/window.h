@@ -2,7 +2,6 @@
 #define WINDOW_H
 
 
-class GLContextSurfaceWrapper;
 
 // qt
 #include <QQuickView>
@@ -14,14 +13,6 @@ class Window : public QQuickView {
   Q_OBJECT
 public:
   explicit Window(QWindow *parent = 0);
-
-
-  std::shared_ptr<GLContextSurfaceWrapper>    glSurface() const;
-  void                                        initGLSurface();
-
-private:
-  std::shared_ptr<GLContextSurfaceWrapper>    _glsurface;
-
 
 signals:
   void      signRcPairActiveStateChanged( const QString& name, bool state );

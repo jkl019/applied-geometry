@@ -1,53 +1,36 @@
 #include "window.h"
 
-#include "glcontextsurfacewrapper.h"
+//local
+#include "fboinsgrenderer.h"
 
-//qt
-#include <QQuickItem>
-#include <QDebug>
+// qt
+#include "QOpenGLContext"
 
-Window::Window(QWindow *parent) :
-  QQuickView(parent) {
+Window::Window(QWindow *parent) : QQuickView(parent) {
 
-  // Turn off clear before rendering !!!!!!!!!!!!!
-  setClearBeforeRendering(false);
+  qmlRegisterType<FboInSGRenderer>("SceneGraphRendering", 1, 0, "Renderer");
 
-  // Set rendering surface type to GL surface
-  setSurfaceType( OpenGLSurface );
-
-  // Setup GLformat
-  QSurfaceFormat fmt;
-  fmt.setMajorVersion(3);
-  fmt.setMinorVersion(3);
-  fmt.setDepthBufferSize(24);
-  fmt.setStencilBufferSize(1);
-  fmt.setSwapBehavior( QSurfaceFormat::DoubleBuffer );
-  fmt.setSamples(4);
-  fmt.setProfile( QSurfaceFormat::CompatibilityProfile );
-  fmt.setOption(QSurfaceFormat::DeprecatedFunctions);
-//  fmt.setProfile( QSurfaceFormat::CoreProfile );
-  QSurfaceFormat::setDefaultFormat(fmt);
-  setFormat(fmt);
-
-
-  // Set the GLContext and scene graph to be persistent
+  setSurfaceType(QSurface::OpenGLSurface);
   setPersistentOpenGLContext(true);
   setPersistentSceneGraph(true);
 
-  // Initial size
-  setResizeMode(QQuickView::SizeRootObjectToView);
+  // Turn off clear before rendering !!!!!!!!!!!!!
+//  setClearBeforeRendering(false);
+
+  QSurfaceFormat format;
+  if(QOpenGLContext::openGLModuleType() == QOpenGLContext::LibGL) {
+//    format.setVersion(4,0);
+    format.setProfile(QSurfaceFormat::CompatibilityProfile);
+    format.setOption(QSurfaceFormat::DeprecatedFunctions);
+  }
+  format.setDepthBufferSize(24);
+  format.setSamples(4);
+  format.setStencilBufferSize(8);
+  QSurfaceFormat::setDefaultFormat(format);
+  setFormat(format);
+
+  setResizeMode(SizeRootObjectToView);
+
+//  resize(800,600);
   setMinimumSize( QSize( 800, 600 ) );
-
-  // Create window
-  create();
-}
-
-std::shared_ptr<GLContextSurfaceWrapper>
-Window::glSurface() const {
-
-  return _glsurface;
-}
-
-void Window::initGLSurface() {
-  _glsurface = std::make_shared<GLContextSurfaceWrapper>(openglContext());
 }

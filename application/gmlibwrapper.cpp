@@ -28,11 +28,11 @@
 
 std::unique_ptr<GMlibWrapper> GMlibWrapper::_instance {nullptr};
 
+GMlibWrapper&
+GMlibWrapper::instance() { return *_instance; }
 
-GMlibWrapper::GMlibWrapper(std::shared_ptr<GLContextSurfaceWrapper> context)
-//  : GMlibWrapper()
-  : QObject(), _timer_id{0}, _glsurface(context), _select_renderer{nullptr}
-{
+
+GMlibWrapper::GMlibWrapper() : QObject(), _timer_id{0}, _select_renderer{nullptr} {
 
   if(_instance != nullptr) {
 
@@ -44,110 +44,80 @@ GMlibWrapper::GMlibWrapper(std::shared_ptr<GLContextSurfaceWrapper> context)
 
 
   _instance = std::unique_ptr<GMlibWrapper>(this);
-
-  _glsurface->makeCurrent();
-
-  // Setup and initialized GMlib GL backend
-  GMlib::GL::OpenGLManager::init();
-
-  // Setup and init the GMlib GMWindow
-  _scene = std::make_shared<GMlib::Scene>();
 }
 
 GMlibWrapper::~GMlibWrapper() {
 
   stop();
 
-  _glsurface->makeCurrent(); {
 
-    _select_renderer->releaseCamera();
-    _select_renderer.reset();
+  _select_renderer->releaseCamera();
+  _select_renderer.reset();
 
-    for( auto& rc_pair : _rc_pairs ) {
+  for( auto& rc_pair : _rc_pairs ) {
 
-      rc_pair.second.renderer->releaseCamera();
-      _scene->removeCamera( rc_pair.second.camera.get() );
+    rc_pair.second.renderer->releaseCamera();
+    _scene->removeCamera( rc_pair.second.camera.get() );
 
-      rc_pair.second.renderer.reset();
-      rc_pair.second.camera.reset();
-    }
+    rc_pair.second.renderer.reset();
+    rc_pair.second.camera.reset();
+  }
 
-    _scene->clear();
+  _scene->clear();
 
-  } _glsurface->doneCurrent();
+  _instance.release();
 }
 
-void GMlibWrapper::changeRcPairViewport(const QString& name, const QRectF& geometry) {
+//void GMlibWrapper::changeRcPairViewport(const QString& name, const QRectF& geometry) {
 
-  const QSize size = geometry.size().toSize();
+//  const QSize size = geometry.size().toSize();
 
-  if( size.width() <= 0 || size.height() <= 0 )
-    return;
+//  if( size.width() <= 0 || size.height() <= 0 )
+//    return;
 
-  if( _rc_pairs.count(name.toStdString()) <= 0 )
-    return;
+//  if( _rc_pairs.count(name.toStdString()) <= 0 )
+//    return;
 
-  auto& viewport = _rc_pairs[name.toStdString()].viewport;
-  if(viewport.geometry == geometry )
-    return;
+//  auto& viewport = _rc_pairs[name.toStdString()].viewport;
+//  if(viewport.geometry == geometry )
+//    return;
 
-  viewport.geometry = geometry;
-  viewport.changed = true;
+//  viewport.geometry = geometry;
+//  viewport.changed = true;
+//}
+
+void GMlibWrapper::toggleSimulation() {  _scene->toggleRun(); }
+
+
+void GMlibWrapper::render( const QString& name, const QRect& viewport_in, GMlib::RenderTarget& target ) {
+
+  auto&        rc_pair = rcPair(name);
+  auto&         camera = rc_pair.camera;
+  auto&       renderer = rc_pair.renderer;
+  auto&       viewport = rc_pair.viewport;
+
+  // Update viewport
+  if(viewport != viewport_in) {
+
+    viewport = viewport_in;
+
+    const auto& size = viewport.size();
+    renderer->reshape( GMlib::Vector<int,2>(size.width(),size.height()));
+    camera->reshape( 0, 0, size.width(), size.height() );
+  }
+
+  // Render and swap buffers
+  renderer->render(target);
+//  renderer->swap();
 }
 
-void GMlibWrapper::toggleSimulation() {
-
-  _scene->toggleRun();
-}
 
 void GMlibWrapper::timerEvent(QTimerEvent* e) {
 
   e->accept();
 
-  // Simuation order
-  // 1) Prepare must be run first
-  // 2) Simulate and render can be run in parallell
-
-
-  // Grab and activate GL context
-  _glsurface->makeCurrent(); {
-
-    _scene->prepare();
-
-    _scene->simulate();
-
-    for( auto& rc_pair : _rc_pairs ) {
-
-      const auto&   active  = rc_pair.second.active;
-      auto&         camera  = rc_pair.second.camera;
-      auto&       renderer  = rc_pair.second.renderer;
-      auto&       viewport  = rc_pair.second.viewport;
-
-      // Continue with next pair if not active
-      if(!active) continue;
-
-      // Update viewport
-      if(viewport.changed) {
-
-        const auto& size = viewport.geometry.size();
-        renderer->reshape( GMlib::Vector<int,2>(size.width(),size.height()));
-        camera->reshape( 0, 0, size.width(), size.height() );
-        viewport.changed = false;
-      }
-
-      // Render and swap buffers
-      renderer->render();
-      renderer->swap();
-    }
-
-  } _glsurface->doneCurrent();
-
-  emit signFrameReady();
-}
-
-const GMlibWrapper&
-GMlibWrapper::getInstance() {
-  return *_instance;
+  _scene->simulate();
+  prepare();
 }
 
 void GMlibWrapper::start() {
@@ -169,50 +139,53 @@ void GMlibWrapper::stop() {
   _timer_id = 0;
 }
 
-void GMlibWrapper::init() {
+void GMlibWrapper::initialize() {
 
-  // Make OpenGL context current on offscreensurface
-  _glsurface->makeCurrent(); {
+  // Setup and initialized GMlib GL backend
+  GMlib::GL::OpenGLManager::init();
 
-    // Setup Select Renderer
-    _select_renderer = std::make_shared<GMlib::DefaultSelectRenderer>();
-    _select_renderer->setSelectRboName("select_render_color_rbo");
+  // Setup and init the GMlib GMWindow
+  _scene = std::make_shared<GMlib::Scene>();
 
-  } _glsurface->doneCurrent();
+  // Setup Select Renderer
+  _select_renderer = std::make_shared<GMlib::DefaultSelectRenderer>();
+  _select_renderer->setSelectRboName("select_render_color_rbo");
 }
 
 GMlib::SceneObject*
 GMlibWrapper::findSceneObject(const QString& rc_name, const GMlib::Point<int,2>& pos) {
 
-  if(!_rc_pairs.count(rc_name.toStdString()))
-    throw std::invalid_argument("[][]Render/Camera pair '" + rc_name.toStdString() + "'  does not exist in [" + __FILE__ + " on line " + std::to_string(__LINE__) + "]!");
+  return nullptr;
 
-  auto rc_pair = _rc_pairs.at(rc_name.toStdString());
-  auto cam = rc_pair.camera;
-  auto viewport = rc_pair.viewport.geometry.size();
-  GMlib::Vector<int,2> size( viewport.width(), viewport.height() );
+//  if(!_rc_pairs.count(rc_name.toStdString()))
+//    throw std::invalid_argument("[][]Render/Camera pair '" + rc_name.toStdString() + "'  does not exist in [" + __FILE__ + " on line " + std::to_string(__LINE__) + "]!");
 
-
-  GMlib::SceneObject* sel_obj = nullptr;
-
-  // Setup select renderer to match current view and prepare
-  _select_renderer->setCamera(cam.get());
-  _select_renderer->reshape( size );
-  _select_renderer->prepare();
-
-  // Render selectors and find object ad pos
-  _select_renderer->select( GMlib::GM_SO_TYPE_SELECTOR );
-  sel_obj = _select_renderer->findObject(pos(0),pos(1));
+//  auto rc_pair = _rc_pairs.at(rc_name.toStdString());
+//  auto cam = rc_pair.camera;
+//  auto viewport = rc_pair.viewport.geometry.size();
+//  GMlib::Vector<int,2> size( viewport.width(), viewport.height() );
 
 
-  // Render other objects and find object ad pos
-  if(!sel_obj) {
+//  GMlib::SceneObject* sel_obj = nullptr;
 
-    _select_renderer->select( -GMlib::GM_SO_TYPE_SELECTOR );
-    sel_obj = _select_renderer->findObject(pos(0),pos(1));
-  }
+//  // Setup select renderer to match current view and prepare
+//  _select_renderer->setCamera(cam.get());
+//  _select_renderer->reshape( size );
+//  _select_renderer->prepare();
 
-  return sel_obj;
+//  // Render selectors and find object ad pos
+//  _select_renderer->select( GMlib::GM_SO_TYPE_SELECTOR );
+//  sel_obj = _select_renderer->findObject(pos(0),pos(1));
+
+
+//  // Render other objects and find object ad pos
+//  if(!sel_obj) {
+
+//    _select_renderer->select( -GMlib::GM_SO_TYPE_SELECTOR );
+//    sel_obj = _select_renderer->findObject(pos(0),pos(1));
+//  }
+
+//  return sel_obj;
 }
 
 RenderCamPair&
@@ -237,11 +210,18 @@ RenderCamPair& GMlibWrapper::createRCPair(const QString& name) {
   rc_pair.camera = std::make_shared<GMlib::Camera>();
   rc_pair.renderer->setCamera(rc_pair.camera.get());
 
-  auto rc_names = _rc_name_model.stringList();
-  rc_names << name;
-  _rc_name_model.setStringList(rc_names);
-
   return _rc_pairs[name.toStdString()] = rc_pair;
+}
+
+void
+GMlibWrapper::updateRCPairNameModel() {
+
+  QStringList names;
+  for( auto& rc_pair : _rc_pairs )
+    names << QString(rc_pair.first.c_str());
+
+
+  _rc_name_model.setStringList(names);
 }
 
 std::shared_ptr<GMlib::DefaultSelectRenderer>
@@ -250,11 +230,11 @@ GMlibWrapper::defaultSelectRenderer() const {
   return _select_renderer;
 }
 
-void
-GMlibWrapper::changeRcPairActiveState(const QString& name, bool state) {
+//void
+//GMlibWrapper::changeRcPairActiveState(const QString& name, bool state) {
 
-  rcPair(name).active = state;
-}
+//  rcPair(name).active = state;
+//}
 
 QStringListModel&
 GMlibWrapper::rcNameModel() {
@@ -268,14 +248,16 @@ GMlibWrapper::scene() const {
   return _scene;
 }
 
-const GMlib::TextureRenderTarget&
-GMlibWrapper::renderTextureOf(const QString& name) const {
+//const GMlib::TextureRenderTarget&
+//GMlibWrapper::renderTextureOf(const QString& name) const {
 
-  return rcPair(name).renderer->getFrontRenderTarget();
-}
+//  return static_cast<const GMlib::TextureRenderTarget&>(rcPair(name).renderer->getFrontRenderTarget());
+//}
 
 const std::shared_ptr<GMlib::Camera>&
 GMlibWrapper::camera(const QString& name) const {
 
   return rcPair(name).camera;
 }
+
+void  GMlibWrapper::prepare() {  _scene->prepare(); }

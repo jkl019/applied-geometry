@@ -2,13 +2,8 @@
 
 #include "testtorus.h"
 
-
-// application
-#include "application/gmlibwrapper.h"
-#include "application/window.h"
-
-// hidmanager
-#include "hidmanager/defaulthidmanager.h"
+//// hidmanager
+//#include "hidmanager/defaulthidmanager.h"
 
 // gmlib
 #include <gmOpenglModule>
@@ -39,7 +34,7 @@ void Scenario::initializeScenario() {
   GMlib::Vector<float,3> init_cam_up(  0.0f, 0.0f, 1.0f );
 
   // Projection cam
-  auto proj_rcpair = gmlib()->createRCPair("Projection");
+  auto proj_rcpair = createRCPair("Projection");
   proj_rcpair.camera->set(init_cam_pos,init_cam_dir,init_cam_up);
   proj_rcpair.camera->setCuttingPlanes( 1.0f, 8000.0f );
   proj_rcpair.camera->rotateGlobal( GMlib::Angle(-45), GMlib::Vector<float,3>( 1.0f, 0.0f, 0.0f ) );
@@ -48,21 +43,21 @@ void Scenario::initializeScenario() {
   proj_rcpair.renderer->reshape( GMlib::Vector<int,2>(init_viewport_size, init_viewport_size) );
 
   // Front cam
-  auto front_rcpair = gmlib()->createRCPair("Front");
+  auto front_rcpair = createRCPair("Front");
   front_rcpair.camera->set( init_cam_pos + GMlib::Vector<float,3>( 0.0f, -50.0f, 0.0f ), init_cam_dir, init_cam_up );
   front_rcpair.camera->setCuttingPlanes( 1.0f, 8000.0f );
   scene()->insertCamera( front_rcpair.camera.get() );
   front_rcpair.renderer->reshape( GMlib::Vector<int,2>(init_viewport_size, init_viewport_size) );
 
   // Side cam
-  auto side_rcpair = gmlib()->createRCPair("Side");
+  auto side_rcpair = createRCPair("Side");
   side_rcpair.camera->set( init_cam_pos + GMlib::Vector<float,3>( -50.0f, 0.0f, 0.0f ), GMlib::Vector<float,3>( 1.0f, 0.0f, 0.0f ), init_cam_up );
   side_rcpair.camera->setCuttingPlanes( 1.0f, 8000.0f );
   scene()->insertCamera( side_rcpair.camera.get() );
   side_rcpair.renderer->reshape( GMlib::Vector<int,2>(init_viewport_size, init_viewport_size) );
 
   // Top cam
-  auto top_rcpair = gmlib()->createRCPair("Top");
+  auto top_rcpair = createRCPair("Top");
   top_rcpair.camera->set( init_cam_pos + GMlib::Vector<float,3>( 0.0f, 0.0f, 50.0f ), -init_cam_up, init_cam_dir );
   top_rcpair.camera->setCuttingPlanes( 1.0f, 8000.0f );
   scene()->insertCamera( top_rcpair.camera.get() );
@@ -92,15 +87,15 @@ void Scenario::initializeScenario() {
 
 
 
-  // Setup default hid-bindings
-  hidmanager()->setupDefaultHidBindings();
+//  // Setup default hid-bindings
+//  hidmanager()->setupDefaultHidBindings();
 
-  // Load QML
-  window()->setSource( QUrl("qrc:/qml/main.qml") );
+//  // Load QML
+//  window()->setSource( QUrl("qrc:/qml/main.qml") );
 
-  // Connect up HiD signals
-  connect( hidmanager().get(), &DefaultHidManager::signToggleSimulation, gmlib().get(),          &GMlibWrapper::toggleSimulation );
-  connect( hidmanager().get(), SIGNAL(signOpenCloseHidHelp()),           window()->rootObject(), SIGNAL(toggleHidBindView()) );
+//  // Connect up HiD signals
+//  connect( hidmanager().get(), &DefaultHidManager::signToggleSimulation, gmlib().get(),          &GMlibWrapper::toggleSimulation );
+//  connect( hidmanager().get(), SIGNAL(signOpenCloseHidHelp()),           window()->rootObject(), SIGNAL(toggleHidBindView()) );
 
 
 }

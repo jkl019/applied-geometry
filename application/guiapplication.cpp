@@ -21,111 +21,81 @@
 std::unique_ptr<GuiApplication> GuiApplication::_instance {nullptr};
 
 
-GuiApplication::GuiApplication(int& argc, char *argv[])
-  : QGuiApplication(argc, argv),
-    _window{std::make_shared<Window>()}, _gmlib{nullptr}, _glsurface{nullptr}
-{
+GuiApplication::GuiApplication(int& argc, char **argv) : QGuiApplication(argc, argv) {
 
   assert(!_instance);
   _instance = std::unique_ptr<GuiApplication>(this);
 
-  connect( _window.get(), &Window::sceneGraphInitialized,     this, &GuiApplication::onSGInit );
-  connect( this,          &QGuiApplication::lastWindowClosed, this, &QGuiApplication::quit );
+  connect( &_window, &Window::sceneGraphInitialized,
+           this,     &GuiApplication::onSceneGraphInitialized,
+           Qt::DirectConnection );
+
+  connect( this, &GuiApplication::signOnSceneGraphInitializedDone,
+           this, &GuiApplication::afterSceneGraphInitialized );
+
+  connect( this, &QGuiApplication::lastWindowClosed,
+           this, &QGuiApplication::quit );
+
+  _window.rootContext()->setContextProperty( "rc_name_model", &_scenario.rcNameModel() );
+  _window.setSource(QUrl("qrc:///qml/main.qml"));
+
+  _window.show();
 }
 
 GuiApplication::~GuiApplication() {
 
-  _glsurface->makeCurrent(); {
-
-    _gmlib.reset();
-    _window.reset();
-
-  } _glsurface->doneCurrent();
-}
-
-void GuiApplication::show() {
-
-  _window->show();
+  _instance.release();
 }
 
 void
-GuiApplication::onSGInit() {
-
-  // Init GLSurface
-  _window->initGLSurface();
-  _glsurface = _window->glSurface();
+GuiApplication::onSceneGraphInitialized() {
 
   // Init GMlibWrapper
-  _gmlib = std::make_shared<GMlibWrapper>(_glsurface);
-  _gmlib->init();
-  connect( _gmlib.get(),  &GMlibWrapper::signFrameReady,         _window.get(), &Window::update );
-  connect( _window.get(), &Window::signRcPairViewportChanged,    _gmlib.get(),  &GMlibWrapper::changeRcPairViewport );
-  connect( _window.get(), &Window::signRcPairActiveStateChanged, _gmlib.get(),  &GMlibWrapper::changeRcPairActiveState );
+  _scenario.initialize();
+  connect( &_scenario,  &GMlibWrapper::signFrameReady,
+           &_window,    &Window::update );
 
-  // Create hidmanager
-  _hidmanager = std::make_shared<DefaultHidManager>( _gmlib );
-  _window->rootContext()->setContextProperty( "hidmanager_model", _hidmanager->getModel() );
-  _window->rootContext()->setContextProperty( "rc_name_model", &_gmlib->rcNameModel() );
+//  connect( &_window,    &Window::signRcPairViewportChanged,
+//           &_scenario,  &GMlibWrapper::changeRcPairViewport );
 
-  connect( _window.get(), &Window::signMousePressed,       _hidmanager.get(), &StandardHidManager::registerMousePressEvent );
-  connect( _window.get(), &Window::signMouseReleased,      _hidmanager.get(), &StandardHidManager::registerMouseReleaseEvent );
-  connect( _window.get(), &Window::signMouseDoubleClicked, _hidmanager.get(), &StandardHidManager::registerMouseDoubleClickEvent);
-  connect( _window.get(), &Window::signMouseMoved,         _hidmanager.get(), &StandardHidManager::registerMouseMoveEvent );
-  connect( _window.get(), &Window::signKeyPressed,         _hidmanager.get(), &StandardHidManager::registerKeyPressEvent );
-  connect( _window.get(), &Window::signKeyReleased,        _hidmanager.get(), &StandardHidManager::registerKeyReleaseEvent );
-  connect( _window.get(), &Window::signWheelEventOccurred, _hidmanager.get(), &StandardHidManager::registerWheelEvent );
+//  connect( &_window,    &Window::signRcPairActiveStateChanged,
+//           &_scenario,  &GMlibWrapper::changeRcPairActiveState );
 
-  connect( _hidmanager.get(), &StandardHidManager::signBeforeHidAction, this,  &GuiApplication::beforeHidAction, Qt::DirectConnection );
-  connect( _hidmanager.get(), &StandardHidManager::signAfterHidAction,  this,  &GuiApplication::afterHidAction );
+//  // Create hidmanager
+//  _hidmanager = std::make_shared<DefaultHidManager>( _gmlib );
+//  _window->rootContext()->setContextProperty( "hidmanager_model", _hidmanager->getModel() );
+//  _window->rootContext()->setContextProperty( "rc_name_model", &_gmlib->rcNameModel() );
+
+//  connect( _window.get(), &Window::signMousePressed,       _hidmanager.get(), &StandardHidManager::registerMousePressEvent );
+//  connect( _window.get(), &Window::signMouseReleased,      _hidmanager.get(), &StandardHidManager::registerMouseReleaseEvent );
+//  connect( _window.get(), &Window::signMouseDoubleClicked, _hidmanager.get(), &StandardHidManager::registerMouseDoubleClickEvent);
+//  connect( _window.get(), &Window::signMouseMoved,         _hidmanager.get(), &StandardHidManager::registerMouseMoveEvent );
+//  connect( _window.get(), &Window::signKeyPressed,         _hidmanager.get(), &StandardHidManager::registerKeyPressEvent );
+//  connect( _window.get(), &Window::signKeyReleased,        _hidmanager.get(), &StandardHidManager::registerKeyReleaseEvent );
+//  connect( _window.get(), &Window::signWheelEventOccurred, _hidmanager.get(), &StandardHidManager::registerWheelEvent );
+
+//  connect( _hidmanager.get(), &StandardHidManager::signBeforeHidAction, this,  &GuiApplication::beforeHidAction, Qt::DirectConnection );
+//  connect( _hidmanager.get(), &StandardHidManager::signAfterHidAction,  this,  &GuiApplication::afterHidAction );
 
   // Init test scene of the GMlib wrapper
-  _glsurface->makeCurrent(); {
-    initializeScenario();
-  } _glsurface->doneCurrent();
+  _scenario.initializeScenario();
+  _scenario.prepare();
+
+  emit signOnSceneGraphInitializedDone();
+}
+
+void
+GuiApplication::afterSceneGraphInitialized() {
+
+  // Update RCPair name model
+  _scenario.updateRCPairNameModel();
 
   // Start simulator
-  _gmlib->start();
+  _scenario.start();
 }
 
-void GuiApplication::beforeHidAction() {
-
-//  qDebug() << "BeforeHidAction:";
-  _glsurface->makeCurrent();
-}
-
-void GuiApplication::afterHidAction() {
-
-//  qDebug() << "AfterHidAction:";
-  _glsurface->doneCurrent();
-}
-
-std::shared_ptr<Window> GuiApplication::window() {
-
-  return _window;
-}
-
-std::shared_ptr<GMlibWrapper> GuiApplication::gmlib() {
-
-  return _gmlib;
-}
-
-std::shared_ptr<GLContextSurfaceWrapper> GuiApplication::glsurface() {
-
-  return _glsurface;
-}
-
-std::shared_ptr<DefaultHidManager> GuiApplication::hidmanager() {
-
-  return _hidmanager;
-}
-
-std::shared_ptr<GMlib::Scene> GuiApplication::scene() {
-
-  return _gmlib->scene();
-}
-
-const GuiApplication&
-GuiApplication::instance() {
-
-  return *_instance;
-}
+Window&            GuiApplication::window()     {  return _window; }
+//GMlibWrapper&      GuiApplication::gmlib()      {  return _gmlib; }
+//DefaultHidManager& GuiApplication::hidmanager() {  return _hidmanager; }
+std::shared_ptr<GMlib::Scene> GuiApplication::scene() {  return _scenario.scene(); }
+const GuiApplication& GuiApplication::instance() {  return *_instance; }

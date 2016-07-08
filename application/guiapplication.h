@@ -2,8 +2,10 @@
 #define GUIAPPLICATION_H
 
 
-class Window;
-class GMlibWrapper;
+#include "gmlibwrapper.h"
+#include "window.h"
+#include "../scenario.h"
+
 class GLContextSurfaceWrapper;
 class DefaultHidManager;
 
@@ -24,38 +26,31 @@ namespace GMlib {
 class GuiApplication : public QGuiApplication {
   Q_OBJECT
 public:
-  explicit GuiApplication(int& argc, char* argv[]);
+  explicit GuiApplication(int& argc, char** argv);
   ~GuiApplication();
 
-    void      show();               // Need this as QT is difficult, just like a little bratt!!!
-
 private:
-  std::shared_ptr<Window>                     _window;
-  std::shared_ptr<GMlibWrapper>               _gmlib;
-  std::shared_ptr<GLContextSurfaceWrapper>    _glsurface;
-  std::shared_ptr<DefaultHidManager>          _hidmanager;
+  Window                                      _window;
+  Scenario                                    _scenario;
+//  std::shared_ptr<DefaultHidManager>          _hidmanager;
 
   void                                        setupScene();
-
-  virtual void                                initializeScenario() = 0;
-  virtual void                                cleanupScenario() = 0;
 
 private slots:
 
   // Void waranty on re-implementation
-  virtual void                                onSGInit();
-
-  void                                        beforeHidAction();
-  void                                        afterHidAction();
+  virtual void                                onSceneGraphInitialized();
+  virtual void                                afterSceneGraphInitialized();
 
 protected:
 
-  std::shared_ptr<Window>                     window();
-  std::shared_ptr<GMlibWrapper>               gmlib();
-  std::shared_ptr<GLContextSurfaceWrapper>    glsurface();
-  std::shared_ptr<DefaultHidManager>          hidmanager();
+  Window&                                     window();
+  GMlibWrapper&                               gmlib();
+//  const DefaultHidManager&                    hidmanager();
   std::shared_ptr<GMlib::Scene>               scene();
 
+signals:
+  void                                        signOnSceneGraphInitializedDone();
 
 
 private:

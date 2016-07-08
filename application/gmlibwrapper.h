@@ -15,7 +15,7 @@ namespace GMlib {
   class PointLight;
   class DefaultRenderer;
   class DefaultSelectRenderer;
-  class TextureRenderTarget;
+  class RenderTarget;
 
   template<typename T, int n>
   class PSurf;
@@ -40,13 +40,9 @@ class QWheelEvent;
 
 struct RenderCamPair {
   RenderCamPair() {}
-  std::shared_ptr<GMlib::DefaultRenderer>     renderer {nullptr};
-  std::shared_ptr<GMlib::Camera>              camera {nullptr};
-  struct {
-    QRectF                      geometry { QRectF(0,0,200,200) };
-    bool                        changed {true};
-  } viewport;
-  bool                                        active {false};
+  std::shared_ptr<GMlib::DefaultRenderer>     renderer { nullptr };
+  std::shared_ptr<GMlib::Camera>              camera   { nullptr };
+  QRect                                       viewport { QRect(0,0,200,200) };
 };
 
 
@@ -56,17 +52,17 @@ struct RenderCamPair {
 class GMlibWrapper : public QObject {
   Q_OBJECT
 public:
-  explicit GMlibWrapper(std::shared_ptr<GLContextSurfaceWrapper> wrapper );
+  explicit GMlibWrapper();
   ~GMlibWrapper();
 
   void                                              start();
   void                                              stop();
 
   const std::shared_ptr<GMlib::Scene>&              scene() const;
-  const GMlib::TextureRenderTarget&                 renderTextureOf(const QString& name ) const;
+//  const GMlib::TextureRenderTarget&                 renderTextureOf(const QString& name ) const;
   const std::shared_ptr<GMlib::Camera>&             camera(const QString& name ) const;
 
-  void                                              init();
+  void                                              initialize();
 
   GMlib::SceneObject*                               findSceneObject( const QString& rc_name, const GMlib::Point<int,2>& pos );
   QStringListModel&                                 rcNameModel();
@@ -74,14 +70,18 @@ public:
   RenderCamPair&                                    rcPair(const QString& name);
   const RenderCamPair&                              rcPair(const QString& name) const;
   RenderCamPair&                                    createRCPair( const QString& name );
+  void                                              updateRCPairNameModel();
 
   std::shared_ptr<GMlib::DefaultSelectRenderer>     defaultSelectRenderer() const;
 
+  void                                              render( const QString& name, const QRect& viewport,
+                                                            GMlib::RenderTarget& target );
 
+  void                                              prepare();
 
 public slots:
-  void                                              changeRcPairActiveState( const QString& name, bool state );
-  void                                              changeRcPairViewport( const QString& name, const QRectF& geometry);
+//  void                                              changeRcPairActiveState( const QString& name, bool state );
+//  void                                              changeRcPairViewport( const QString& name, const QRectF& geometry);
 
   void                                              toggleSimulation();
 
@@ -89,10 +89,13 @@ protected:
   void                                              timerEvent(QTimerEvent *e);
 
 
+  virtual void                                      initializeScenario() = 0;
+  virtual void                                      cleanupScenario() = 0;
+
+
 private:
   int                                               _timer_id;
 
-  std::shared_ptr<GLContextSurfaceWrapper>          _glsurface;
   std::shared_ptr<GMlib::Scene>                     _scene;
 
   std::unordered_map<std::string, RenderCamPair>    _rc_pairs;
@@ -117,7 +120,7 @@ signals:
 private:
   static std::unique_ptr<GMlibWrapper>              _instance;
 public:
-  static const GMlibWrapper&                        getInstance();
+  static GMlibWrapper&                              instance();
 };
 
 

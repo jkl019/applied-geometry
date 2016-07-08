@@ -2,17 +2,17 @@
 #define SCENARIO_H
 
 
-#include "application/guiapplication.h"
+#include "application/gmlibwrapper.h"
 
 // qt
 #include <QObject>
 
 
 
-class Scenario : public GuiApplication {
+class Scenario : public GMlibWrapper {
   Q_OBJECT
 public:
-  using GuiApplication::GuiApplication;
+  using GMlibWrapper::GMlibWrapper;
 
   void    initializeScenario() override;
   void    cleanupScenario() override;

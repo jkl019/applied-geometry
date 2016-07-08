@@ -1,7 +1,5 @@
 // local
-#include "../scenario.h"
-#include "rcpairrenderer.h"
-#include "texturerenderer.h"
+#include "guiapplication.h"
 
 // gmlib
 #include <core/gmglobal>
@@ -41,15 +39,8 @@ int main(int argc, char *argv[]) try {
   else
     qDebug() << QString( "GMlib version: %1" ).arg( GM_VERSION_STR ).toStdString().c_str();
 
-  // Register modules
-  qmlRegisterType<RCPairRenderer>( "MyCppComponents", 1, 0, "RCPairRenderer" );
-  qmlRegisterType<TextureRenderer>( "MyCppComponents", 1, 0, "TextureRenderer" );
-
-
   // Create the application object
-  Scenario a(argc, argv);
-
-  a.show();
+  GuiApplication a(argc, argv);
 
   // Start the app, and return control to the Qt system.
   return a.exec();
