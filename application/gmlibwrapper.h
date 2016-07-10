@@ -63,6 +63,7 @@ public:
   const std::shared_ptr<GMlib::Camera>&             camera(const QString& name ) const;
 
   void                                              initialize();
+  void                                              cleanUp();
 
   GMlib::SceneObject*                               findSceneObject( const QString& rc_name, const GMlib::Point<int,2>& pos );
   QStringListModel&                                 rcNameModel();
@@ -72,7 +73,7 @@ public:
   RenderCamPair&                                    createRCPair( const QString& name );
   void                                              updateRCPairNameModel();
 
-  std::shared_ptr<GMlib::DefaultSelectRenderer>     defaultSelectRenderer() const;
+//  std::shared_ptr<GMlib::DefaultSelectRenderer>     defaultSelectRenderer() const;
 
   void                                              render( const QString& name, const QRect& viewport,
                                                             GMlib::RenderTarget& target );
@@ -99,7 +100,7 @@ private:
   std::shared_ptr<GMlib::Scene>                     _scene;
 
   std::unordered_map<std::string, RenderCamPair>    _rc_pairs;
-  std::shared_ptr<GMlib::DefaultSelectRenderer>     _select_renderer;
+//  std::shared_ptr<GMlib::DefaultSelectRenderer>     _select_renderer;
 
   int                                               _replot_low_medium_high {1};
   bool                                              _move_object_button_pressed {false};

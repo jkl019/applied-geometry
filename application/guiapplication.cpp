@@ -29,6 +29,10 @@ GuiApplication::GuiApplication(int& argc, char **argv) : QGuiApplication(argc, a
            this,     &GuiApplication::onSceneGraphInitialized,
            Qt::DirectConnection );
 
+  connect( &_window, &Window::sceneGraphInvalidated,
+           this,     &GuiApplication::onSceneGraphInvalidated,
+           Qt::DirectConnection );
+
   connect( this, &GuiApplication::signOnSceneGraphInitializedDone,
            this, &GuiApplication::afterSceneGraphInitialized );
 
@@ -43,6 +47,10 @@ GuiApplication::GuiApplication(int& argc, char **argv) : QGuiApplication(argc, a
 
 GuiApplication::~GuiApplication() {
 
+  _scenario.stop();
+  _window.setPersistentOpenGLContext(false);
+  _window.setPersistentSceneGraph(false);
+  _window.releaseResources();
   _instance.release();
 }
 
@@ -81,6 +89,13 @@ GuiApplication::onSceneGraphInitialized() {
   _scenario.prepare();
 
   emit signOnSceneGraphInitializedDone();
+}
+
+void GuiApplication::onSceneGraphInvalidated() {
+
+  qDebug() << "on SceneGraph Invalidated";
+
+  _scenario.cleanUp();
 }
 
 void

@@ -40,6 +40,7 @@ private slots:
 
   // Void waranty on re-implementation
   virtual void                                onSceneGraphInitialized();
+  virtual void                                onSceneGraphInvalidated();
   virtual void                                afterSceneGraphInitialized();
 
 protected:

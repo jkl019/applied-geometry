@@ -30,7 +30,7 @@ GMlibWrapper&
 GMlibWrapper::instance() { return *_instance; }
 
 
-GMlibWrapper::GMlibWrapper() : QObject(), _timer_id{0}, _select_renderer{nullptr} {
+GMlibWrapper::GMlibWrapper() : QObject(), _timer_id{0}/*, _select_renderer{nullptr}*/ {
 
   if(_instance != nullptr) {
 
@@ -45,23 +45,6 @@ GMlibWrapper::GMlibWrapper() : QObject(), _timer_id{0}, _select_renderer{nullptr
 }
 
 GMlibWrapper::~GMlibWrapper() {
-
-  stop();
-
-
-  _select_renderer->releaseCamera();
-  _select_renderer.reset();
-
-  for( auto& rc_pair : _rc_pairs ) {
-
-    rc_pair.second.renderer->releaseCamera();
-    _scene->removeCamera( rc_pair.second.camera.get() );
-
-    rc_pair.second.renderer.reset();
-    rc_pair.second.camera.reset();
-  }
-
-  _scene->clear();
 
   _instance.release();
 }
@@ -146,8 +129,32 @@ void GMlibWrapper::initialize() {
   _scene = std::make_shared<GMlib::Scene>();
 
   // Setup Select Renderer
-  _select_renderer = std::make_shared<GMlib::DefaultSelectRenderer>();
-  _select_renderer->setSelectRboName("select_render_color_rbo");
+//  _select_renderer = std::make_shared<GMlib::DefaultSelectRenderer>();
+//  _select_renderer->setSelectRboName("select_render_color_rbo");
+}
+
+void GMlibWrapper::cleanUp() {
+
+  stop();
+
+//  _select_renderer->releaseCamera();
+//  _select_renderer.reset();
+
+  for( auto& rc_pair : _rc_pairs ) {
+
+    rc_pair.second.renderer->releaseCamera();
+    _scene->removeCamera( rc_pair.second.camera.get() );
+
+//    rc_pair.second.renderer.reset();
+//    rc_pair.second.camera.reset();
+  }
+  _rc_pairs.clear();
+
+  _scene->clear();
+  _scene.reset();
+
+  // Clean up GMlib GL backend
+//  GMlib::GL::OpenGLManager::cleanUp();   // NO IMPLEMENTED IN GMlib
 }
 
 GMlib::SceneObject*
@@ -223,11 +230,11 @@ GMlibWrapper::updateRCPairNameModel() {
   _rc_name_model.setStringList(names);
 }
 
-std::shared_ptr<GMlib::DefaultSelectRenderer>
-GMlibWrapper::defaultSelectRenderer() const {
+//std::shared_ptr<GMlib::DefaultSelectRenderer>
+//GMlibWrapper::defaultSelectRenderer() const {
 
-  return _select_renderer;
-}
+//  return _select_renderer;
+//}
 
 //void
 //GMlibWrapper::changeRcPairActiveState(const QString& name, bool state) {
