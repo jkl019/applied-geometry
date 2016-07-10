@@ -29,12 +29,14 @@ public:
 
   void render() {
 
+    if(!_rcpair_name.length()) return;
+
     // Pick up the FBO set by the QQuickFrameBufferObject upon the render() call
     _gl.glGetIntegerv(GL_FRAMEBUFFER_BINDING,&_rt._fbo);
 
     // Prepare render and camera
     auto &gmlib = GMlibWrapper::instance();
-    gmlib.render("Projection",QRect(QPoint(0,0),QSize(_size)),_rt);
+    gmlib.render(_rcpair_name,QRect(QPoint(0,0),QSize(_size)),_rt);
 
     // Restore to QML's GLState;
     // we do not know what GMlib has done
@@ -57,17 +59,31 @@ public:
     return new QOpenGLFramebufferObject(size, format);
   }
 
-  void synchronize(QQuickFramebufferObject *item) { _item = item; }
+  void synchronize(QQuickFramebufferObject *item) {
+
+    _item = static_cast<FboInSGRenderer*>(item);
+    _rcpair_name = _item->rcPairName();
+  }
 
   QOpenGLFunctions            _gl;
-  QQuickFramebufferObject*    _item;
+  FboInSGRenderer*            _item;
   QSize                       _size;
   QQuickFboInlineRenderTarget _rt;
+  QString                     _rcpair_name;
 };
 
 
 
 
 FboInSGRenderer::FboInSGRenderer() { setMirrorVertically(true); }
+
+const QString&
+FboInSGRenderer::rcPairName() const { return _name; }
+
+void
+FboInSGRenderer::setRcPairName(const QString& name) {
+  _name = name;
+  update();
+}
 
 QQuickFramebufferObject::Renderer* FboInSGRenderer::createRenderer() const { return new GMlibInFboRenderer(); }

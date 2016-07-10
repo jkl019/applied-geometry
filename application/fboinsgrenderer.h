@@ -4,11 +4,19 @@
 #include <QtQuick/QQuickFramebufferObject>
 
 class FboInSGRenderer : public QQuickFramebufferObject {
-    Q_OBJECT
+  Q_OBJECT
+  Q_PROPERTY(QString rcpair_name     READ rcPairName WRITE setRcPairName)
 public:
   FboInSGRenderer();
 
-  Renderer*       createRenderer() const;
+  const QString&    rcPairName() const;
+  void              setRcPairName( const QString& name );
+
+  Renderer*         createRenderer() const;
+
+private:
+
+  QString     _name {};
 };
 
 #endif

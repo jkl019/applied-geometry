@@ -1,7 +1,6 @@
 #include "guiapplication.h"
 
 // local
-#include "glcontextsurfacewrapper.h"
 #include "window.h"
 #include "gmlibwrapper.h"
 

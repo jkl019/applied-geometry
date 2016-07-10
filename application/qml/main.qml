@@ -18,7 +18,7 @@ Item {
 
     anchors.fill: parent
 
-//    name: rc_pair_cb.currentText
+    rcpair_name: rc_pair_cb.currentText
 
     ComboBox {
       id: rc_pair_cb

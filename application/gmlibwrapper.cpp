@@ -1,6 +1,4 @@
 #include "gmlibwrapper.h"
-#include "glcontextsurfacewrapper.h"
-
 
 #include "../testtorus.h"
 #include "utils.h"
@@ -220,6 +218,7 @@ GMlibWrapper::updateRCPairNameModel() {
   for( auto& rc_pair : _rc_pairs )
     names << QString(rc_pair.first.c_str());
 
+  std::reverse(names.begin(),names.end());
 
   _rc_name_model.setStringList(names);
 }

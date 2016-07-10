@@ -1,6 +1,5 @@
 #include "renderer.h"
 #include "window.h"
-#include "glcontextsurfacewrapper.h"
 #include "gmlibwrapper.h"
 
 // Qt
