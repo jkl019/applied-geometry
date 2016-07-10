@@ -69,17 +69,9 @@ GuiApplication::onSceneGraphInitialized() {
 //           &_scenario,  &GMlibWrapper::changeRcPairActiveState );
 
 //  // Create hidmanager
-//  _hidmanager = std::make_shared<DefaultHidManager>( _gmlib );
 //  _window->rootContext()->setContextProperty( "hidmanager_model", _hidmanager->getModel() );
 //  _window->rootContext()->setContextProperty( "rc_name_model", &_gmlib->rcNameModel() );
 
-//  connect( _window.get(), &Window::signMousePressed,       _hidmanager.get(), &StandardHidManager::registerMousePressEvent );
-//  connect( _window.get(), &Window::signMouseReleased,      _hidmanager.get(), &StandardHidManager::registerMouseReleaseEvent );
-//  connect( _window.get(), &Window::signMouseDoubleClicked, _hidmanager.get(), &StandardHidManager::registerMouseDoubleClickEvent);
-//  connect( _window.get(), &Window::signMouseMoved,         _hidmanager.get(), &StandardHidManager::registerMouseMoveEvent );
-//  connect( _window.get(), &Window::signKeyPressed,         _hidmanager.get(), &StandardHidManager::registerKeyPressEvent );
-//  connect( _window.get(), &Window::signKeyReleased,        _hidmanager.get(), &StandardHidManager::registerKeyReleaseEvent );
-//  connect( _window.get(), &Window::signWheelEventOccurred, _hidmanager.get(), &StandardHidManager::registerWheelEvent );
 
 //  connect( _hidmanager.get(), &StandardHidManager::signBeforeHidAction, this,  &GuiApplication::beforeHidAction, Qt::DirectConnection );
 //  connect( _hidmanager.get(), &StandardHidManager::signAfterHidAction,  this,  &GuiApplication::afterHidAction );
@@ -106,6 +98,17 @@ GuiApplication::afterSceneGraphInitialized() {
 
   // Start simulator
   _scenario.start();
+
+  _hidmanager = std::make_shared<DefaultHidManager>( &_scenario );
+  connect( &_window, &Window::signKeyPressed,         _hidmanager.get(), &StandardHidManager::registerKeyPressEvent );
+  connect( &_window, &Window::signKeyReleased,        _hidmanager.get(), &StandardHidManager::registerKeyReleaseEvent );
+  connect( &_window, &Window::signMouseDoubleClicked, _hidmanager.get(), &StandardHidManager::registerMouseDoubleClickEvent);
+  connect( &_window, &Window::signMouseMoved,         _hidmanager.get(), &StandardHidManager::registerMouseMoveEvent );
+  connect( &_window, &Window::signMousePressed,       _hidmanager.get(), &StandardHidManager::registerMousePressEvent );
+  connect( &_window, &Window::signMouseReleased,      _hidmanager.get(), &StandardHidManager::registerMouseReleaseEvent );
+  connect( &_window, &Window::signWheelEventOccurred, _hidmanager.get(), &StandardHidManager::registerWheelEvent );
+
+  _hidmanager->setupDefaultHidBindings();
 }
 
 Window&            GuiApplication::window()     {  return _window; }

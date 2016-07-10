@@ -144,9 +144,6 @@ void GMlibWrapper::cleanUp() {
 
     rc_pair.second.renderer->releaseCamera();
     _scene->removeCamera( rc_pair.second.camera.get() );
-
-//    rc_pair.second.renderer.reset();
-//    rc_pair.second.camera.reset();
   }
   _rc_pairs.clear();
 

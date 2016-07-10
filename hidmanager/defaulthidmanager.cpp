@@ -16,7 +16,7 @@ using namespace GMlib;
 
 
 
-DefaultHidManager::DefaultHidManager(std::shared_ptr<GMlibWrapper> gmlib, QObject* parent)
+DefaultHidManager::DefaultHidManager(GMlibWrapper* gmlib, QObject* parent)
   : StandardHidManager(parent), _gmlib{gmlib} {}
 
 void DefaultHidManager::heDeSelectAllObjects() {

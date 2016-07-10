@@ -32,7 +32,7 @@ public:
 private:
   Window                                      _window;
   Scenario                                    _scenario;
-//  std::shared_ptr<DefaultHidManager>          _hidmanager;
+  std::shared_ptr<DefaultHidManager>          _hidmanager;
 
   void                                        setupScene();
 

@@ -10,7 +10,7 @@ class GMlibWrapper;
 class DefaultHidManager : public StandardHidManager {
   Q_OBJECT
 public:
-  explicit DefaultHidManager( std::shared_ptr<GMlibWrapper> gmlib, QObject* parent = 0x0 );
+  explicit DefaultHidManager( GMlibWrapper* gmlib, QObject* parent = 0x0 );
 
   void                        setupDefaultHidBindings();
 
@@ -53,7 +53,7 @@ private:
 
   GMlib::Point<int,2>               toGMlibViewPoint(const QString& view_name, const QPoint& pos);
 
-  std::shared_ptr<GMlibWrapper>     _gmlib;
+  GMlibWrapper*                     _gmlib;
 
 };
 

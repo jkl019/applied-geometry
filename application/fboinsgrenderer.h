@@ -5,7 +5,7 @@
 
 class FboInSGRenderer : public QQuickFramebufferObject {
   Q_OBJECT
-  Q_PROPERTY(QString rcpair_name     READ rcPairName WRITE setRcPairName)
+  Q_PROPERTY(QString rcpair_name READ rcPairName WRITE setRcPairName)
 public:
   FboInSGRenderer();
 
@@ -14,9 +14,29 @@ public:
 
   Renderer*         createRenderer() const;
 
-private:
+private slots:
+  void              onWindowChanged( QQuickWindow* window );
 
-  QString     _name {};
+
+signals:
+  void              signKeyPressed( const QString& name, QKeyEvent* event );
+  void              signKeyReleased( const QString& name, QKeyEvent* event );
+  void              signMouseDoubleClicked( const QString& name, QMouseEvent* event );
+  void              signMouseMoved( const QString& name, QMouseEvent* event );
+  void              signMousePressed( const QString& name, QMouseEvent* event );
+  void              signMouseReleased( const QString& name, QMouseEvent* event );
+  void              signWheelEventOccurred( const QString& name, QWheelEvent* event);
+
+private:
+  void              keyPressEvent(QKeyEvent *event);
+  void              keyReleaseEvent(QKeyEvent *event);
+  void              mousePressEvent(QMouseEvent *event);
+  void              mouseReleaseEvent(QMouseEvent *event);
+  void              mouseDoubleClickEvent(QMouseEvent *event);
+  void              mouseMoveEvent(QMouseEvent *event);
+  void              wheelEvent(QWheelEvent *event);
+
+  QString           _name {};
 };
 
 #endif
