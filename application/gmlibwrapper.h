@@ -59,7 +59,6 @@ public:
   void                                              stop();
 
   const std::shared_ptr<GMlib::Scene>&              scene() const;
-//  const GMlib::TextureRenderTarget&                 renderTextureOf(const QString& name ) const;
   const std::shared_ptr<GMlib::Camera>&             camera(const QString& name ) const;
 
   void                                              initialize();
@@ -84,7 +83,6 @@ public slots:
 protected:
   void                                              timerEvent(QTimerEvent *e);
 
-
   virtual void                                      initializeScenario() = 0;
   virtual void                                      cleanupScenario() = 0;
 
@@ -105,7 +103,6 @@ private:
   GMlib::Point<int,2>                               _prev_mouse_pos;
 
   QStringListModel                                  _rc_name_model;
-
 
 signals:
   void                                              signFrameReady();

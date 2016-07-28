@@ -34,22 +34,10 @@ private:
   Scenario                                    _scenario;
   DefaultHidManager                           _hidmanager;
 
-  void                                        setupScene();
-
 private slots:
-
-  // Void waranty on re-implementation
   virtual void                                onSceneGraphInitialized();
   virtual void                                onSceneGraphInvalidated();
-  virtual void                                afterSceneGraphInitialized();
-
-  void                                        onBeforeSync();
-
-protected:
-
-  Window&                                     window();
-  GMlibWrapper&                               gmlib();
-  std::shared_ptr<GMlib::Scene>               scene();
+  virtual void                                afterOnSceneGraphInitialized();
 
 signals:
   void                                        signOnSceneGraphInitializedDone();

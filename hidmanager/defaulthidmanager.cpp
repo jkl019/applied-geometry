@@ -568,21 +568,21 @@ void DefaultHidManager::setupDefaultHidBindings() {
   // Object Selection
   QString ha_id_objsel_toggle_all =
       registerHidAction("Object selection",
-                        "Toggle: Select all objects",
-                        "Toggle Selection for all objects",
+                        "Toggle: (de)select all objects",
+                        "Toggle selection on all objects",
                         this, SLOT(heToggleSelectAllObjects()) );
 
   QString ha_id_objsel_select =
       registerHidAction("Object selection",
-                        "Select Object",
-                        "Select object",
+                        "Toggle selection of one object",
+                        "Toggle selection of object under cursor; deslecting all other objects",
                         this, SLOT(heSelectObject(HidInputEvent::HidInputParams)),
                         OGL_TRIGGER);
 
   QString ha_id_objsel_select_multi =
       registerHidAction("Object selection",
-                        "Select Objects",
-                        "Select objects",
+                        "Toggle selection of an object",
+                        "Toggle selection of object under cursor; do not deselect other objects",
                         this, SLOT(heSelectObjects(HidInputEvent::HidInputParams)),
                         OGL_TRIGGER);
 
@@ -631,6 +631,13 @@ void DefaultHidManager::setupDefaultHidBindings() {
                          "Toggle simulation",
                          this, SLOT(heToggleSimulation()) );
 
+  // Open/Close HidBindings view
+  QString ha_id_var_open_close_hbview =
+      registerHidAction( "Application",
+                         "Open/Close Hid help",
+                         "Toggle open/close the Hid bindings help view",
+                         this, SLOT(heOpenCloseHidHelp()) );
+
   // Various cleanup
   QString ha_id_var_lm_rel =
       registerHidAction( "Various",
@@ -638,18 +645,6 @@ void DefaultHidManager::setupDefaultHidBindings() {
                          "Stuff that happens on left mouse release",
                          this, SLOT(heLeftMouseReleaseStuff()) );
 
-  QString ha_id_var_close_app =
-      registerHidAction( "Various",
-                         "Quit",
-                         "Close application!",
-                         qApp, SLOT(quit()) );
-
-  // Open/Close HidBindings view
-  QString ha_id_var_open_close_hbview =
-      registerHidAction( "Various",
-                         "Open/Close Hid help",
-                         "Toggle open/close the Hid bindings help view",
-                         this, SLOT(heOpenCloseHidHelp()) );
 
 
 
@@ -659,7 +654,6 @@ void DefaultHidManager::setupDefaultHidBindings() {
   registerHidMapping( ha_id_objint_replot_high,           new KeyPressInput( Qt::Key_P, Qt::ShiftModifier ) );
   registerHidMapping( ha_id_objint_replot_med,            new KeyPressInput( Qt::Key_P ) );
   registerHidMapping( ha_id_objint_replot_low,            new KeyPressInput( Qt::Key_P, Qt::ControlModifier) );
-  registerHidMapping( ha_id_var_close_app,                new KeyPressInput( Qt::Key_Q, Qt::ControlModifier) );
   registerHidMapping( ha_id_sim_toggle,                   new KeyPressInput( Qt::Key_R ) );
   registerHidMapping( ha_id_render_toggle_shademode,      new KeyPressInput( Qt::Key_Z ) );
 

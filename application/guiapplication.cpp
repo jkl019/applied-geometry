@@ -37,7 +37,7 @@ GuiApplication::GuiApplication(int& argc, char **argv) : QGuiApplication(argc, a
            Qt::DirectConnection );
 
   connect( this, &GuiApplication::signOnSceneGraphInitializedDone,
-           this, &GuiApplication::afterSceneGraphInitialized );
+           this, &GuiApplication::afterOnSceneGraphInitialized );
 
   connect( this, &QGuiApplication::lastWindowClosed,
            this, &QGuiApplication::quit );
@@ -82,17 +82,10 @@ void GuiApplication::onSceneGraphInvalidated() {
 }
 
 void
-GuiApplication::afterSceneGraphInitialized() {
-
-  // Update RCPair name model
-  _scenario.updateRCPairNameModel();
-
-  // Start simulator
-  _scenario.start();
+GuiApplication::afterOnSceneGraphInitialized() {
 
   // Hidmanager setup
   _hidmanager.setupDefaultHidBindings();
-
   connect( &_window, &Window::signKeyPressed,         &_hidmanager, &StandardHidManager::registerKeyPressEvent );
   connect( &_window, &Window::signKeyReleased,        &_hidmanager, &StandardHidManager::registerKeyReleaseEvent );
   connect( &_window, &Window::signMouseDoubleClicked, &_hidmanager, &StandardHidManager::registerMouseDoubleClickEvent);
@@ -101,23 +94,30 @@ GuiApplication::afterSceneGraphInitialized() {
   connect( &_window, &Window::signMouseReleased,      &_hidmanager, &StandardHidManager::registerMouseReleaseEvent );
   connect( &_window, &Window::signWheelEventOccurred, &_hidmanager, &StandardHidManager::registerWheelEvent );
 
-  connect( &_window,     &Window::beforeRendering,
-           &_hidmanager, &DefaultHidManager::triggerOGLActions,
+  // Handle HID OpenGL actions; needs to have the OGL context bound;
+  // QQuickWindow's beforeRendering singnal provides that on a DirectConnection
+  connect( &_window, &Window::beforeRendering,        &_hidmanager, &DefaultHidManager::triggerOGLActions,
            Qt::DirectConnection );
 
+  // Register an application close event in the hidmanager;
+  // the QWindow must be closed instead of the application being quitted,
+  // this is to make sure that GL exits gracefully
+  QString ha_id_var_close_app =
+  _hidmanager.registerHidAction( "Application", "Quit", "Close application!", &_window, SLOT(close()));
+  _hidmanager.registerHidMapping( ha_id_var_close_app, new KeyPressInput( Qt::Key_Q, Qt::ControlModifier) );
+
+  // Connect some application spesific inputs.
   connect( &_hidmanager, &DefaultHidManager::signToggleSimulation,
            &_scenario,   &GMlibWrapper::toggleSimulation );
 
   connect( &_hidmanager,          SIGNAL(signOpenCloseHidHelp()),
            _window.rootObject(),  SIGNAL(toggleHidBindView()) );
 
+  // Update RCPair name model
+  _scenario.updateRCPairNameModel();
+
+  // Start simulator
+  _scenario.start();
 }
 
-void GuiApplication::onBeforeSync() {
-
-//  if(_hidmanager) _hidmanager->forceUpdate();
-}
-
-Window&            GuiApplication::window()     {  return _window; }
-std::shared_ptr<GMlib::Scene> GuiApplication::scene() {  return _scenario.scene(); }
 const GuiApplication& GuiApplication::instance() {  return *_instance; }
