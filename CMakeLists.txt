@@ -63,9 +63,6 @@ set( HDRS
   hidmanager/defaulthidmanager.h
 
   application/fboinsgrenderer.h
-  application/renderer.h
-#  application/rcpairrenderer.h
-#  application/texturerenderer.h
   application/gmlibwrapper.h
   application/guiapplication.h
   application/window.h
@@ -87,9 +84,6 @@ set( SRCS
   hidmanager/defaulthidmanager.cpp
 
   application/fboinsgrenderer.cpp
-  application/renderer.cpp
-#  application/rcpairrenderer.cpp
-#  application/texturerenderer.cpp
   application/gmlibwrapper.cpp
   application/guiapplication.cpp
   application/window.cpp
@@ -109,9 +103,6 @@ QT5_WRAP_CPP( HDRS_MOC
   hidmanager/defaulthidmanager.h
 
   application/fboinsgrenderer.h
-  application/renderer.h
-#  application/rcpairrenderer.h
-#  application/texturerenderer.h
   application/gmlibwrapper.h
   application/guiapplication.h
   application/window.h
