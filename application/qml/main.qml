@@ -34,41 +34,41 @@ Item {
       textRole: "display"
     }
 
-//    Button {
-//      text: "?"
-//      anchors.top: parent.top
-//      anchors.right: parent.right
-//      anchors.margins: 5
+    Button {
+      text: "?"
+      anchors.top: parent.top
+      anchors.right: parent.right
+      anchors.margins: 5
 
-//      width: height
-//      opacity: 0.7
+      width: height
+      opacity: 0.7
 
-//      onClicked: hid_bind_view.toggle()
-//    }
+      onClicked: hid_bind_view.toggle()
+    }
 
-//    HidBindingView {
-//      id: hid_bind_view
-//      anchors.fill: parent
-//      anchors.margins: 50
-//      visible:false
+    HidBindingView {
+      id: hid_bind_view
+      anchors.fill: parent
+      anchors.margins: 50
+      visible:false
 
-//      states: [
-//        State{
-//          name: "show"
-//          PropertyChanges {
-//            target: hid_bind_view
-//            visible: true
-//          }
-//        }
-//      ]
+      states: [
+        State{
+          name: "show"
+          PropertyChanges {
+            target: hid_bind_view
+            visible: true
+          }
+        }
+      ]
 
-//      function toggle() {
+      function toggle() {
 
-//        if(state === "") state = "show"
-//        else state = ""
+        if(state === "") state = "show"
+        else state = ""
 
-//      }
-//    }
+      }
+    }
 
   }
 

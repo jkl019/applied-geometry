@@ -43,6 +43,7 @@ GuiApplication::GuiApplication(int& argc, char **argv) : QGuiApplication(argc, a
            this, &QGuiApplication::quit );
 
   _window.rootContext()->setContextProperty( "rc_name_model", &_scenario.rcNameModel() );
+  _window.rootContext()->setContextProperty( "hidmanager_model", _hidmanager.getModel() );
   _window.setSource(QUrl("qrc:///qml/main.qml"));
 
   _window.show();
@@ -64,22 +65,9 @@ GuiApplication::onSceneGraphInitialized() {
 
   // Init GMlibWrapper
   _scenario.initialize();
+  _hidmanager.init(_scenario);
   connect( &_scenario,  &GMlibWrapper::signFrameReady,
            &_window,    &Window::update );
-
-//  connect( &_window,    &Window::signRcPairViewportChanged,
-//           &_scenario,  &GMlibWrapper::changeRcPairViewport );
-
-//  connect( &_window,    &Window::signRcPairActiveStateChanged,
-//           &_scenario,  &GMlibWrapper::changeRcPairActiveState );
-
-//  // Create hidmanager
-//  _window->rootContext()->setContextProperty( "hidmanager_model", _hidmanager->getModel() );
-//  _window->rootContext()->setContextProperty( "rc_name_model", &_gmlib->rcNameModel() );
-
-
-//  connect( _hidmanager.get(), &StandardHidManager::signBeforeHidAction, this,  &GuiApplication::beforeHidAction, Qt::DirectConnection );
-//  connect( _hidmanager.get(), &StandardHidManager::signAfterHidAction,  this,  &GuiApplication::afterHidAction );
 
   // Init test scene of the GMlib wrapper
   _scenario.initializeScenario();
@@ -102,23 +90,32 @@ GuiApplication::afterSceneGraphInitialized() {
   // Start simulator
   _scenario.start();
 
-  _hidmanager = std::make_shared<DefaultHidManager>( &_scenario );
-  connect( &_window, &Window::signKeyPressed,         _hidmanager.get(), &StandardHidManager::registerKeyPressEvent );
-  connect( &_window, &Window::signKeyReleased,        _hidmanager.get(), &StandardHidManager::registerKeyReleaseEvent );
-  connect( &_window, &Window::signMouseDoubleClicked, _hidmanager.get(), &StandardHidManager::registerMouseDoubleClickEvent);
-  connect( &_window, &Window::signMouseMoved,         _hidmanager.get(), &StandardHidManager::registerMouseMoveEvent );
-  connect( &_window, &Window::signMousePressed,       _hidmanager.get(), &StandardHidManager::registerMousePressEvent );
-  connect( &_window, &Window::signMouseReleased,      _hidmanager.get(), &StandardHidManager::registerMouseReleaseEvent );
-  connect( &_window, &Window::signWheelEventOccurred, _hidmanager.get(), &StandardHidManager::registerWheelEvent );
+  // Hidmanager setup
+  _hidmanager.setupDefaultHidBindings();
 
+  connect( &_window, &Window::signKeyPressed,         &_hidmanager, &StandardHidManager::registerKeyPressEvent );
+  connect( &_window, &Window::signKeyReleased,        &_hidmanager, &StandardHidManager::registerKeyReleaseEvent );
+  connect( &_window, &Window::signMouseDoubleClicked, &_hidmanager, &StandardHidManager::registerMouseDoubleClickEvent);
+  connect( &_window, &Window::signMouseMoved,         &_hidmanager, &StandardHidManager::registerMouseMoveEvent );
+  connect( &_window, &Window::signMousePressed,       &_hidmanager, &StandardHidManager::registerMousePressEvent );
+  connect( &_window, &Window::signMouseReleased,      &_hidmanager, &StandardHidManager::registerMouseReleaseEvent );
+  connect( &_window, &Window::signWheelEventOccurred, &_hidmanager, &StandardHidManager::registerWheelEvent );
 
-  _hidmanager->setupDefaultHidBindings();
-  connect( _hidmanager.get(), &DefaultHidManager::signToggleSimulation,
-           &_scenario,        &GMlibWrapper::toggleSimulation );
-
-  connect( &_window,          &Window::beforeRendering,
-           _hidmanager.get(), &DefaultHidManager::triggerOGLActions,
+  connect( &_window,     &Window::beforeRendering,
+           &_hidmanager, &DefaultHidManager::triggerOGLActions,
            Qt::DirectConnection );
+
+  connect( &_hidmanager, &DefaultHidManager::signToggleSimulation,
+           &_scenario,   &GMlibWrapper::toggleSimulation );
+
+  connect( &_hidmanager,          SIGNAL(signOpenCloseHidHelp()),
+           _window.rootObject(),  SIGNAL(toggleHidBindView()) );
+
+}
+
+void GuiApplication::onBeforeSync() {
+
+//  if(_hidmanager) _hidmanager->forceUpdate();
 }
 
 Window&            GuiApplication::window()     {  return _window; }

@@ -58,7 +58,6 @@ set( HDRS
   hidmanager/hidinputevent.h
   hidmanager/hidkbmouseinput.h
   hidmanager/hidmanager.h
-  hidmanager/hidmanagermodel.h
   hidmanager/hidmanagertreemodel.h
   hidmanager/standardhidmanager.h
   hidmanager/defaulthidmanager.h
@@ -83,7 +82,6 @@ set( SRCS
   hidmanager/hidinputevent.cpp
   hidmanager/hidkbmouseinput.cpp
   hidmanager/hidmanager.cpp
-  hidmanager/hidmanagermodel.cpp
   hidmanager/hidmanagertreemodel.cpp
   hidmanager/standardhidmanager.cpp
   hidmanager/defaulthidmanager.cpp
@@ -106,7 +104,6 @@ set( SRCS
 QT5_WRAP_CPP( HDRS_MOC
   hidmanager/hidaction.h
   hidmanager/hidmanager.h
-  hidmanager/hidmanagermodel.h
   hidmanager/hidmanagertreemodel.h
   hidmanager/standardhidmanager.h
   hidmanager/defaulthidmanager.h

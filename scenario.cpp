@@ -81,22 +81,6 @@ void Scenario::initializeScenario() {
 
   surface->test01();
 
-
-
-
-
-
-
-//  // Setup default hid-bindings
-//  hidmanager()->setupDefaultHidBindings();
-
-//  // Load QML
-//  window()->setSource( QUrl("qrc:/qml/main.qml") );
-
-//  // Connect up HiD signals
-//  connect( hidmanager().get(), SIGNAL(signOpenCloseHidHelp()),           window()->rootObject(), SIGNAL(toggleHidBindView()) );
-
-
 }
 
 void Scenario::cleanupScenario() {

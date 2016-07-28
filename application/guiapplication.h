@@ -5,9 +5,9 @@
 #include "gmlibwrapper.h"
 #include "window.h"
 #include "../scenario.h"
+#include "../hidmanager/defaulthidmanager.h"
 
 class GLContextSurfaceWrapper;
-class DefaultHidManager;
 
 // gmlib
 namespace GMlib {
@@ -32,7 +32,7 @@ public:
 private:
   Window                                      _window;
   Scenario                                    _scenario;
-  std::shared_ptr<DefaultHidManager>          _hidmanager;
+  DefaultHidManager                           _hidmanager;
 
   void                                        setupScene();
 
@@ -42,6 +42,8 @@ private slots:
   virtual void                                onSceneGraphInitialized();
   virtual void                                onSceneGraphInvalidated();
   virtual void                                afterSceneGraphInitialized();
+
+  void                                        onBeforeSync();
 
 protected:
 

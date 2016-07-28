@@ -13,12 +13,14 @@ class GMlibWrapper;
 class DefaultHidManager : public StandardHidManager {
   Q_OBJECT
 public:
-  explicit DefaultHidManager( GMlibWrapper* gmlib, QObject* parent = 0x0 );
+  explicit DefaultHidManager( QObject* parent = Q_NULLPTR );
+  virtual ~DefaultHidManager();
 
   static const unsigned int   OGL_TRIGGER {8};
 
   void                        setupDefaultHidBindings();
 
+  void                        init( GMlibWrapper& gmlib );
 
 public slots:
   void                        triggerOGLActions();

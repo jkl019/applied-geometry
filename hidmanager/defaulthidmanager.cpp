@@ -17,8 +17,13 @@ using namespace GMlib;
 
 
 
-DefaultHidManager::DefaultHidManager(GMlibWrapper* gmlib, QObject* parent)
-  : StandardHidManager(parent), _gmlib{gmlib} {}
+DefaultHidManager::DefaultHidManager(QObject* parent)
+  : StandardHidManager(parent), _gmlib{nullptr} {}
+
+DefaultHidManager::~DefaultHidManager() {
+
+  _gmlib = nullptr;
+}
 
 void DefaultHidManager::triggerAction(const HidAction* action, const HidInputEvent::HidInputParams& params ) {
 
@@ -487,6 +492,8 @@ float DefaultHidManager::cameraSpeedScale(Camera *cam) const {
 
 Scene* DefaultHidManager::scene() const {
 
+  assert(_gmlib);
+
   return _gmlib->scene().get();
 }
 
@@ -671,4 +678,9 @@ void DefaultHidManager::setupDefaultHidBindings() {
   registerHidMapping( ha_id_view_pan_h,                   new WheelInput( Qt::ControlModifier ) );
   registerHidMapping( ha_id_view_pan_v,                   new WheelInput( Qt::ShiftModifier ) );
   registerHidMapping( ha_id_view_zoom,                    new WheelInput() );
+}
+
+void DefaultHidManager::init(GMlibWrapper& gmlib) {
+
+  _gmlib = &gmlib;
 }

@@ -128,7 +128,7 @@ QString HidManager::registerHidAction( const QString& group,
 
   _hid_actions.insert( act );
 
-  _model->update(_hid_actions);
+  _model->update(_hid_actions, _hid_bindings);
 
   return identifier;
 }
@@ -152,7 +152,7 @@ bool HidManager::registerHidMapping(const QString& action_name, const HidInput *
 
   _hid_bindings.insert(HidBinding(action_name,hid_input));
 
-  _model->update(_hid_bindings);
+  _model->update(_hid_actions,_hid_bindings);
 
   return true;
 }
@@ -164,6 +164,5 @@ HidManagerTreeModel *HidManager::getModel() const {
 
 void HidManager::forceUpdate() {
 
-  _model->update(_hid_actions);
-  _model->update(_hid_bindings);
+  _model->update(_hid_actions,_hid_bindings);
 }

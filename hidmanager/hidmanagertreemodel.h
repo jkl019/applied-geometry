@@ -28,8 +28,7 @@ public:
 
   QVariant        headerData(int section, Qt::Orientation orientation, int role) const;
 
-  void            update( const HidManager::HidActions& action );
-  void            update( const HidManager::HidBindings& bindings );
+  void            update( const HidManager::HidActions& action, const HidManager::HidBindings& bindings );
 
   QHash< int, QByteArray >    roleNames() const;
 
