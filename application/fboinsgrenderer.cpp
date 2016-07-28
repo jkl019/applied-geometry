@@ -102,6 +102,8 @@ QQuickFramebufferObject::Renderer* FboInSGRenderer::createRenderer() const { ret
 
 void FboInSGRenderer::onWindowChanged(QQuickWindow* w) {
 
+  if(!w) return;
+
   auto window = static_cast<Window*>(w);
 
   connect( this,   &FboInSGRenderer::signKeyPressed,

@@ -5,6 +5,7 @@
 // local
 #include "hidinput.h"
 #include "hidbinding.h"
+#include "hidinputevent.h"
 
 class HidAction;
 //class HidManagerModel;
@@ -37,6 +38,9 @@ class QWheelEvent;
 #include <cassert>
 
 
+class CustomEventLoop;
+class HidManager;
+
 
 
 class HidManager : public QObject {
@@ -54,7 +58,9 @@ public:
   QString                   registerHidAction( const QString& name,
                                                const QString& description,
                                                const QString& group,
-                                               const QObject* receiver, const char* method );
+                                               const QObject* receiver, const char* method,
+                                               unsigned int custom_trigger= 0
+                                               );
 
   bool                      registerHidMapping( const QString& action_name, const HidInput* hid_input );
 
@@ -65,13 +71,14 @@ public:
 protected:
   void                      customEvent( QEvent* event );
 
-private:
+  virtual void              triggerAction( const HidAction* action, const HidInputEvent::HidInputParams& params );
+
+public:
   HidActions              _hid_actions;
   HidBindings             _hid_bindings;
+private:
 
   HidManagerTreeModel     *_model;
-
-  bool                    _ogl_action;
 
 
 signals:

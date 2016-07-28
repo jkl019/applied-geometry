@@ -12,8 +12,32 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 HidManager::HidManager( QObject *parent) :
-  QObject(parent), _ogl_action(false) {
+  QObject(parent) {
 
   _model = new HidManagerTreeModel(this,this);
 }
@@ -32,8 +56,6 @@ void HidManager::customEvent(QEvent *event) {
 
   if( event->type() != HidInputEvent::HID_INPUT )
     return;
-
-  event->setAccepted(true);
 
   HidInputEvent *he= static_cast<HidInputEvent*>( event );
 
@@ -61,16 +83,30 @@ void HidManager::customEvent(QEvent *event) {
     return;
   }
 
+//  auto act_event_handler = const_cast<QObject*>((*act_itr)->getEventHandler());
+//  if(act_event_handler) {
+//    _ceq01.enqueue(event);
+////    QCoreApplication::sendEvent(act_event_handler, event);
+//    return;
+//  }
+
+  event->setAccepted(true);
+  triggerAction( *act_itr, he->getParams() );
+}
+
+void HidManager::triggerAction(const HidAction* action, const HidInputEvent::HidInputParams& params) {
 
   emit signBeforeHidAction();
-  (*act_itr)->trigger( he->getParams() );
+  action->trigger( params );
   emit signAfterHidAction();
 }
 
 QString HidManager::registerHidAction( const QString& group,
-                                    const QString& name,
-                                    const QString& description,
-                                    const QObject *receiver, const char *method) {
+                                       const QString& name,
+                                       const QString& description,
+                                       const QObject *receiver, const char *method,
+                                       unsigned int custom_trigger
+                                       ) {
 
 //  if( _hid_actions.contains( text ) )
 //    return 0x0;
@@ -87,15 +123,14 @@ QString HidManager::registerHidAction( const QString& group,
   }
 //  qDebug() << "  Does not exist";
 
-  HidAction *act = new HidAction( group, name, description );
-  connect( act, SIGNAL(signTrigger(HidInputEvent::HidInputParams)), receiver, method );
+  HidAction *act = new HidAction( group, name, description, custom_trigger );
+  connect( act, SIGNAL(signTrigger(HidInputEvent::HidInputParams)), receiver, method, Qt::DirectConnection );
 
   _hid_actions.insert( act );
 
   _model->update(_hid_actions);
 
   return identifier;
-
 }
 
 bool HidManager::registerHidMapping(const QString& action_name, const HidInput *hid_input) {
@@ -132,4 +167,3 @@ void HidManager::forceUpdate() {
   _model->update(_hid_actions);
   _model->update(_hid_bindings);
 }
-

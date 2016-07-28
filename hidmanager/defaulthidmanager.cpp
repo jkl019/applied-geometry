@@ -2,6 +2,7 @@
 
 // local
 #include "../application/gmlibwrapper.h"
+#include "hidaction.h"
 
 // gmlib
 #include <gmSceneModule>
@@ -18,6 +19,24 @@ using namespace GMlib;
 
 DefaultHidManager::DefaultHidManager(GMlibWrapper* gmlib, QObject* parent)
   : StandardHidManager(parent), _gmlib{gmlib} {}
+
+void DefaultHidManager::triggerAction(const HidAction* action, const HidInputEvent::HidInputParams& params ) {
+
+  if(action->getCustomTrigger() == OGL_TRIGGER)
+    _ogl_actions.emplace(action,params);
+  else
+    HidManager::triggerAction(action,params);
+}
+
+void DefaultHidManager::triggerOGLActions() {
+
+  while(!_ogl_actions.empty()) {
+
+    auto action = _ogl_actions.front();
+    HidManager::triggerAction(action.first,action.second);
+    _ogl_actions.pop();
+  }
+}
 
 void DefaultHidManager::heDeSelectAllObjects() {
 
@@ -550,13 +569,15 @@ void DefaultHidManager::setupDefaultHidBindings() {
       registerHidAction("Object selection",
                         "Select Object",
                         "Select object",
-                        this, SLOT(heSelectObject(HidInputEvent::HidInputParams)) );
+                        this, SLOT(heSelectObject(HidInputEvent::HidInputParams)),
+                        OGL_TRIGGER);
 
   QString ha_id_objsel_select_multi =
       registerHidAction("Object selection",
                         "Select Objects",
                         "Select objects",
-                        this, SLOT(heSelectObjects(HidInputEvent::HidInputParams)) );
+                        this, SLOT(heSelectObjects(HidInputEvent::HidInputParams)),
+                        OGL_TRIGGER);
 
   // Object Interaction
   QString ha_id_objint_toggle_edit =
@@ -569,19 +590,22 @@ void DefaultHidManager::setupDefaultHidBindings() {
       registerHidAction( "Object interaction",
                          "Replot: QuickHigh",
                          "Replot with \"high\" resolution",
-                         this, SLOT(heReplotQuickHigh()) );
+                         this, SLOT(heReplotQuickHigh()),
+                         OGL_TRIGGER);
 
   QString ha_id_objint_replot_med =
       registerHidAction( "Object interaction",
                          "Replot: QuickMedium",
                          "Replot with \"medium\" resolution",
-                         this, SLOT(heReplotQuickMedium()) );
+                         this, SLOT(heReplotQuickMedium()),
+                         OGL_TRIGGER);
 
   QString ha_id_objint_replot_low =
       registerHidAction( "Object interaction",
                          "Replot: QuickLow",
                          "Replot with \"low\" resolution",
-                         this, SLOT(heReplotQuickLow()) );
+                         this, SLOT(heReplotQuickLow()),
+                         OGL_TRIGGER);
 
 
 
@@ -590,7 +614,8 @@ void DefaultHidManager::setupDefaultHidBindings() {
       registerHidAction( "Rendering",
                          "Toggle: Shading mode",
                          "Toggle shadeing mode",
-                         this, SLOT(heToggleObjectDisplayMode()) );
+                         this, SLOT(heToggleObjectDisplayMode()),
+                         OGL_TRIGGER);
 
   // Simulator
   QString ha_id_sim_toggle =

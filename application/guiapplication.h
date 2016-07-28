@@ -47,7 +47,6 @@ protected:
 
   Window&                                     window();
   GMlibWrapper&                               gmlib();
-//  const DefaultHidManager&                    hidmanager();
   std::shared_ptr<GMlib::Scene>               scene();
 
 signals:

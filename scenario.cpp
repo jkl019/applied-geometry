@@ -94,7 +94,6 @@ void Scenario::initializeScenario() {
 //  window()->setSource( QUrl("qrc:/qml/main.qml") );
 
 //  // Connect up HiD signals
-//  connect( hidmanager().get(), &DefaultHidManager::signToggleSimulation, gmlib().get(),          &GMlibWrapper::toggleSimulation );
 //  connect( hidmanager().get(), SIGNAL(signOpenCloseHidHelp()),           window()->rootObject(), SIGNAL(toggleHidBindView()) );
 
 

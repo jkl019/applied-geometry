@@ -3,6 +3,9 @@
 
 #include "standardhidmanager.h"
 
+
+#include <queue>
+
 // local
 class GMlibWrapper;
 
@@ -12,7 +15,16 @@ class DefaultHidManager : public StandardHidManager {
 public:
   explicit DefaultHidManager( GMlibWrapper* gmlib, QObject* parent = 0x0 );
 
+  static const unsigned int   OGL_TRIGGER {8};
+
   void                        setupDefaultHidBindings();
+
+
+public slots:
+  void                        triggerOGLActions();
+
+protected:
+  void                        triggerAction(const HidAction *action, const HidInputEvent::HidInputParams &params) override;
 
 signals:
   void signToggleSimulation();
@@ -54,6 +66,9 @@ private:
   GMlib::Point<int,2>               toGMlibViewPoint(const QString& view_name, const QPoint& pos);
 
   GMlibWrapper*                     _gmlib;
+
+  std::queue<std::pair<const HidAction*,HidInputEvent::HidInputParams>>   _ogl_actions;
+
 
 };
 

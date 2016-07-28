@@ -73,17 +73,12 @@ public:
   RenderCamPair&                                    createRCPair( const QString& name );
   void                                              updateRCPairNameModel();
 
-//  std::shared_ptr<GMlib::DefaultSelectRenderer>     defaultSelectRenderer() const;
-
   void                                              render( const QString& name, const QRect& viewport,
                                                             GMlib::RenderTarget& target );
 
   void                                              prepare();
 
 public slots:
-//  void                                              changeRcPairActiveState( const QString& name, bool state );
-//  void                                              changeRcPairViewport( const QString& name, const QRectF& geometry);
-
   void                                              toggleSimulation();
 
 protected:
@@ -100,7 +95,7 @@ private:
   std::shared_ptr<GMlib::Scene>                     _scene;
 
   std::unordered_map<std::string, RenderCamPair>    _rc_pairs;
-//  std::shared_ptr<GMlib::DefaultSelectRenderer>     _select_renderer;
+  std::shared_ptr<GMlib::DefaultSelectRenderer>     _select_renderer;
 
   int                                               _replot_low_medium_high {1};
   bool                                              _move_object_button_pressed {false};

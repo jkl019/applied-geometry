@@ -25,6 +25,9 @@ GuiApplication::GuiApplication(int& argc, char **argv) : QGuiApplication(argc, a
   assert(!_instance);
   _instance = std::unique_ptr<GuiApplication>(this);
 
+
+  qRegisterMetaType<HidInputEvent::HidInputParams> ("HidInputEvent::HidInputParams");
+
   connect( &_window, &Window::sceneGraphInitialized,
            this,     &GuiApplication::onSceneGraphInitialized,
            Qt::DirectConnection );
@@ -52,6 +55,8 @@ GuiApplication::~GuiApplication() {
   _window.setPersistentSceneGraph(false);
   _window.releaseResources();
   _instance.release();
+
+  qDebug() << "Bye bye ^^, ~~ \"emerge --oneshot life\"";
 }
 
 void
@@ -85,8 +90,6 @@ GuiApplication::onSceneGraphInitialized() {
 
 void GuiApplication::onSceneGraphInvalidated() {
 
-  qDebug() << "on SceneGraph Invalidated";
-
   _scenario.cleanUp();
 }
 
@@ -108,11 +111,16 @@ GuiApplication::afterSceneGraphInitialized() {
   connect( &_window, &Window::signMouseReleased,      _hidmanager.get(), &StandardHidManager::registerMouseReleaseEvent );
   connect( &_window, &Window::signWheelEventOccurred, _hidmanager.get(), &StandardHidManager::registerWheelEvent );
 
+
   _hidmanager->setupDefaultHidBindings();
+  connect( _hidmanager.get(), &DefaultHidManager::signToggleSimulation,
+           &_scenario,        &GMlibWrapper::toggleSimulation );
+
+  connect( &_window,          &Window::beforeRendering,
+           _hidmanager.get(), &DefaultHidManager::triggerOGLActions,
+           Qt::DirectConnection );
 }
 
 Window&            GuiApplication::window()     {  return _window; }
-//GMlibWrapper&      GuiApplication::gmlib()      {  return _gmlib; }
-//DefaultHidManager& GuiApplication::hidmanager() {  return _hidmanager; }
 std::shared_ptr<GMlib::Scene> GuiApplication::scene() {  return _scenario.scene(); }
 const GuiApplication& GuiApplication::instance() {  return *_instance; }

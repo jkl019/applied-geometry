@@ -13,20 +13,22 @@ class HidAction : public QObject {
   Q_OBJECT
 
 public:
-  HidAction( const QString& group, const QString& name, const QString& description = QString() );
+  HidAction( const QString& group, const QString& name, const QString& description = QString(), unsigned int custom_trigger = 0);
 
-  const QString& getGroup() const;
-  const QString& getName() const;
-  const QString& getDescription() const;
+  const QString&  getGroup() const;
+  const QString&  getName() const;
+  const QString&  getDescription() const;
+  unsigned int    getCustomTrigger() const;
 
   QString         getIdentifier() const;
 
   void    trigger( const HidInputEvent::HidInputParams& params ) const;
 
 private:
-  QString   _name;
-  QString   _group;
-  QString   _description;
+  QString         _name;
+  QString         _group;
+  QString         _description;
+  unsigned int    _custom_trigger;
 
 signals:
   void  signTrigger( const HidInputEvent::HidInputParams& params ) const;
