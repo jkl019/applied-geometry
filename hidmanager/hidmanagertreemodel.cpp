@@ -197,7 +197,7 @@ void HidManagerTreeModel::update(const HidManager::HidActions &a,const HidManage
     heil.append((*ha_itr)->getDescription());
 
     heil.append(
-      [=]() mutable {
+      [=]() {
         auto itr = std::find_if(b.begin(), b.end(), HidBindingCompare( (*ha_itr)->getIdentifier() ));
         return itr != b.end() ? itr->getHidBindingText() : "";
       }()
