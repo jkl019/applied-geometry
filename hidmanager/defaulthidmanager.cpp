@@ -544,7 +544,8 @@ void DefaultHidManager::setupDefaultHidBindings() {
       registerHidAction("View",
                         "Lock To ...",
                         "Lock camera to an object or to the scene.",
-                        this, SLOT(heLockTo(HidInputEvent::HidInputParams)) );
+                        this, SLOT(heLockTo(HidInputEvent::HidInputParams)),
+                        OGL_TRIGGER);
 
   // Object Transformation
   QString ha_id_objtrans_scale =
@@ -557,7 +558,8 @@ void DefaultHidManager::setupDefaultHidBindings() {
       registerHidAction("Object transformation",
                         "Move Objects",
                         "Move objects",
-                        this, SLOT(heMoveSelectedObjects(HidInputEvent::HidInputParams)) );
+                        this, SLOT(heMoveSelectedObjects(HidInputEvent::HidInputParams)),
+                        OGL_TRIGGER);
 
   QString ha_id_objtrans_rotate =
       registerHidAction("Object transformation",
@@ -591,7 +593,8 @@ void DefaultHidManager::setupDefaultHidBindings() {
       registerHidAction( "Object interaction",
                          "Toggle: Edit mode",
                          "Toggle edit mode for editable objects",
-                         this, SLOT(heEdit()) );
+                         this, SLOT(heEdit()),
+                         OGL_TRIGGER);
 
   QString ha_id_objint_replot_high =
       registerHidAction( "Object interaction",
