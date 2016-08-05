@@ -314,8 +314,8 @@ void DefaultHidManager::heRotateSelectedObjects(const HidInputEvent::HidInputPar
 
   // Compute rotation axis and angle in respect to the camera and view.
   const UnitVector<float,3> rot_v =
-    float( pos(0) - prev(0) ) * cam->getUp() -
-    float( prev(1) - pos(1) ) * cam->getSide();
+    float( pos(0) - prev(0) ) * cam->getGlobalUp() -
+    float( prev(1) - pos(1) ) * cam->getGlobalSide();
   const Angle ang(
     M_2PI * sqrt(
       pow( double( pos(0) - prev(0) ) / cam->getViewportW(), 2 ) +
@@ -333,7 +333,7 @@ void DefaultHidManager::heRotateSelectedObjects(const HidInputEvent::HidInputPar
   for( int i = 0; i < objs.getSize(); ++i )
     if( objs(i)->getTypeId() != GM_SO_TYPE_SELECTOR )
       if( std::abs(pos(0)-prev(0)) > POS_TOLERANCE || std::abs(pos(1)-prev(1)) > POS_TOLERANCE )
-        no_objs > 1 ? objs(i)->rotate( ang, sphere.getPos(), rot_v) : objs(i)->rotate( ang, rot_v);
+        no_objs > 1 ? objs(i)->rotateGlobal( ang, sphere.getPos(), rot_v) : objs(i)->rotateGlobal( ang, rot_v);
 }
 
 void DefaultHidManager::heScaleSelectedObjects(const HidInputEvent::HidInputParams& params) {
