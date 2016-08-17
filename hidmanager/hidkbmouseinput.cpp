@@ -165,9 +165,6 @@ KeyPressInput::KeyPressInput( const Keymap& keymap, const Qt::KeyboardModifiers&
 KeyPressInput::KeyPressInput(const Qt::Key &key, const Qt::KeyboardModifiers &keymods)
   : KeyInput( key, keymods, QVariant( "KeyPress" ) ) {}
 
-KeyReleaseInput::KeyReleaseInput( const Keymap& keymap, const Qt::KeyboardModifiers& keymods )
-  : KeyInput( keymap, keymods, QVariant( "KeyRelease" ) ) {}
-
 KeyReleaseInput::KeyReleaseInput(const Qt::Key &key, const Qt::KeyboardModifiers &keymods)
   : KeyInput( key, keymods, QVariant( "KeyRelease" ) ) {}
 

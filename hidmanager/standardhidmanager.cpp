@@ -26,6 +26,7 @@ StandardHidManager::StandardHidManager( QObject* parent )
   _reg_wheel_state = false;
   _reg_next_key_event_type = KEY_NONE;
   _reg_next_mouse_event_type = MOUSE_NONE;
+  _reg_key_last_unreg = Qt::Key_Any;
 }
 
 void StandardHidManager::registerKeyPressEvent(const QString& name, QKeyEvent *e) {
@@ -47,6 +48,7 @@ void StandardHidManager::registerKeyReleaseEvent(const QString& name, QKeyEvent 
   registerRCPairName( name );
   unregisterKey( Qt::Key(e->key()), e->modifiers() );
   registerKeyEventType( KEY_RELEASE );
+
   generateEvent();
 }
 
@@ -125,6 +127,8 @@ void StandardHidManager::unregisterKey(Qt::Key key, Qt::KeyboardModifiers modifi
   // Update keymap
   if( !isKeyRegistered(key) )
     return;
+
+  _reg_key_last_unreg = key;
 
   _reg_keymap.remove( key );
 }
@@ -240,7 +244,7 @@ void StandardHidManager::generateEvent() {
         QCoreApplication::sendEvent( this, new HidInputEvent( KeyPressInput( _reg_keymap, _reg_keymods ), key_params ) );
       } break;
       case KEY_RELEASE: {
-        QCoreApplication::sendEvent( this, new HidInputEvent( KeyReleaseInput( _reg_keymap, _reg_keymods ), key_params ) );
+        QCoreApplication::sendEvent( this, new HidInputEvent( KeyReleaseInput( _reg_key_last_unreg, _reg_keymods ), key_params ) );
       } break;
     }
 

@@ -85,6 +85,7 @@ private:
 
   KeyInput::Keymap            _reg_keymap;
   Qt::KeyboardModifiers       _reg_keymods;
+  Qt::Key                     _reg_key_last_unreg;
 
   Qt::MouseButtons            _reg_mouse_buttons;
 

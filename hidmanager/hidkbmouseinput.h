@@ -54,10 +54,10 @@ public:
 
 class KeyReleaseInput : public KeyInput {
 public:
-  KeyReleaseInput( const Keymap& keymap, const Qt::KeyboardModifiers& keymods );
   KeyReleaseInput( const Qt::Key& key, const Qt::KeyboardModifiers& keymods = Qt::NoModifier );
 
   QString     toString() const;
+
 };
 
 
