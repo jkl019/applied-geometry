@@ -64,8 +64,7 @@ GuiApplication::~GuiApplication() {
 void
 GuiApplication::onSceneGraphInitialized() {
 
-  // Print format
-  qDebug() << "Surface format: " << QOpenGLContext::currentContext()->format();
+  qDebug() << "GL context: " << QOpenGLContext::currentContext()->format();
 
   // Init GMlibWrapper
   _scenario.initialize();
