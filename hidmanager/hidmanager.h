@@ -69,7 +69,7 @@ public:
   void                      forceUpdate();         // Needs to go
 
 protected:
-  void                      customEvent( QEvent* event );
+  void                      customEvent( QEvent* event ) override;
 
   virtual void              triggerAction( const HidAction* action, const HidInputEvent::HidInputParams& params );
 

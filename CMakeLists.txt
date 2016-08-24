@@ -1,13 +1,20 @@
 # Minimum CMake version required
-cmake_minimum_required(VERSION 2.8.11)
+cmake_minimum_required(VERSION 3.1)
 
-# Global name of the project
-project(GMlibQmlDemo)
+# Specify compiler features
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)
 
-# Version
-set(VERSION_MAJOR 0)
-set(VERSION_MINOR 1)
-set(VERSION_PATCH 0)
+# Clang++
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Weverything")  # -Weverything equivalent to g++ -pedantic, -Werror and -Wall
+else()
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic -Wall -Werror")
+endif()
+
+# Nice name for the IDEs
+project(GMlibQmlDemo VERSION 0.1 LANGUAGES C CXX)
+
 
 # Adjust the CMAKE_MODULE_PATH to include the "local" cmake/Modules directory
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
@@ -28,7 +35,7 @@ find_package(Qt5Gui 5.1)
 ################################
 # Find GMlib
 find_package(
-  GMlib 0.5 EXACT
+  GMlib 0.6.0 EXACT
   PATHS ${GMLIB_DIR}
   NO_DEFAULT_PATH
 )

@@ -29,7 +29,7 @@ class GMlibInFboRenderer : public QQuickFramebufferObject::Renderer {
 public:
   GMlibInFboRenderer() { _gl.initializeOpenGLFunctions(); }
 
-  void render() {
+  void render() override {
 
     if(!_rcpair_name.length()) return;
 
@@ -51,7 +51,7 @@ public:
     update();
   }
 
-  QOpenGLFramebufferObject *createFramebufferObject(const QSize &size) {
+  QOpenGLFramebufferObject *createFramebufferObject(const QSize &size) override {
 
     _size = size;
 
@@ -61,7 +61,7 @@ public:
     return new QOpenGLFramebufferObject(size, format);
   }
 
-  void synchronize(QQuickFramebufferObject *item) {
+  void synchronize(QQuickFramebufferObject *item) override {
 
     _item = static_cast<FboInSGRenderer*>(item);
     _rcpair_name = _item->rcPairName();

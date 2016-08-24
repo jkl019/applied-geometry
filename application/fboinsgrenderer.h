@@ -12,7 +12,7 @@ public:
   const QString&    rcPairName() const;
   void              setRcPairName( const QString& name );
 
-  Renderer*         createRenderer() const;
+  Renderer*         createRenderer() const override;
 
 private slots:
   void              onWindowChanged( QQuickWindow* window );
@@ -28,13 +28,13 @@ signals:
   void              signWheelEventOccurred( const QString& name, QWheelEvent* event);
 
 private:
-  void              keyPressEvent(QKeyEvent *event);
-  void              keyReleaseEvent(QKeyEvent *event);
-  void              mousePressEvent(QMouseEvent *event);
-  void              mouseReleaseEvent(QMouseEvent *event);
-  void              mouseDoubleClickEvent(QMouseEvent *event);
-  void              mouseMoveEvent(QMouseEvent *event);
-  void              wheelEvent(QWheelEvent *event);
+  void              keyPressEvent(QKeyEvent *event) override;
+  void              keyReleaseEvent(QKeyEvent *event) override;
+  void              mousePressEvent(QMouseEvent *event) override;
+  void              mouseReleaseEvent(QMouseEvent *event) override;
+  void              mouseDoubleClickEvent(QMouseEvent *event) override;
+  void              mouseMoveEvent(QMouseEvent *event) override;
+  void              wheelEvent(QWheelEvent *event) override;
 
   QString           _name {};
 };

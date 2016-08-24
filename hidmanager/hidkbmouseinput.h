@@ -14,7 +14,7 @@ public:
 
   bool                    isKeyboardModifiersActive(const Qt::KeyboardModifiers& modifiers ) const;
 
-  QString                 toString() const;
+  QString                 toString() const override;
 };
 
 
@@ -37,10 +37,10 @@ public:
   bool                      isKeyActive( Qt::Key key ) const;
   bool                      isKeymapEqual( const Keymap& keymap ) const;
 
-  QString                   toString() const;
+  QString                   toString() const override;
 
 private:
-  bool                      equals(const HidInput &) const;
+  bool                      equals(const HidInput &) const override;
 };
 
 
@@ -56,7 +56,7 @@ class KeyReleaseInput : public KeyInput {
 public:
   KeyReleaseInput( const Qt::Key& key, const Qt::KeyboardModifiers& keymods = Qt::NoModifier );
 
-  QString     toString() const;
+  QString     toString() const override;
 
 };
 
@@ -81,10 +81,10 @@ public:
   Qt::MouseButtons    getMouseButtons() const;
   void                setMouseButtons( const Qt::MouseButtons& buttons );
 
-  QString     toString() const;
+  QString     toString() const override;
 
 protected:
-  bool equals(const HidInput & other) const;
+  bool equals(const HidInput & other) const override;
 };
 
 
@@ -102,7 +102,7 @@ class MouseReleaseInput : public MouseButtonInput {
 public:
   MouseReleaseInput( const Qt::MouseButtons& buttons, const Qt::KeyboardModifiers& keymods = Qt::NoModifier );
 
-  QString     toString() const;
+  QString     toString() const override;
 };
 
 
@@ -112,7 +112,7 @@ class MouseDoubleClickInput : public MouseButtonInput {
 public:
   MouseDoubleClickInput( const Qt::MouseButtons& buttons, const Qt::KeyboardModifiers& keymods = Qt::NoModifier );
 
-  QString     toString() const;
+  QString     toString() const override;
 };
 
 
@@ -122,7 +122,7 @@ class MouseMoveInput : public MouseButtonInput {
 public:
   MouseMoveInput( const Qt::MouseButtons& buttons, const Qt::KeyboardModifiers& keymods = Qt::NoModifier );
 
-  QString     toString() const;
+  QString     toString() const override;
 };
 
 
@@ -135,10 +135,10 @@ class WheelInput : public KeyModifierInput {
 public:
   WheelInput( const Qt::KeyboardModifiers& keymods = Qt::NoModifier );
 
-  QString     toString() const;
+  QString     toString() const override;
 
 private:
-  bool      equals(const HidInput &) const;
+  bool      equals(const HidInput &) const override;
 };
 
 

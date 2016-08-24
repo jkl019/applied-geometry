@@ -81,7 +81,7 @@ public slots:
   void                                              toggleSimulation();
 
 protected:
-  void                                              timerEvent(QTimerEvent *e);
+  void                                              timerEvent(QTimerEvent *e) override;
 
   virtual void                                      initializeScenario() = 0;
   virtual void                                      cleanupScenario() = 0;

@@ -221,33 +221,24 @@ void StandardHidManager::generateEvent() {
     QCoreApplication::sendEvent( this, new HidInputEvent( WheelInput( _reg_keymods ), wheel_params ) );
     registerWheelData(false,0);
   }
-  else if( _reg_next_mouse_event_type != MOUSE_NONE ) {
-
-    switch( _reg_next_mouse_event_type ) {
-      case MOUSE_DBL_CLICK:
-        QCoreApplication::sendEvent( this, new HidInputEvent( MouseDoubleClickInput( _reg_mouse_buttons, _reg_keymods ), mouse_params ) );
-        break;
-      case MOUSE_CLICK:
-        QCoreApplication::sendEvent( this, new HidInputEvent( MousePressInput( _reg_mouse_buttons, _reg_keymods ), mouse_params ) );
-        break;
-      case MOUSE_RELEASE:
-        QCoreApplication::sendEvent( this, new HidInputEvent( MouseReleaseInput( _reg_mouse_buttons, _reg_keymods ), mouse_params ) );
-        break;
-    }
-
+  else if( _reg_next_mouse_event_type == MOUSE_DBL_CLICK ) {
+    QCoreApplication::sendEvent( this, new HidInputEvent( MouseDoubleClickInput( _reg_mouse_buttons, _reg_keymods ), mouse_params ) );
     registerMouseEventType( MOUSE_NONE );
   }
-  else if( _reg_next_key_event_type != KEY_NONE ) {
-
-    switch( _reg_next_key_event_type ) {
-      case KEY_PRESS: {
-        QCoreApplication::sendEvent( this, new HidInputEvent( KeyPressInput( _reg_keymap, _reg_keymods ), key_params ) );
-      } break;
-      case KEY_RELEASE: {
-        QCoreApplication::sendEvent( this, new HidInputEvent( KeyReleaseInput( _reg_key_last_unreg, _reg_keymods ), key_params ) );
-      } break;
-    }
-
+  else if( _reg_next_mouse_event_type == MOUSE_CLICK ) {
+    QCoreApplication::sendEvent( this, new HidInputEvent( MousePressInput( _reg_mouse_buttons, _reg_keymods ), mouse_params ) );
+    registerMouseEventType( MOUSE_NONE );
+  }
+  else if( _reg_next_mouse_event_type == MOUSE_RELEASE ) {
+    QCoreApplication::sendEvent( this, new HidInputEvent( MouseReleaseInput( _reg_mouse_buttons, _reg_keymods ), mouse_params ) );
+    registerMouseEventType( MOUSE_NONE );
+  }
+  else if( _reg_next_key_event_type == KEY_PRESS ) {
+    QCoreApplication::sendEvent( this, new HidInputEvent( KeyPressInput( _reg_keymap, _reg_keymods ), key_params ) );
+    registerKeyEventType( KEY_NONE );
+  }
+  else if( _reg_next_key_event_type == KEY_RELEASE ) {
+    QCoreApplication::sendEvent( this, new HidInputEvent( KeyReleaseInput( _reg_key_last_unreg, _reg_keymods ), key_params ) );
     registerKeyEventType( KEY_NONE );
   }
 
