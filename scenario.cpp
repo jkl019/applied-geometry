@@ -19,8 +19,8 @@ void Scenario::initializeScenario() {
 
   // Insert a light
   GMlib::Point<GLfloat,3> init_light_pos( 2.0, 4.0, 10 );
-  GMlib::PointLight *light = new GMlib::PointLight(  GMlib::GMcolor::White, GMlib::GMcolor::White,
-                                                     GMlib::GMcolor::White, init_light_pos );
+  GMlib::PointLight *light = new GMlib::PointLight(  GMlib::GMcolor::white(), GMlib::GMcolor::white(),
+                                                     GMlib::GMcolor::white(), init_light_pos );
   light->setAttenuation(0.8, 0.002, 0.0008);
   scene()->insertLight( light, false );
 

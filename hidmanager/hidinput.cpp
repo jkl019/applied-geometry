@@ -31,4 +31,11 @@ HidInput::operator <  ( const HidInput& other ) const { return sizeof(_type) + s
 bool
 HidInput::operator == ( const HidInput& other ) const {  return equals(other); }
 
+const HidInput&
+HidInput::getDefault() {
+
+  static const HidInput hid_input = HidInput();
+  return hid_input;
+}
+
 

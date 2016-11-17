@@ -21,6 +21,8 @@ public:
   bool                            operator <  ( const HidInput& other ) const;
   bool                            operator == ( const HidInput& other ) const;
 
+  static const HidInput&          getDefault(); 
+
 private:
   QVariant                    _type;
   QMap<QString,QVariant>      _data;

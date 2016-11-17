@@ -33,7 +33,7 @@ HidBinding::operator == ( const HidBinding& binding ) const {
 
 
 HidBindingCompare::HidBindingCompare( const HidInput& input ) : _comp_input(true), _text(), _input(input) {}
-HidBindingCompare::HidBindingCompare( const QString text ) : _comp_input(false), _text(text), _input(HidInput()) {}
+HidBindingCompare::HidBindingCompare( const QString text ) : _comp_input(false), _text(text), _input(HidInput::getDefault()) {}
 
 bool
 HidBindingCompare::operator () ( const HidBinding& binding ) const {

@@ -1,23 +1,51 @@
 # Minimum CMake version required
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.4)
+
+# Global name of the project
+project(GMlibQmlDemo VERSION 0.1.0 LANGUAGES CXX)
 
 # Specify compiler features
 set(CMAKE_CXX_STANDARD 14)
 
 message("CMAKE_CXX_COMPILER_ID: ${CMAKE_CXX_COMPILER_ID}")
 
-# Clang++
-if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-  set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-Weverything")  # -Weverything includes -pedantic and -Werror
-  # using Clang
-#elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-else()
-  set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-pedantic -Wall -Werror")
-  # using GCC
-endif()
+# Compiler options
+if(MSVC)
+  message("Compiler: ${CMAKE_CXX_COMPILER_ID}")
+elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+  message("Compiler: ${CMAKE_CXX_COMPILER_ID}")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic -Wall -Werror")
+elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+  message("Compiler: ${CMAKE_CXX_COMPILER_ID}")
 
-# Global name of the project
-project(GMlibQmlDemo VERSION 0.1.0 LANGUAGES C CXX)
+  # Default compile flags (read: turn on all checks)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Weverything -Wno-c++98-compat -Wno-documentation -pedantic -Werror")
+
+  # Extra compile flags to turn of stuff we don't want to handle at the moment
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-exit-time-destructors")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-conversion")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-padded")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-weak-vtables")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-global-constructors")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-undefined-var-template")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-double-promotion")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-float-equal")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-ignored-qualifiers")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-non-virtual-dtor")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-covered-switch-default")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-parameter")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-old-style-cast")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-implicit-fallthrough")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-shadow")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-reserved-id-macro")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unreachable-code")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unreachable-code-return")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-macros")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-undefined-reinterpret-cast")
+else()
+  message(WARNING "Compiler <${CMAKE_CXX_COMPILER_ID}> is not a supported C++ compiler.")
+endif()
 
 
 # Adjust the CMAKE_MODULE_PATH to include the "local" cmake/Modules directory
@@ -39,7 +67,7 @@ find_package(Qt5Gui 5.1)
 ################################
 # Find GMlib
 find_package(
-  GMlib 0.9 EXACT
+  GMlib 0.6.9 EXACT
   PATHS ${GMLIB_DIR}
   NO_DEFAULT_PATH
 )

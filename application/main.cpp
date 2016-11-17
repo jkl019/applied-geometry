@@ -8,6 +8,7 @@
 #include <QDebug>
 
 // stl
+#include <iostream>
 #include <stdexcept>
 
 int main(int argc, char *argv[]) try {
@@ -27,11 +28,11 @@ int main(int argc, char *argv[]) try {
 
 
   // Checking GMlib Version
-  if( GM_VERSION < GM_VERSION_CHECK( 0,9, 0 ) ) {
+  if( GM_VERSION < GM_VERSION_CHECK( 0,6, 9 ) ) {
 
     QString critical = QString(
       "GMlib version %1 not supported."
-      "At least GMlib version 0.5.0 needed. Please Rebuild GMlib"
+      "At least GMlib version 0.6.9 needed. Please Rebuild GMlib"
     ).arg( GM_VERSION_STR );
     qCritical() << critical;
     return 0;
