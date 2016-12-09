@@ -118,6 +118,8 @@ void GMlibWrapper::cleanUp() {
 
   stop();
 
+  cleanupScenario();
+
   _select_renderer.reset();
 
   for( auto& rc_pair : _rc_pairs ) {
