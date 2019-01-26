@@ -8,11 +8,10 @@
 #include "hidinputevent.h"
 
 class HidAction;
-//class HidManagerModel;
 class HidManagerTreeModel;
 
 // GMlib
-#include <gmCoreModule>
+#include <core/types/gmpoint.h>
 
 namespace GMlib {
   class Camera;

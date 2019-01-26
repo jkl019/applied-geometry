@@ -2,7 +2,8 @@
 #define TESTTORUS_H
 
 
-#include <parametrics/gmptorus>
+// gmlib
+#include <parametrics/surfaces/gmptorus.h>
 
 
 class TestTorus : public GMlib::PTorus<float> {

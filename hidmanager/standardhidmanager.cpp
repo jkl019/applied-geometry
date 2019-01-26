@@ -12,7 +12,6 @@
 #include <QKeyEvent>
 #include <QWheelEvent>
 #define QT_NO_OPENGL
-//#include <QtWidgets>
 
 // stl
 #include <cmath>

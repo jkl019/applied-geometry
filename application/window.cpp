@@ -4,7 +4,7 @@
 #include "fboinsgrenderer.h"
 
 // qt
-#include "QOpenGLContext"
+#include <QOpenGLContext>
 
 Window::Window(QWindow *parent) : QQuickView(parent) {
 

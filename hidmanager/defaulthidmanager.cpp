@@ -5,8 +5,14 @@
 #include "hidaction.h"
 
 // gmlib
-#include <gmSceneModule>
-#include <gmParametricsModule>
+#include <scene/gmsceneobject.h>
+#include <scene/camera/gmisocamera.h>
+#include <parametrics/curves/gmpbeziercurve.h>
+#include <parametrics/surfaces/gmpbeziersurf.h>
+#include <parametrics/triangles/gmpbeziertriangle.h>
+#include <parametrics/curves/gmperbscurve.h>
+#include <parametrics/surfaces/gmperbssurf.h>
+#include <parametrics/triangles/gmperbstriangle.h>
 using namespace GMlib;
 
 // qt

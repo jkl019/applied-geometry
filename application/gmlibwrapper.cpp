@@ -5,9 +5,7 @@
 
 
 // GMlib
-#include <gmOpenglModule>
-#include <gmSceneModule>
-#include <gmParametricsModule>
+#include <scene/render/gmdefaultselectrenderer.h>
 
 // Qt
 #include <QTimerEvent>

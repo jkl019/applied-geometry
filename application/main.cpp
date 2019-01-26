@@ -2,7 +2,7 @@
 #include "guiapplication.h"
 
 // gmlib
-#include <core/gmglobal>
+#include <core/gmglobal.h>
 
 // qt
 #include <QDebug>
@@ -28,11 +28,12 @@ int main(int argc, char *argv[]) try {
 
 
   // Checking GMlib Version
-  if( GM_VERSION < GM_VERSION_CHECK( 0,6, 9 ) ) {
+  if( GM_VERSION < GM_VERSION_CHECK( 0, 7, 0 ) ) {
 
     QString critical = QString(
-      "GMlib version %1 not supported."
-      "At least GMlib version 0.6.9 needed. Please Rebuild GMlib"
+      "GMlib version %1 not supported. "
+      "At least GMlib version 0.7.0 needed. "
+      "Please rebuild GMlib."
     ).arg( GM_VERSION_STR );
     qCritical() << critical;
     return 0;

@@ -3,7 +3,6 @@
 // local
 #include "hidinputevent.h"
 #include "hidaction.h"
-//#include "hidmanagermodel.h"
 #include "hidmanagertreemodel.h"
 
 

@@ -2,13 +2,9 @@
 
 #include "testtorus.h"
 
-//// hidmanager
-//#include "hidmanager/defaulthidmanager.h"
-
 // gmlib
-#include <gmOpenglModule>
-#include <gmSceneModule>
-#include <gmParametricsModule>
+#include <scene/light/gmpointlight.h>
+#include <parametrics/visualizers/gmpsurfnormalsvisualizer.h>
 
 // qt
 #include <QQuickItem>

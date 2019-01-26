@@ -1,102 +1,92 @@
 # Minimum CMake version required
-cmake_minimum_required(VERSION 3.4)
+# -- 3.8  for compile featurs controll
+# -- 3.11 for target declarations with no souces and a following
+#         target_sources directive
+cmake_minimum_required(VERSION 3.11)
 
 # Global name of the project
-project(QmlDemo VERSION 0.1.0 LANGUAGES CXX)
+project(QmlDemo VERSION 0.2.0 LANGUAGES CXX)
 
-# Specify compiler features
-set(CMAKE_CXX_STANDARD 14)
+# Add executable target
+add_executable( ${PROJECT_NAME} )
 
-message("CMAKE_CXX_COMPILER_ID: ${CMAKE_CXX_COMPILER_ID}")
 
-# Compiler options
-if(MSVC)
-  message("Compiler: ${CMAKE_CXX_COMPILER_ID}")
-elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-  message("Compiler: ${CMAKE_CXX_COMPILER_ID}")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic -Wall -Werror")
-elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-  message("Compiler: ${CMAKE_CXX_COMPILER_ID}")
 
-  # Default compile flags (read: turn on all checks)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Weverything -Wno-c++98-compat -Wno-documentation -pedantic -Werror")
+####################
+# Configure Wintendo
 
-  # Extra compile flags to turn of stuff we don't want to handle at the moment
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-exit-time-destructors")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-conversion")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-padded")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-weak-vtables")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-global-constructors")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-undefined-var-template")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-double-promotion")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-float-equal")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-ignored-qualifiers")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-non-virtual-dtor")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-covered-switch-default")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-parameter")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-old-style-cast")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-implicit-fallthrough")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-shadow")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-reserved-id-macro")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unreachable-code")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unreachable-code-return")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-macros")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-undefined-reinterpret-cast")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-gnu-statement-expression")
-else()
-  message(WARNING "Compiler <${CMAKE_CXX_COMPILER_ID}> is not a supported C++ compiler.")
+# IF on Wintendo platform
+if(MSVC AND NOT VCPKG_TOOLCHAIN)
+  message(FATAL_ERROR
+    "Enable VCPKG toolchain on MSVC platform\n"
+    "  Star over; CMAKE_TOOLCHAIN_FILE definition missing!\n"
+    "  i.e.: cmake -DCMAKE_TOOLCHAIN_FILE=<path_to>\\vcpkg\\scripts\\buildsystems\\vcpkg.cmake <path_to>\\source\\"
+    )
 endif()
 
 
-# Adjust the CMAKE_MODULE_PATH to include the "local" cmake/Modules directory
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
-
-
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-
+####################
+# Configure gmlib2qt
+find_package(gmlib 0.7 REQUIRED CONFIG NO_DEFAULT_PATH)
+target_link_libraries( ${PROJECT_NAME} gmlib::gmlib )
 
 
 ################################
-# Find the required Qt libraries
+# Configure Qt5 packages
 find_package(Qt5Core 5.1)
 find_package(Qt5Quick 5.1)
 find_package(Qt5Gui 5.1)
-
-################################
-# Find GMlib
-find_package(
-  GMlib 0.6.9 EXACT
-  PATHS ${GMLIB_DIR}
-  NO_DEFAULT_PATH
-)
-message( "GMlib_INCLUDE_DIRS: ${GMlib_INCLUDE_DIRS}" )
-message( "GMlib_LINK_DIRS:    ${GMlib_LINK_DIRS}" )
-message( "GMlib_DEFINITIONS:  ${GMlib_DEFINITIONS}" )
-message( "GMlib_LIBRARIES:    ${GMlib_LIBRARIES}" )
-include_directories( ${GMlib_INCLUDE_DIRS} )
-link_directories( ${GMlib_LINK_DIRS} )
-add_definitions(${GMlib_DEFINITIONS})
-
-include_directories( ${GLEW_INCLUDE_DIRS} )
-if(WIN32)
-  add_definitions(-DGLEW_STATIC)
-endif(WIN32)
+target_link_libraries(  ${PROJECT_NAME}
+  Qt5::Core Qt5::Quick Qt5::Gui
+  )
 
 
+###########################
+# Compiler spesific options
+
+# Get GMlib Transitive target COMPILE properties
+get_target_property(DEMO_GMLIB_TRANS_INTERFACE_COMPILE_DEFINITIONS gmlib::gmlib INTERFACE_COMPILE_DEFINITIONS)
+get_target_property(DEMO_GMLIB_TRANS_INTERFACE_COMPILE_FEATURES gmlib::gmlib INTERFACE_COMPILE_FEATURES)
+get_target_property(DEMO_GMLIB_TRANS_INTERFACE_COMPILE_OPTIONS gmlib::gmlib INTERFACE_COMPILE_OPTIONS)
+
+# Set GMlib INTERFACE target COMPILE property dependency on GMlib2 PUBLIC profile
+target_compile_definitions(${PROJECT_NAME} PUBLIC ${DEMO_GMLIB_TRANS_INTERFACE_COMPILE_DEFINITIONS})
+target_compile_features(${PROJECT_NAME}    PUBLIC ${DEMO_GMLIB_TRANS_INTERFACE_COMPILE_FEATURES})
+target_compile_options(${PROJECT_NAME}     PUBLIC ${DEMO_GMLIB_TRANS_INTERFACE_COMPILE_OPTIONS})
+
+# Turn off platform-spesific extensions
+set_target_properties(${PROJECT_NAME} PROPERTIES CXX_EXTENSIONS OFF)
+
+# Add additional compile options
+target_compile_options(${PROJECT_NAME}
+#  PUBLIC $<$<CXX_COMPILER_ID:AppleClang>:
+#    -some-compiler-flag # somewhere over the rainbow
+#    >
+  PUBLIC $<$<CXX_COMPILER_ID:Clang>:
+    -Wno-unused-parameter
+    -Wno-old-style-cast
+    -Wno-implicit-fallthrough
+    -Wno-shadow
+    -Wno-reserved-id-macro
+    -Wno-unreachable-code
+    -Wno-unreachable-code-return
+    -Wno-unused-macros
+    -Wno-undefined-reinterpret-cast
+    >
+#  PUBLIC $<$<CXX_COMPILER_ID:GNU>:
+#    -some-compiler-flag
+#    >
+#  PUBLIC $<$<CXX_COMPILER_ID:MSVC>:
+#    /some-compiler-option
+#    >
+    )
 
 
-#######
-# Files
 
-set( HDRS
+
+# Qt moc'ing
+qt5_wrap_cpp( HDRS_MOC
   hidmanager/hidaction.h
-  hidmanager/hidbinding.h
-  hidmanager/hidinput.h
-  hidmanager/hidinputevent.h
-  hidmanager/hidkbmouseinput.h
   hidmanager/hidmanager.h
   hidmanager/hidmanagertreemodel.h
   hidmanager/standardhidmanager.h
@@ -106,13 +96,21 @@ set( HDRS
   application/gmlibwrapper.h
   application/guiapplication.h
   application/window.h
-  application/utils.h
 
-  testtorus.h
   scenario.h
   )
+target_sources( ${PROJECT_NAME} PRIVATE ${HDRS_MOC})
 
-set( SRCS
+
+# Qt resouces files
+qt5_add_resources( RCCS_MOC
+  application/application.qrc
+  )
+target_sources( ${PROJECT_NAME} PRIVATE ${RCCS_MOC})
+
+
+# Sources
+target_sources( ${PROJECT_NAME} PRIVATE
   hidmanager/hidaction.cpp
   hidmanager/hidbinding.cpp
   hidmanager/hidinput.cpp
@@ -132,46 +130,4 @@ set( SRCS
 
   scenario.cpp
   )
-
-#########
-# Moc'ing
-QT5_WRAP_CPP( HDRS_MOC
-  hidmanager/hidaction.h
-  hidmanager/hidmanager.h
-  hidmanager/hidmanagertreemodel.h
-  hidmanager/standardhidmanager.h
-  hidmanager/defaulthidmanager.h
-
-  application/fboinsgrenderer.h
-  application/gmlibwrapper.h
-  application/guiapplication.h
-  application/window.h
-
-  scenario.h
-  )
-
-set( RCCS
- application/application.qrc
-)
-
-QT5_ADD_RESOURCES( RCCS_MOC ${RCCS} )
-
-
-
-
-#########
-# Compile
-add_executable( ${CMAKE_PROJECT_NAME} ${HDRS} ${SRCS} ${HDRS_MOC} ${FORM_HDRS} ${RCCS_MOC} )
-
-######
-# Link
-target_link_libraries( ${CMAKE_PROJECT_NAME}
-  ${GMlib_LIBRARIES}
-  Qt5::Core
-  Qt5::Quick
-  Qt5::Gui
-  ${GLEW_LIBRARIES}
-  ${OPENGL_LIBRARIES}
-  )
-
 
