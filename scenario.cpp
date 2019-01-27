@@ -6,6 +6,9 @@
 #include <scene/light/gmpointlight.h>
 #include <parametrics/visualizers/gmpsurfnormalsvisualizer.h>
 
+#include <trianglesystem/gmtrianglesystem.h>
+#include <parametrics/curves/gmpcircle.h>
+
 // qt
 #include <QQuickItem>
 
@@ -61,24 +64,67 @@ void Scenario::initializeScenario() {
 
 
 
+  // Init Test Torus example
+  initializeTestTorusExample();
 
-
-
-
-  // Surface visualizers
-  auto surface_visualizer = new GMlib::PSurfNormalsVisualizer<float,3>;
-
-  // Surface
-  auto surface = new TestTorus;
-  surface->toggleDefaultVisualizer();
-  surface->insertVisualizer(surface_visualizer);
-  surface->replot(200,200,1,1);
-  scene()->insert(surface);
-
-  surface->test01();
+  // Init TriangleFacets example
+//  initializeTriangleFacetExample();
 
 }
 
 void Scenario::cleanupScenario() {
 
+  if (m_test_torus != nullptr)
+    cleanupTestTorusExample();
+}
+
+void Scenario::initializeTestTorusExample()
+{
+  // Surface visualizers
+  auto surface_visualizer = new GMlib::PSurfNormalsVisualizer<float,3>;
+
+  // Surface
+  m_test_torus = std::make_shared<TestTorus>();
+  m_test_torus->toggleDefaultVisualizer();
+  m_test_torus->insertVisualizer(surface_visualizer);
+  m_test_torus->replot(200,200,1,1);
+  scene()->insert(m_test_torus.get());
+
+  m_test_torus->test01();
+}
+
+void Scenario::cleanupTestTorusExample()
+{
+  scene()->remove(m_test_torus.get());
+  m_test_torus.reset();
+}
+
+void Scenario::initializeTriangleFacetExample() {
+
+  auto circle = GMlib::PCircle<float>(4.0f);
+
+  m_triangle_facets = std::make_shared<GMlib::TriangleFacets<float>>();
+
+  for (auto i = 0UL; i < 10; ++i) {
+
+    const auto dt_s = float(10);
+    const auto t =
+        float(circle.getParStart() + i * (circle.getParDelta() / dt_s));
+    const auto circle_eval = circle.evaluate(t, 0);
+    m_triangle_facets->insertVertex(
+        GMlib::TSVertex<float>{circle_eval[0][0], circle_eval[0][1]});
+  }
+  m_triangle_facets->insertVertex(GMlib::TSVertex<float>{0.0f, 0.0f, 1.0f});
+
+  m_triangle_facets->toggleDefaultVisualizer();
+  m_triangle_facets->triangulateDelaunay();
+  m_triangle_facets->replot();
+
+  scene()->insert(m_triangle_facets.get());
+}
+
+void Scenario::cleanupTriangleFacetExample()
+{
+  scene()->remove(m_triangle_facets.get());
+  m_triangle_facets.reset();
 }
