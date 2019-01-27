@@ -72,6 +72,9 @@ target_compile_options(${PROJECT_NAME}
     -Wno-unreachable-code-return
     -Wno-unused-macros
     -Wno-undefined-reinterpret-cast
+    -Wno-redundant-parens
+    -Wno-inconsistent-missing-destructor-override
+    -Wno-zero-as-null-pointer-constant
     >
 #  PUBLIC $<$<CXX_COMPILER_ID:GNU>:
 #    -some-compiler-flag
