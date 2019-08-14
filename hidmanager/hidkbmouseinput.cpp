@@ -1,6 +1,6 @@
 #include "hidkbmouseinput.h"
 
-
+#include <iostream>
 // Qt
 #include <QKeySequence>
 #include <QStringList>

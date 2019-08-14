@@ -3,6 +3,7 @@
 *~
 *.save
 *.bak
+*.back
 *.backup
 *.o
 *.lib
@@ -18,6 +19,8 @@
 *.user*
 *.cbp
 *.autosave
+# Clang temp files QtCreator wintendo
+*.c.*
 
 #
 ########
@@ -28,12 +31,16 @@ CMakeFiles/
 build/
 BUILD/
 
+########
+## CTest
+CTestTestfile.cmake
+Testing/
+
 #
 ##################################
 ## QMake (Deprecated build-system)
 *.pro
 *.pri
-moc_*
 
 #
 ########################################

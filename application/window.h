@@ -12,7 +12,7 @@
 class Window : public QQuickView {
   Q_OBJECT
 public:
-  explicit Window(QWindow *parent = 0);
+  explicit Window(QWindow *parent = nullptr);
 
 signals:
   void      signRcPairActiveStateChanged( const QString& name, bool state );

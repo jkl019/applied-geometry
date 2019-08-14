@@ -14,7 +14,7 @@ class DefaultHidManager : public StandardHidManager {
   Q_OBJECT
 public:
   explicit DefaultHidManager( QObject* parent = Q_NULLPTR );
-  virtual ~DefaultHidManager();
+  virtual ~DefaultHidManager() override;
 
   static const unsigned int   OGL_TRIGGER {8};
 
@@ -32,8 +32,12 @@ signals:
   void signToggleSimulation();
   void signOpenCloseHidHelp();
 
-private slots:
+public slots:
   virtual void                      heDeSelectAllObjects();
+  virtual void                      heColapse();
+  virtual void                      heClose();
+  virtual void                      heSurroundigsphere();
+  virtual void                      heSelectors();
   virtual void                      heEdit();
   virtual void                      heLockTo( const HidInputEvent::HidInputParams& params );
   virtual void                      heMoveCamera( const HidInputEvent::HidInputParams& params );

@@ -8,6 +8,7 @@
 #include "hidinputevent.h"
 
 class HidAction;
+//class HidManagerModel;
 class HidManagerTreeModel;
 
 // GMlib

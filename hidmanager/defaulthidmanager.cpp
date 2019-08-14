@@ -7,6 +7,7 @@
 // gmlib
 #include <scene/gmsceneobject.h>
 #include <scene/camera/gmisocamera.h>
+
 #include <parametrics/curves/gmpbeziercurve.h>
 #include <parametrics/surfaces/gmpbeziersurf.h>
 #include <parametrics/triangles/gmpbeziertriangle.h>
@@ -19,7 +20,7 @@ using namespace GMlib;
 #include <QGuiApplication>
 
 // Local Defines
-#define SNAP 0.01
+#define SNAP 0.01f
 
 
 
@@ -53,6 +54,43 @@ void DefaultHidManager::heDeSelectAllObjects() {
 
   scene()->removeSelections();
 }
+
+
+void DefaultHidManager::heColapse() {
+
+  const Array<SceneObject*> &sel_objs = scene()->getSelectedObjects();
+
+  for( int i = 0; i < sel_objs.getSize(); i++ )
+    sel_objs(i)->toggleCollapsed();
+}
+
+
+void DefaultHidManager::heClose() {
+
+  const Array<SceneObject*> &sel_objs = scene()->getSelectedObjects();
+
+  for( int i = 0; i < sel_objs.getSize(); i++ )
+    sel_objs(i)->toggleClose();
+}
+
+
+void DefaultHidManager::heSurroundigsphere() {
+
+  const Array<SceneObject*> &sel_objs = scene()->getSelectedObjects();
+
+  for( int i = 0; i < sel_objs.getSize(); i++ )
+    sel_objs(i)->toggleDisplaySurroundingSphere();
+}
+
+
+void DefaultHidManager::heSelectors() {
+
+  const Array<SceneObject*> &sel_objs = scene()->getSelectedObjects();
+
+  for( int i = 0; i < sel_objs.getSize(); i++ )
+    sel_objs(i)->toggleSelectors();
+}
+
 
 void DefaultHidManager::heEdit() {
 
@@ -129,7 +167,7 @@ void DefaultHidManager::heEdit() {
         if( bsObj->isSelectorsVisible() )
           bsObj->hideSelectors();
         else
-          bsObj->showSelectors(true);
+          bsObj->showSelectors();
       }
     }
     else if( btObj ) {
@@ -172,9 +210,7 @@ void DefaultHidManager::heLockTo(const HidInputEvent::HidInputParams& params) {
     cam->unLock();
   else {
 
-    cam->lock(
-      ( scene()->getSphereClean().getPos() - cam->getPos() ) *
-      cam->getDir() );
+    cam->lock(double((scene()->getSphereClean().getPos()-cam->getPos())*cam->getDir()));
   }
 }
 
@@ -185,14 +221,11 @@ void DefaultHidManager::heMoveCamera(const HidInputEvent::HidInputParams& params
   auto prev      = toGMlibViewPoint(view_name, prevPosFromParams(params));
 
   auto *cam = findCamera(view_name);
-  if( !cam )
-    return;
+  if( !cam ) return;
 
   const float scale = cameraSpeedScale( cam );
-  const Vector<float,2> delta (
-     (pos(0) - prev(0)) * scale / cam->getViewportW(),
-     (prev(1) - pos(1)) * scale / cam->getViewportH()
-  );
+  const Vector<float,2> delta( (pos(0) - prev(0)) * scale / cam->getViewportW(),
+                               (prev(1) - pos(1)) * scale / cam->getViewportH() );
   cam->move( delta );
 }
 
@@ -217,7 +250,7 @@ void DefaultHidManager::heMoveSelectedObjects( const HidInputEvent::HidInputPara
       ( ( prev(0) - pos(0) ) * dh ) * cam->getSide() +
       ( ( pos(1) - prev(1) ) * dh ) * cam->getUp() );
 
-    if( deltav.getLength() > SNAP && deltav.getLength() < 1000.0 ) {
+    if( deltav.getLength() > SNAP && deltav.getLength() < 1000.0f ) {
 
       if( obj->getTypeId() != GM_SO_TYPE_SELECTOR )
         obj->translateGlobal( deltav );
@@ -270,22 +303,20 @@ void DefaultHidManager::heReplotQuick(int factor) {
 
       GMlib::PERBSCurve<float> *erbs = dynamic_cast<GMlib::PERBSCurve<float>*>(curve);
       if( erbs )
-        erbs->replot(
-          (erbs->getLocalCurves().getDim()-1)*factor + 1,
-          1 );
+        erbs->sample( (erbs->getLocalCurves().getDim()-1)*factor + 1, 1 );
       else
-        curve->replot( std::pow<int>( factor, 2 ) * 100, 2 );
+        curve->sample( factor*factor*100, 2 );
     }
     else if( surf ) {
 
       GMlib::PERBSSurf<float> *erbs = dynamic_cast<GMlib::PERBSSurf<float>*>(surf);
       if( erbs )
-        erbs->replot(
+        erbs->sample(
           (erbs->getLocalPatches().getDim1()-1)*factor + 1,
           (erbs->getLocalPatches().getDim2()-1)*factor + 1,
           2, 2 );
       else {
-        surf->replot( 10 * factor, 10 * factor, 2, 2 );
+        surf->sample( 10*factor, 10*factor, 2, 2 );
       }
     }
   }
@@ -319,27 +350,29 @@ void DefaultHidManager::heRotateSelectedObjects(const HidInputEvent::HidInputPar
   const Array<SceneObject*> &objs = scene()->getSelectedObjects();
 
   // Compute rotation axis and angle in respect to the camera and view.
-  const UnitVector<float,3> rot_v =
-    float( pos(0) - prev(0) ) * cam->getGlobalUp() -
-    float( prev(1) - pos(1) ) * cam->getGlobalSide();
-  const Angle ang(
-    M_2PI * sqrt(
-      pow( double( pos(0) - prev(0) ) / cam->getViewportW(), 2 ) +
-      pow( double( prev(1) - pos(1) ) / cam->getViewportH(), 2 ) ) );
-
-
-  int no_objs = 0;
+  const UnitVector<float,3> rot_v = (pos(0) - prev(0)) * cam->getGlobalUp() - (prev(1) - pos(1)) * cam->getGlobalSide();
+  const Angle ang(M_2PI*sqrt(pow(double(pos(0)-prev(0))/cam->getViewportW(),2) + pow(double(prev(1)-pos(1))/cam->getViewportH(),2)));
   Sphere<float,3> sphere;
+  int   no_objs = 0;
+
   for( int i = 0; i < objs.getSize(); ++i )
     if( objs(i)->getTypeId() != GM_SO_TYPE_SELECTOR ) {
       sphere += objs(i)->getSurroundingSphereClean();
       no_objs++;
     }
+  Vector<float,3> mv_v = sphere.getPos();
 
   for( int i = 0; i < objs.getSize(); ++i )
     if( objs(i)->getTypeId() != GM_SO_TYPE_SELECTOR )
-      if( std::abs(pos(0)-prev(0)) > POS_TOLERANCE || std::abs(pos(1)-prev(1)) > POS_TOLERANCE )
-        no_objs > 1 ? objs(i)->rotateGlobal( ang, sphere.getPos(), rot_v) : objs(i)->rotateGlobal( ang, rot_v);
+      if( std::abs(pos(0)-prev(0)) > POS_TOLERANCE || std::abs(pos(1)-prev(1)) > POS_TOLERANCE ){
+          if(no_objs==1 && objs(i)->isLocal())
+              objs(i)->rotateGlobal(ang, rot_v);
+          else {
+              objs(i)->move(mv_v);
+              objs(i)->rotateGlobal(ang, rot_v);
+              objs(i)->move(-mv_v);
+          }
+      }
 }
 
 void DefaultHidManager::heScaleSelectedObjects(const HidInputEvent::HidInputParams& params) {
@@ -363,7 +396,7 @@ void DefaultHidManager::heScaleSelectedObjects(const HidInputEvent::HidInputPara
       ( ( pos(1) - prev(1) ) * dh ) * cam->getUp() );
 
 
-    if( deltav.getLength() < 1000.0 )
+    if( deltav.getLength() < 1000.0f )
       obj->scale( Vector<float,3>( 1.0f + deltav(1) ) );
   }
 }
@@ -390,6 +423,7 @@ void DefaultHidManager::heSelectObject(const HidInputEvent::HidInputParams& para
   obj->setSelected( !selected );
 }
 
+
 void DefaultHidManager::heSelectObjects(const HidInputEvent::HidInputParams& params) {
 
   auto view_name = viewNameFromParams(params);
@@ -399,6 +433,7 @@ void DefaultHidManager::heSelectObjects(const HidInputEvent::HidInputParams& par
 
 //  if(obj) obj->toggleSelected();
 }
+
 
 void DefaultHidManager::heSelectObjectTree( SceneObject* obj ) {
 
@@ -413,23 +448,24 @@ void DefaultHidManager::heSelectObjectTree( SceneObject* obj ) {
     heSelectObjectTree( (obj->getChildren())[i] );
 }
 
+
 void DefaultHidManager::heToggleObjectDisplayMode() {
 
   const Array<SceneObject*> &sel_objs = scene()->getSelectedObjects();
 
   for( int i = 0; i < sel_objs.getSize(); i++ ) {
-
-
     auto obj = sel_objs(i);
     GMlib::Array<GMlib::Visualizer*> &visus = obj->getVisualizers();
     for( int i = 0; i < visus.getSize(); i++ ) visus[i]->toggleDisplayMode();
   }
 }
 
+
 void DefaultHidManager::heToggleSimulation() {
 
   emit signToggleSimulation();
 }
+
 
 void DefaultHidManager::heToggleSelectAllObjects() {
 
@@ -451,19 +487,17 @@ void DefaultHidManager::heZoom(const HidInputEvent::HidInputParams& params) {
   Camera *isocam = dynamic_cast<IsoCamera*>( cam );
 
   if( isocam ) {
-
-    if( wheel_delta < 0 ) isocam->zoom( 1.05 );
-    if( wheel_delta > 0 ) isocam->zoom( 0.95 );
+    if( wheel_delta < 0 ) isocam->zoom( 1.05f );
+    if( wheel_delta > 0 ) isocam->zoom( 0.95f );
   }
   else if( cam ) {
-
-    double scale;
+      double scale;
     if( cam->isLocked() )
       scale = cam->getLockDist();
     else
-      scale = scene()->getSphere().getRadius();
+      scale = double(scene()->getSphere().getRadius());
 
-    cam->move( wheel_delta*scale / cam->getViewportH() );
+    cam->move( wheel_delta*scale/cam->getViewportH() );
   }
 }
 
@@ -489,9 +523,12 @@ float DefaultHidManager::cameraSpeedScale(Camera *cam) const {
     return 1.0f;
 
   if(cam->isLocked())
-    return M_2PI * cam->getLockDist();
+    return float(M_2PI*cam->getLockDist());
 
-  return scene()->getSphere().getRadius();
+  if(scene()->getSphere().isValid())
+    return scene()->getSphere().getRadius();
+  else
+    return 0.0f;
 }
 
 
@@ -595,6 +632,34 @@ void DefaultHidManager::setupDefaultHidBindings() {
                         OGL_TRIGGER);
 
   // Object Interaction
+  QString ha_id_objint_toggle_colaps =
+      registerHidAction( "Object interaction",
+                         "Toggle: Colapsed mode",
+                         "Toggle colapsed mode for objects",
+                         this, SLOT(heColapse()),
+                         OGL_TRIGGER);
+
+  QString ha_id_objint_toggle_close =
+      registerHidAction( "Object interaction",
+                         "Toggle: Close mode",
+                         "Toggle close mode for objects",
+                         this, SLOT(heClose()),
+                         OGL_TRIGGER);
+
+  QString ha_id_objint_toggle_surroundigsph =
+      registerHidAction( "Object interaction",
+                         "Toggle: Show surroundigsphere for objects",
+                         "Toggle surroundigsphere for objects",
+                         this, SLOT(heSurroundigsphere()),
+                         OGL_TRIGGER);
+
+  QString ha_id_objint_toggle_selectors =
+      registerHidAction( "Object interaction",
+                         "Toggle: Selectors for objects",
+                         "Toggle selectors for objects",
+                         this, SLOT(heSelectors()),
+                         OGL_TRIGGER);
+
   QString ha_id_objint_toggle_edit =
       registerHidAction( "Object interaction",
                          "Toggle: Edit mode",
@@ -622,7 +687,6 @@ void DefaultHidManager::setupDefaultHidBindings() {
                          "Replot with \"low\" resolution",
                          this, SLOT(heReplotQuickLow()),
                          OGL_TRIGGER);
-
 
 
   // Rendering
@@ -658,7 +722,11 @@ void DefaultHidManager::setupDefaultHidBindings() {
 
 
   //// Set up initial mapping
-  registerHidMapping( ha_id_objsel_toggle_all,            new KeyPressInput( Qt::Key_A ) );
+  registerHidMapping( ha_id_objsel_toggle_all,            new KeyPressInput( Qt::Key_A ) ); 
+  registerHidMapping( ha_id_objint_toggle_colaps,         new KeyPressInput( Qt::Key_Z, Qt::ControlModifier) );
+  registerHidMapping( ha_id_objint_toggle_close,          new KeyPressInput( Qt::Key_O, Qt::ControlModifier) );
+  registerHidMapping( ha_id_objint_toggle_surroundigsph,  new KeyPressInput( Qt::Key_S, Qt::ShiftModifier) );
+  registerHidMapping( ha_id_objint_toggle_selectors,      new KeyPressInput( Qt::Key_S, Qt::ControlModifier) );
   registerHidMapping( ha_id_objint_toggle_edit,           new KeyPressInput( Qt::Key_E ) );
   registerHidMapping( ha_id_objint_replot_high,           new KeyPressInput( Qt::Key_P, Qt::ShiftModifier ) );
   registerHidMapping( ha_id_objint_replot_med,            new KeyPressInput( Qt::Key_P ) );

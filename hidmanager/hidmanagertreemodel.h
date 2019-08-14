@@ -14,8 +14,8 @@ class TreeItem;
 class HidManagerTreeModel : public QAbstractTableModel {
   Q_OBJECT
 public:
-  explicit HidManagerTreeModel( HidManager* hidmanager, QObject* parent = 0x0 );
-  ~HidManagerTreeModel();
+  explicit HidManagerTreeModel( HidManager* hidmanager, QObject* parent = nullptr );
+  ~HidManagerTreeModel() override;
 
   QModelIndex     index(int row, int column, const QModelIndex &parent) const override;
   QModelIndex     parent(const QModelIndex &child) const override;

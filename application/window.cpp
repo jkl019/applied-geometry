@@ -4,7 +4,7 @@
 #include "fboinsgrenderer.h"
 
 // qt
-#include <QOpenGLContext>
+#include "QOpenGLContext"
 
 Window::Window(QWindow *parent) : QQuickView(parent) {
 
@@ -16,7 +16,8 @@ Window::Window(QWindow *parent) : QQuickView(parent) {
   setPersistentSceneGraph(true);
 
   setResizeMode(SizeRootObjectToView);
-  setMinimumSize( QSize( 800, 600 ) );
+  setMinimumSize( QSize( 600, 600 ) );
+  resize(1600, 1000);
 
 
   QSurfaceFormat format;

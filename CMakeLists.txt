@@ -105,6 +105,7 @@ qt5_wrap_cpp( HDRS_MOC
 target_sources( ${PROJECT_NAME} PRIVATE ${HDRS_MOC})
 
 
+
 # Qt resouces files
 qt5_add_resources( RCCS_MOC
   application/application.qrc

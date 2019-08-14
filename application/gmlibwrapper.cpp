@@ -7,6 +7,7 @@
 // GMlib
 #include <scene/render/gmdefaultselectrenderer.h>
 
+
 // Qt
 #include <QTimerEvent>
 #include <QRectF>
@@ -79,6 +80,7 @@ void GMlibWrapper::timerEvent(QTimerEvent* e) {
   _scene->simulate();
   prepare();
 }
+
 
 void GMlibWrapper::start() {
 
@@ -190,7 +192,7 @@ RenderCamPair& GMlibWrapper::createRCPair(const QString& name) {
   auto rc_pair = RenderCamPair {};
 
   rc_pair.renderer = std::make_shared<GMlib::DefaultRenderer>();
-  rc_pair.camera = std::make_shared<GMlib::Camera>();
+  rc_pair.camera   = std::make_shared<GMlib::Camera>();
   rc_pair.renderer->setCamera(rc_pair.camera.get());
 
   return _rc_pairs[name.toStdString()] = rc_pair;

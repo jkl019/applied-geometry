@@ -1,15 +1,13 @@
 #include "fboinsgrenderer.h"
 
-#include "gmlibwrapper.h"
-#include "window.h"
-
-// gmlib
-#include <scene/render/gmrendertarget.h>
-
-// qt
 #include <QOpenGLFramebufferObject>
 #include <QQuickWindow>
 #include <QOpenGLFunctions>
+
+#include "gmlibwrapper.h"
+#include "window.h"
+
+#include <scene/render/gmrendertarget.h>
 
 
 class QQuickFboInlineRenderTarget : public GMlib::RenderTarget {

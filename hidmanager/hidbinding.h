@@ -28,7 +28,7 @@ private:
 };
 
 inline
-uint qHash( const HidBinding& binding ) { return qHash( binding.getActionName() );   }
+unsigned int qHash( const HidBinding& binding ) { return qHash( binding.getActionName() );   }
 
 
 struct HidBindingCompare : public std::unary_function<const HidBinding, bool> {

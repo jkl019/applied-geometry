@@ -121,6 +121,9 @@ GuiApplication::afterOnSceneGraphInitialized() {
 
   // Start simulator
   _scenario.start();
+
+
+  connect( &_window, &Window::beforeRendering, &_scenario, &Scenario::callDefferedGL, Qt::DirectConnection );
 }
 
 const GuiApplication& GuiApplication::instance() {  return *_instance; }

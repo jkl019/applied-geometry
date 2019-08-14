@@ -12,6 +12,7 @@
 #include <QKeyEvent>
 #include <QWheelEvent>
 #define QT_NO_OPENGL
+//#include <QtWidgets>
 
 // stl
 #include <cmath>
@@ -28,22 +29,28 @@ StandardHidManager::StandardHidManager( QObject* parent )
   _reg_key_last_unreg = Qt::Key_Any;
 }
 
+
 void StandardHidManager::registerKeyPressEvent(const QString& name, QKeyEvent *e) {
 
+//  std::lock_guard<std::mutex> lk(_input_mutex);
   registerRCPairName( name );
   registerKey( Qt::Key(e->key()), e->modifiers() );
   registerKeyEventType( KEY_PRESS );
   generateEvent();
 }
 
+
 void StandardHidManager::registerWindowPosition( const QPoint& pos ) {
 
+//  std::lock_guard<std::mutex> lk(_input_mutex);
   _reg_view_prev_pos = _reg_view_pos;
   _reg_view_pos = pos;
 }
 
+
 void StandardHidManager::registerKeyReleaseEvent(const QString& name, QKeyEvent *e) {
 
+//  std::lock_guard<std::mutex> lk(_input_mutex);
   registerRCPairName( name );
   unregisterKey( Qt::Key(e->key()), e->modifiers() );
   registerKeyEventType( KEY_RELEASE );
@@ -51,8 +58,10 @@ void StandardHidManager::registerKeyReleaseEvent(const QString& name, QKeyEvent 
   generateEvent();
 }
 
+
 void StandardHidManager::registerMouseDoubleClickEvent(const QString& name, QMouseEvent* e ) {
 
+//  std::lock_guard<std::mutex> lk(_input_mutex);
   registerRCPairName( name );
   registerWindowPosition( e->pos() );
   registerMouseButtons( e->buttons(), e->modifiers() );
@@ -61,8 +70,10 @@ void StandardHidManager::registerMouseDoubleClickEvent(const QString& name, QMou
   generateEvent();
 }
 
+
 void StandardHidManager::registerMouseMoveEvent(const QString& name, QMouseEvent* e) {
 
+//  std::lock_guard<std::mutex> lk(_input_mutex);
   registerRCPairName( name );
   registerWindowPosition( e->pos() );
   registerMouseEventType( MOUSE_MOVE );
@@ -70,8 +81,10 @@ void StandardHidManager::registerMouseMoveEvent(const QString& name, QMouseEvent
   generateEvent();
 }
 
+
 void StandardHidManager::registerMousePressEvent(const QString& name, QMouseEvent* e) {
 
+//  std::lock_guard<std::mutex> lk(_input_mutex);
   registerRCPairName( name );
   registerWindowPosition( e->pos() );
   registerMouseButtons( e->buttons(), e->modifiers() );
@@ -80,8 +93,10 @@ void StandardHidManager::registerMousePressEvent(const QString& name, QMouseEven
   generateEvent();
 }
 
+
 void StandardHidManager::registerMouseReleaseEvent(const QString& name, QMouseEvent* e){
 
+//  std::lock_guard<std::mutex> lk(_input_mutex);
   registerRCPairName( name );
   registerWindowPosition( e->pos() );
   registerMouseButtons( e->buttons(), e->modifiers() );
@@ -94,12 +109,12 @@ void StandardHidManager::registerMouseReleaseEvent(const QString& name, QMouseEv
 void StandardHidManager::registerKey(Qt::Key key, Qt::KeyboardModifiers modifiers) {
 
   _reg_keymods = modifiers;
-
   if( isKeyRegistered( key ) )
     return;
 
   _reg_keymap[key] = true;
 }
+
 
 void StandardHidManager::registerMouseButtons(Qt::MouseButtons buttons, Qt::KeyboardModifiers modifiers ) {
 
@@ -107,15 +122,18 @@ void StandardHidManager::registerMouseButtons(Qt::MouseButtons buttons, Qt::Keyb
   _reg_keymods = modifiers;
 }
 
+
 void StandardHidManager::registerKeyEventType(StandardHidManager::KeyEventType type) {
 
   _reg_next_key_event_type = type;
 }
 
+
 void StandardHidManager::registerMouseEventType(StandardHidManager::MouseEventType type ) {
 
   _reg_next_mouse_event_type = type;
 }
+
 
 void StandardHidManager::unregisterKey(Qt::Key key, Qt::KeyboardModifiers modifiers) {
 
@@ -132,11 +150,13 @@ void StandardHidManager::unregisterKey(Qt::Key key, Qt::KeyboardModifiers modifi
   _reg_keymap.remove( key );
 }
 
+
 void StandardHidManager::registerWheelData(bool state, int delta) {
 
   _reg_wheel_state = state;
   _reg_wheel_delta = delta;
 }
+
 
 void StandardHidManager::registerWheelEvent(const QString& name, QWheelEvent *e) {
 
@@ -148,35 +168,40 @@ void StandardHidManager::registerWheelEvent(const QString& name, QWheelEvent *e)
   generateEvent();
 }
 
+
 QString
 StandardHidManager::viewNameFromParams(const HidInputEvent::HidInputParams& params) {
   return params["view_name"].toString();
 }
+
 
 QPoint
 StandardHidManager::posFromParams(const HidInputEvent::HidInputParams& params) {
   return params["pos"].toPoint();
 }
 
+
 QPoint
 StandardHidManager::prevPosFromParams(const HidInputEvent::HidInputParams& params) {
   return params["prev_pos"].toPoint();
 }
+
 
 int
 StandardHidManager::wheelDeltaFromParams(const HidInputEvent::HidInputParams& params) {
   return params["wheel_delta"].toInt();
 }
 
-bool StandardHidManager::isKeyRegistered(Qt::Key key) const {
 
+bool StandardHidManager::isKeyRegistered(Qt::Key key) const {
   return _reg_keymap.value(key, false);
 }
 
-bool StandardHidManager::isAnyKeysRegistered() const {
 
+bool StandardHidManager::isAnyKeysRegistered() const {
   return _reg_keymap.size() > 0;
 }
+
 
 bool StandardHidManager::isModKeyRegistered(Qt::KeyboardModifier keymod) const {
 
@@ -188,6 +213,7 @@ bool StandardHidManager::isModKeyRegistered(Qt::KeyboardModifier keymod) const {
   return (_reg_keymods & keymod) == keymod;
 }
 
+
 bool StandardHidManager::isMouseButtonRegistered(Qt::MouseButton button) const {
 
   // No button is a special case
@@ -197,6 +223,7 @@ bool StandardHidManager::isMouseButtonRegistered(Qt::MouseButton button) const {
 
   return (_reg_mouse_buttons & button) == button;
 }
+
 
 void StandardHidManager::generateEvent() {
 
@@ -261,7 +288,6 @@ void StandardHidManager::generateEvent() {
 
 
 void StandardHidManager::registerRCPairName(const QString& name) {
-
   _reg_rcpair_name = name;
 }
 

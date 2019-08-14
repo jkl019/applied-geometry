@@ -24,7 +24,7 @@ public:
     test_01_torus->translate(d + d.getNormalized()*2.0f);
     test_01_torus->rotate( GMlib::Angle(90), GMlib::Vector<float,3>( 0.0f, 1.0f, 0.0f) );
     test_01_torus->toggleDefaultVisualizer();
-    test_01_torus->replot(200,200,1,1);
+    test_01_torus->sample(200,200,1,1);
     insert(test_01_torus.get());
 
     m_test01 = true;
@@ -34,8 +34,12 @@ public:
 protected:
   void localSimulate(double dt) override {
 
-    rotate( GMlib::Angle(90) * dt, GMlib::Vector<float,3>( 0.0f, 0.0f, 1.0f ) );
-    rotate( GMlib::Angle(180) * dt, GMlib::Vector<float,3>( 1.0f, 1.0f, 0.0f ) );
+      static double t=0;
+      t += dt;
+
+      GMlib::Vector<float,3> vec(sin(t),cos(t),5*dt);
+      vec *= 0.05;
+      this->move(vec);
   }
 
 private:

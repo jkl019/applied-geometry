@@ -86,7 +86,6 @@ protected:
   virtual void                                      initializeScenario() = 0;
   virtual void                                      cleanupScenario() = 0;
 
-
 private:
   int                                               _timer_id;
 

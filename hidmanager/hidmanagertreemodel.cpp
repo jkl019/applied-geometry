@@ -10,7 +10,7 @@ public:
   };
 
 
-  explicit TreeItem(const QList<QVariant> &data, TreeItem *parent = 0x0)
+  explicit TreeItem(const QList<QVariant> &data, TreeItem *parent = nullptr)
     : _children(), _data(data), _parent(parent) {}
 
   ~TreeItem() { qDeleteAll(_children); }
@@ -23,7 +23,7 @@ public:
   void          clear() { _children.clear(); }
   TreeItem*     child(int row) { return _children.value(row); }
   int           childCount() const { return _children.count(); }
-  int           columnCount() const { return 3; return _data.count(); }
+  int           columnCount() const { return 3; /*return _data.count();*/ }
   QVariant      data(int column) const {
 
 

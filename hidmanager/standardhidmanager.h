@@ -15,19 +15,16 @@ class QWheelEvent;
 
 // stl
 #include <memory>
-
+//#include <mutex>
 
 class StandardHidManager : public HidManager {
   Q_OBJECT
 public:
-  explicit StandardHidManager( QObject* parent = 0x0 );
-
-
+  explicit StandardHidManager( QObject* parent = nullptr );
 
   //**********************************
   //
   // Standard Hid manager setup
-
 
 public slots:
   virtual void                registerMousePressEvent( const QString& name, QMouseEvent* event );
@@ -38,16 +35,11 @@ public slots:
   virtual void                registerKeyReleaseEvent( const QString& name,  QKeyEvent* event );
   virtual void                registerWheelEvent( const QString& name, QWheelEvent* event );
 
-
-
-
 protected:
   static QString              viewNameFromParams( const HidInputEvent::HidInputParams& params );
   static QPoint               posFromParams( const HidInputEvent::HidInputParams& params );
   static QPoint               prevPosFromParams( const HidInputEvent::HidInputParams& params );
   static int                  wheelDeltaFromParams( const HidInputEvent::HidInputParams& params );
-
-
 
 private:
   enum MouseEventType {
@@ -72,16 +64,11 @@ private:
                                            Qt::KeyboardModifiers modifiers );
   void                        unregisterKey( Qt::Key key,
                                              Qt::KeyboardModifiers modifiers );
-
   void                        registerMouseButtons( Qt::MouseButtons buttons,
                                                     Qt::KeyboardModifiers modifiers );
-
   void                        registerWheelData( bool state, int delta );
-
-
   void                        registerWindowPosition(const QPoint& pos );
   void                        registerRCPairName( const QString& name );
-
 
   KeyInput::Keymap            _reg_keymap;
   Qt::KeyboardModifiers       _reg_keymods;
@@ -96,53 +83,16 @@ private:
   QPoint                      _reg_view_pos       = {0,0};
   QPoint                      _reg_view_prev_pos  = {0,0};
 
-
-
   bool                        isKeyRegistered( Qt::Key key ) const;
   bool                        isAnyKeysRegistered() const;
   bool                        isModKeyRegistered( Qt::KeyboardModifier keymod ) const;
   bool                        isMouseButtonRegistered( Qt::MouseButton button ) const;
 
-
-
-
-
-
-
-
-
   KeyEventType                _reg_next_key_event_type;
   MouseEventType              _reg_next_mouse_event_type;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+//  std::mutex                  _input_mutex;
 };
 
 
-
 #endif // STANDARDHIDMANAGER_H
-
-
-
-
-
-
-
