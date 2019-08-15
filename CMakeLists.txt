@@ -75,6 +75,7 @@ target_compile_options(${PROJECT_NAME}
     -Wno-redundant-parens
     -Wno-inconsistent-missing-destructor-override
     -Wno-zero-as-null-pointer-constant
+    -Wno-extra-semi-stmt
     >
 #  PUBLIC $<$<CXX_COMPILER_ID:GNU>:
 #    -some-compiler-flag
