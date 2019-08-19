@@ -116,8 +116,8 @@ bool KeyInput::isKeymapEqual(const Keymap &keymap_other) const {
   if( keys.size() != keys_other.size() )
     return false;
 
-  qSort(keys);
-  qSort(keys_other);
+  std::sort(std::begin(keys),std::end(keys));
+  std::sort(std::begin(keys_other),std::end(keys_other));
 
   return keys == keys_other;
 }
