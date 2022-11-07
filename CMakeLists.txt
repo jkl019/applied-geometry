@@ -101,6 +101,8 @@ qt5_wrap_cpp( HDRS_MOC
   application/guiapplication.h
   application/window.h
 
+  application/bspline.h
+
   scenario.h
   )
 target_sources( ${PROJECT_NAME} PRIVATE ${HDRS_MOC})
