@@ -5,6 +5,7 @@
 #include "testtorus.h"
 #include "application/bspline.h"
 #include "parametrics/curves/gmpcircle.h"
+#include <QDebug>
 
 // hidmanager
 #include "hidmanager/defaulthidmanager.h"
@@ -108,12 +109,52 @@ void Scenario::initializeScenario() {
 //    line->sample(20, 0);
 //    this->scene()->insert(line);
 
-    auto circle = new GMlib::PCircle<float>(5);
-    circle->toggleDefaultVisualizer();
-    circle->sample(50, 0);
-    auto points = circle->getDefaultVisualizer();
-    auto p = points->GMlib::~PCurveVisualizer()->_p;
-    this->scene()->insert(circle);
+//    auto circle = new GMlib::PCircle<float>(5);
+//    circle->toggleDefaultVisualizer();
+//    circle->sample(50, 0);
+//    this->scene()->insert(circle);
+
+
+//    GMlib::DVector<GMlib::Vector<float,3>> points;
+//    int number = 30;
+//    float dt = circle->getParDelta() / (number -1);
+
+
+//    for(int i = 0; i < number; i++){
+//        auto point = circle->getPosition(circle->getParStart() + (i * dt));
+//        points.push_back(point);
+//    };
+//    auto spline = new my_namespace::BSpline<float>(points, 6);
+//    spline->toggleDefaultVisualizer();
+//    spline->sample(30, 0);
+//    this->scene()->insert(spline);
+
+    GMlib::Vector<float,3> p;
+    GMlib::DVector<GMlib::Vector<float,3>> c;
+    p[0] = 0.0;
+    p[1] = 0.0;
+    p[2] = 0.0;
+    c.push_back(p);
+    p[0] = 0.0;
+    p[1] = 3.0;
+    p[2] = 0.0;
+    c.push_back(p);
+    p[0] = 1.0;
+    p[1] = 2.0;
+    p[2] = 0.0;
+    c.push_back(p);
+    p[0] = 3.0;
+    p[1] = 3.0;
+    p[2] = 0.0;
+    c.push_back(p);
+    p[0] = 3.0;
+    p[1] = 0.0;
+    p[2] = 0.0;
+    c.push_back(p);
+    auto subdivCurve = my_namespace::Subdivision(c);
+    subdivCurve->toggleDefalutVisualizer();
+    subdivCurve->sample(50, 0);
+    this->scene()->insert(subdivCurve);
 }
 
 void Scenario::cleanupScenario() {}

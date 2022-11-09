@@ -102,6 +102,7 @@ qt5_wrap_cpp( HDRS_MOC
   application/window.h
 
   application/bspline.h
+  application/subdivision.h
 
   scenario.h
   )
