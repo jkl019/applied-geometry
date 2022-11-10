@@ -4,7 +4,9 @@
 #include "scenario.h"
 #include "testtorus.h"
 #include "application/bspline.h"
+#include "application/subdivision.h"
 #include "parametrics/curves/gmpcircle.h"
+#include "parametrics/curves/gmpline.h"
 #include <QDebug>
 
 // hidmanager
@@ -151,9 +153,23 @@ void Scenario::initializeScenario() {
     p[1] = 0.0;
     p[2] = 0.0;
     c.push_back(p);
-    auto subdivCurve = my_namespace::Subdivision(c);
-    subdivCurve->toggleDefalutVisualizer();
-    subdivCurve->sample(50, 0);
+
+//    qDebug() << c;
+
+//    for(int i = 0; i < 4; i++){
+//        auto pl1 = new GMlib::PLine<float>(GMlib::Point<float, 3>(c[i]), GMlib::Point<float, 3>(c[i + 1]));
+//        pl1->toggleDefaultVisualizer();
+//        pl1->sample(3, 0);
+//        this->scene()->insert(pl1);
+//    }
+//    auto pl1 = new GMlib::PLine<float>(GMlib::Point<float, 3>(c[4]), GMlib::Point<float, 3>(c[0]));
+//    pl1->toggleDefaultVisualizer();
+//    pl1->sample(3, 0);
+//    this->scene()->insert(pl1);
+
+    auto subdivCurve = new my_namespace::Subdivision<float>(c);
+    subdivCurve->toggleDefaultVisualizer();
+    subdivCurve->sample(3, 3);
     this->scene()->insert(subdivCurve);
 }
 
