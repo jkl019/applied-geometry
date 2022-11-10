@@ -25,8 +25,8 @@ namespace my_namespace {
       GMlib::DVector<GMlib::Vector<T,3>> _points;
 
       void LaneRiesenfeldClosed(int k, int d);
-      int doublePart();
-      void smoothPartClosed();
+      int doublePart(int n);
+      void smoothPartClosed(int n, int d);
 
     };
   }
