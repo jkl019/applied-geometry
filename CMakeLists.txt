@@ -103,6 +103,9 @@ qt5_wrap_cpp( HDRS_MOC
 
   application/bspline.h
   application/subdivision.h
+  application/lissajous.h
+  application/hypotrochoids.h
+  application/clelia.h
 
   scenario.h
   )
