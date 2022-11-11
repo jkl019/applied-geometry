@@ -106,6 +106,8 @@ qt5_wrap_cpp( HDRS_MOC
   application/lissajous.h
   application/hypotrochoids.h
   application/clelia.h
+  application/cornoid.h
+  application/teardrop.h
 
   scenario.h
   )

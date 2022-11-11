@@ -5,12 +5,16 @@
 #include "testtorus.h"
 #include "application/bspline.h"
 #include "application/subdivision.h"
-#include "application/lissajous.h"
-#include "application/hypotrochoids.h"
-#include "application/clelia.h"
 #include "parametrics/curves/gmpcircle.h"
 #include "parametrics/curves/gmpline.h"
 #include <QDebug>
+
+// Model curves
+#include "application/lissajous.h"
+#include "application/hypotrochoids.h"
+#include "application/clelia.h"
+#include "application/cornoid.h"
+#include "application/teardrop.h"
 
 // hidmanager
 #include "hidmanager/defaulthidmanager.h"
@@ -177,11 +181,21 @@ void Scenario::initializeScenario() {
 //    hypotrochoid->sample(50, 0);
 //    this->scene()->insert(hypotrochoid);
 
-  float n = 4.0;
-  auto clelia = new my_namespace::Clelia<float>(1.0, n);
-  clelia->toggleDefaultVisualizer();
-  clelia->sample(100, 0);
-  this->scene()->insert(clelia);
+//  float n = 4.0;
+//  auto clelia = new my_namespace::Clelia<float>(1.0, n);
+//  clelia->toggleDefaultVisualizer();
+//  clelia->sample(100, 0);
+//  this->scene()->insert(clelia);
+
+//  auto corniod = new my_namespace::Cornoid<float>();
+//  corniod->toggleDefaultVisualizer();
+//  corniod->sample(50, 0);
+//  this->scene()->insert(corniod);
+
+    auto teardrop = new my_namespace::Teardrop<float>();
+    teardrop->toggleDefaultVisualizer();
+    teardrop->sample(50, 0);
+    this->scene()->insert(teardrop);
 }
 
 void Scenario::cleanupScenario() {}
