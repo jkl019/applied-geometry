@@ -19,6 +19,7 @@ namespace my_namespace {
       void                eval(T t, int d, bool l) const override;
       T                   getStartP() const override;
       T                   getEndP()   const override;
+      void                localSimulate(double dt) override;
 
       int _d;
       int _k;

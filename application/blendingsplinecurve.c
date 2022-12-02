@@ -17,7 +17,7 @@ namespace my_namespace {
 
   template <typename T>
   bool Blendingsplinecurve<T>::isClosed() const {
-    return true;
+    return _mc->isClosed();
   }
 
   template <typename T>
@@ -38,6 +38,16 @@ namespace my_namespace {
   template <typename T>
   T Blendingsplinecurve<T>::getEndP() const {
     return _mc->getParEnd();
+  }
+
+  template <typename T>
+  void Blendingsplinecurve<T>::localSimulate(double dt) {
+      for(int i = 0; i < _lc.size() - 1; i++)
+      {
+          _lc[i]->rotate(dt, GMlib::Vector<T,3>(1, 0, 0));
+      }
+      this->resample();
+      this->setEditDone();
   }
 
   template <typename T>
@@ -70,7 +80,13 @@ namespace my_namespace {
       for(int i = 0; i < _n; i++)
       {
           _lc.push_back(new GMlib::PSubCurve<T>(_mc, _t[i], _t[i + 2], _t[i + 1]));
+          _lc[i]->toggleDefaultVisualizer();
+          _lc[i]->sample(5, 0);
+          _lc[i]->setCollapsed(true);
+          _lc[i]->setParent(this);
+          this->insert(_lc[i]);
       }
+      _lc.push_back(_lc[0]);
   }
 
   template <typename T>
@@ -81,12 +97,12 @@ namespace my_namespace {
               return i;
           }
       }
-      return _lc.size();
+      return _lc.size() - 1;
   }
 
   template <typename T>
   T Blendingsplinecurve<T>::b(T t) const {
-      return  t - ( (1 / M_2_PI) * sin(M_2_PI * t) );
+      return  t - ( (1 / T(M_2PI)) * sin(T(M_2PI) * t) );
   }
 
   template <typename T>

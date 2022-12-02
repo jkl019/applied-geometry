@@ -172,7 +172,7 @@ void Scenario::initializeScenario() {
 
     // MODEL CURVES
 
-//    auto lissajousCurve = new my_namespace::LissajousCurve<float>();
+    auto lissajousCurve = new my_namespace::LissajousCurve<float>();
 //    lissajousCurve->toggleDefaultVisualizer();
 //    lissajousCurve->sample(50, 0);
 //    this->scene()->insert(lissajousCurve);
@@ -193,15 +193,16 @@ void Scenario::initializeScenario() {
 //  corniod->sample(50, 0);
 //  this->scene()->insert(corniod);
 
-    auto teardrop = new my_namespace::Teardrop<float>();
+//    auto teardrop = new my_namespace::Teardrop<float>();
 //    teardrop->toggleDefaultVisualizer();
 //    teardrop->sample(50, 0);
 //    this->scene()->insert(teardrop);
 
-    auto blendingspline = new my_namespace::Blendingsplinecurve<float>(teardrop);
+    auto blendingspline = new my_namespace::Blendingsplinecurve<float>(lissajousCurve);
     blendingspline->toggleDefaultVisualizer();
-    blendingspline->sample(5, 0);
+    blendingspline->sample(100, 0);
     this->scene()->insert(blendingspline);
+    //blendingspline->translate(GMlib::Vector<float,3>(5, 0, 0));
 }
 
 void Scenario::cleanupScenario() {}

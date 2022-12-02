@@ -19,8 +19,8 @@ namespace my_namespace {
   {
       this->_p.setDim( d + 1 );
 
-      const T x = 5 * cos(t);
-      const T y = 5 * sin(t) * pow(sin(t/2), 2);
+      const T x = 5 * pow(cos(t), 2);
+      const T y = pow(5, 2) * pow(cos(t), 3) * sin(t) / 4;
 
       this->_p[0][0] = x;
       this->_p[0][1] = y;
