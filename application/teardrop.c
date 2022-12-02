@@ -34,7 +34,7 @@ namespace my_namespace {
 
   template <typename T>
   T Teardrop<T>::getEndP() const {
-    return T( M_2PI );
+    return T(M_PI);
   }
 
 

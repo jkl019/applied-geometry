@@ -108,6 +108,7 @@ qt5_wrap_cpp( HDRS_MOC
   application/clelia.h
   application/cornoid.h
   application/teardrop.h
+  application/blendingsplinecurve.h
 
   scenario.h
   )

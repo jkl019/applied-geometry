@@ -7,6 +7,7 @@
 #include "application/subdivision.h"
 #include "parametrics/curves/gmpcircle.h"
 #include "parametrics/curves/gmpline.h"
+#include "application/blendingsplinecurve.h"
 #include <QDebug>
 
 // Model curves
@@ -193,9 +194,14 @@ void Scenario::initializeScenario() {
 //  this->scene()->insert(corniod);
 
     auto teardrop = new my_namespace::Teardrop<float>();
-    teardrop->toggleDefaultVisualizer();
-    teardrop->sample(50, 0);
-    this->scene()->insert(teardrop);
+//    teardrop->toggleDefaultVisualizer();
+//    teardrop->sample(50, 0);
+//    this->scene()->insert(teardrop);
+
+    auto blendingspline = new my_namespace::Blendingsplinecurve<float>(teardrop);
+    blendingspline->toggleDefaultVisualizer();
+    blendingspline->sample(5, 0);
+    this->scene()->insert(blendingspline);
 }
 
 void Scenario::cleanupScenario() {}
