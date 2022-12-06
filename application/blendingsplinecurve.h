@@ -27,6 +27,9 @@ namespace my_namespace {
       std::vector<T> _t;
       GMlib::PCurve<T,3> *_mc;
       std::vector<GMlib::PCurve<T,3>*> _lc;
+      std::vector<GMlib::Vector<float, 3>> _points;
+      double time;
+      bool increase;
 
       int getBasis(T t, T& p1, T& p2) const;
       void makeKnots();

@@ -8,6 +8,7 @@ namespace my_namespace {
         _d = d;
         _k = d + 1;
         _t.resize(_n + _k);
+        time = 0;
         makeKnots();
         createLocalCurves();
     }
@@ -42,9 +43,21 @@ namespace my_namespace {
 
   template <typename T>
   void Blendingsplinecurve<T>::localSimulate(double dt) {
+
+      if (time > 1)
+          increase = false;
+      else if (time < -1)
+          increase = true;
+      if (increase)
+          time += dt;
+      else
+          time -= dt;
+
       for(int i = 0; i < _lc.size() - 1; i++)
       {
-          _lc[i]->rotate(dt, GMlib::Vector<T,3>(1, 0, 0));
+          _lc[i]->rotate(dt, _points[i]);
+          _lc[i]->translate(time * 0.3 * _points[i]);
+
       }
       this->resample();
       this->setEditDone();
@@ -85,6 +98,7 @@ namespace my_namespace {
           _lc[i]->setCollapsed(true);
           _lc[i]->setParent(this);
           this->insert(_lc[i]);
+          _points.push_back(_lc[i]->getPos());
       }
       _lc.push_back(_lc[0]);
   }

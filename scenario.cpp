@@ -8,6 +8,10 @@
 #include "parametrics/curves/gmpcircle.h"
 #include "parametrics/curves/gmpline.h"
 #include "application/blendingsplinecurve.h"
+#include "application/blendingsplinesurface.h"
+#include "parametrics/surfaces/gmptorus.h"
+#include "parametrics/surfaces/gmpplane.h"
+#include "parametrics/surfaces/gmpcylinder.h"
 #include <QDebug>
 
 // Model curves
@@ -172,7 +176,7 @@ void Scenario::initializeScenario() {
 
     // MODEL CURVES
 
-    auto lissajousCurve = new my_namespace::LissajousCurve<float>();
+//    auto lissajousCurve = new my_namespace::LissajousCurve<float>();
 //    lissajousCurve->toggleDefaultVisualizer();
 //    lissajousCurve->sample(50, 0);
 //    this->scene()->insert(lissajousCurve);
@@ -182,8 +186,8 @@ void Scenario::initializeScenario() {
 //    hypotrochoid->sample(50, 0);
 //    this->scene()->insert(hypotrochoid);
 
-//  float n = 4.0;
-//  auto clelia = new my_namespace::Clelia<float>(1.0, n);
+  float n = 4.0;
+  auto clelia = new my_namespace::Clelia<float>(1.0, n);
 //  clelia->toggleDefaultVisualizer();
 //  clelia->sample(100, 0);
 //  this->scene()->insert(clelia);
@@ -193,16 +197,38 @@ void Scenario::initializeScenario() {
 //  corniod->sample(50, 0);
 //  this->scene()->insert(corniod);
 
-//    auto teardrop = new my_namespace::Teardrop<float>();
-//    teardrop->toggleDefaultVisualizer();
-//    teardrop->sample(50, 0);
-//    this->scene()->insert(teardrop);
-
-    auto blendingspline = new my_namespace::Blendingsplinecurve<float>(lissajousCurve);
+        // BLENDINGSPLINE CURVE
+    //auto teardrop = new my_namespace::Teardrop<float>();
+    auto blendingspline = new my_namespace::Blendingsplinecurve<float>(clelia);
     blendingspline->toggleDefaultVisualizer();
     blendingspline->sample(100, 0);
     this->scene()->insert(blendingspline);
-    //blendingspline->translate(GMlib::Vector<float,3>(5, 0, 0));
+    blendingspline->translate(GMlib::Vector<float,3>(5, 0, 0));
+
+      // CLOSED BLENDINGSPLINE SURFACE
+//    auto torus = new GMlib::PTorus<float>();
+//    auto blendingSplineSurface = new my_namespace::Blendingsplinesurface<float>(torus, 4.0, 3.0);
+//    blendingSplineSurface->toggleDefaultVisualizer();
+//    blendingSplineSurface->sample(60, 60, 1, 1);
+//    this->scene()->insert(blendingSplineSurface);
+
+    // OPEN BLENDINGSPLINE SURFACE
+
+//  auto plane = new GMlib::PPlane<float>(GMlib::Point<float,3>(0, 0, 0),
+//                                        GMlib::Vector<float,3>(6, 0, 0),
+//                                        GMlib::Vector<float,3>(0, 0, 4));
+//  auto blendingSplineSurface = new my_namespace::Blendingsplinesurface<float>(plane, 4.0, 3.0);
+//  blendingSplineSurface->toggleDefaultVisualizer();
+//  blendingSplineSurface->sample(60, 60, 1, 1);
+//  this->scene()->insert(blendingSplineSurface);
+
+  // HALF OPEN BLENDINGSPLINE SURFACE
+//  auto cylinder = new GMlib::PCylinder<float>(2.0, 2.0, 5.0);
+//  auto blendingSplineSurface = new my_namespace::Blendingsplinesurface<float>(cylinder, 4.0, 3.0);
+//  blendingSplineSurface->toggleDefaultVisualizer();
+//  blendingSplineSurface->sample(60, 60, 1, 1);
+//  this->scene()->insert(blendingSplineSurface);
+
 }
 
 void Scenario::cleanupScenario() {}
