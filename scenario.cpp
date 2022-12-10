@@ -7,7 +7,19 @@
 #include "application/subdivision.h"
 #include "parametrics/curves/gmpcircle.h"
 #include "parametrics/curves/gmpline.h"
+#include "application/blendingsplinecurve.h"
+#include "application/blendingsplinesurface.h"
+#include "parametrics/surfaces/gmptorus.h"
+#include "parametrics/surfaces/gmpplane.h"
+#include "parametrics/surfaces/gmpcylinder.h"
 #include <QDebug>
+
+// Model curves
+#include "application/lissajous.h"
+#include "application/hypotrochoids.h"
+#include "application/clelia.h"
+#include "application/cornoid.h"
+#include "application/teardrop.h"
 
 // hidmanager
 #include "hidmanager/defaulthidmanager.h"
@@ -80,6 +92,7 @@ void Scenario::initializeScenario() {
 //    ptrack2->setArrowLength(2);
 //    ptom->insert(ptrack2);
 
+       // FIRST CONSTRUCTOR
 //    GMlib::Vector<float,3> p;
 //    GMlib::DVector<GMlib::Vector<float,3>> c;
 //    p[0] = 0.0;
@@ -111,14 +124,16 @@ void Scenario::initializeScenario() {
 //    line->sample(20, 0);
 //    this->scene()->insert(line);
 
-//    auto circle = new GMlib::PCircle<float>(5);
+      // SECOND CONSTRUCTOR
+//    auto circle = new GMlib::PCircle<float>(3);
 //    circle->toggleDefaultVisualizer();
-//    circle->sample(50, 0);
+//    circle->sample(60, 0);
+//    circle->setColor(GMlib::GMcolor::blueViolet());
 //    this->scene()->insert(circle);
 
 
 //    GMlib::DVector<GMlib::Vector<float,3>> points;
-//    int number = 30;
+//    int number = 50;
 //    float dt = circle->getParDelta() / (number -1);
 
 
@@ -128,49 +143,78 @@ void Scenario::initializeScenario() {
 //    };
 //    auto spline = new my_namespace::BSpline<float>(points, 6);
 //    spline->toggleDefaultVisualizer();
-//    spline->sample(30, 0);
+//    spline->sample(60, 0);
 //    this->scene()->insert(spline);
 
-    GMlib::Vector<float,3> p;
-    GMlib::DVector<GMlib::Vector<float,3>> c;
-    p[0] = 0.0;
-    p[1] = 0.0;
-    p[2] = 0.0;
-    c.push_back(p);
-    p[0] = 0.0;
-    p[1] = 3.0;
-    p[2] = 0.0;
-    c.push_back(p);
-    p[0] = 1.0;
-    p[1] = 2.0;
-    p[2] = 0.0;
-    c.push_back(p);
-    p[0] = 3.0;
-    p[1] = 3.0;
-    p[2] = 0.0;
-    c.push_back(p);
-    p[0] = 3.0;
-    p[1] = 0.0;
-    p[2] = 0.0;
-    c.push_back(p);
+    // SUBDIVISION CURVE
+//    GMlib::Vector<float,3> p;
+//    GMlib::DVector<GMlib::Vector<float,3>> c;
+//    p[0] = 0.0;
+//    p[1] = 0.0;
+//    p[2] = 0.0;
+//    c.push_back(p);
+//    p[0] = 0.0;
+//    p[1] = 3.0;
+//    p[2] = 0.0;
+//    c.push_back(p);
+//    p[0] = 1.0;
+//    p[1] = 2.0;
+//    p[2] = 0.0;
+//    c.push_back(p);
+//    p[0] = 3.0;
+//    p[1] = 3.0;
+//    p[2] = 0.0;
+//    c.push_back(p);
+//    p[0] = 3.0;
+//    p[1] = 0.0;
+//    p[2] = 0.0;
+//    c.push_back(p);
 
-//    qDebug() << c;
+//    auto subdivCurve = new my_namespace::Subdivision<float>(c);
+//    subdivCurve->toggleDefaultVisualizer();
+//    subdivCurve->sample(3, 3);
+//    this->scene()->insert(subdivCurve);
 
-//    for(int i = 0; i < 4; i++){
-//        auto pl1 = new GMlib::PLine<float>(GMlib::Point<float, 3>(c[i]), GMlib::Point<float, 3>(c[i + 1]));
-//        pl1->toggleDefaultVisualizer();
-//        pl1->sample(3, 0);
-//        this->scene()->insert(pl1);
-//    }
-//    auto pl1 = new GMlib::PLine<float>(GMlib::Point<float, 3>(c[4]), GMlib::Point<float, 3>(c[0]));
-//    pl1->toggleDefaultVisualizer();
-//    pl1->sample(3, 0);
-//    this->scene()->insert(pl1);
+    // MODEL CURVE
 
-    auto subdivCurve = new my_namespace::Subdivision<float>(c);
-    subdivCurve->toggleDefaultVisualizer();
-    subdivCurve->sample(3, 3);
-    this->scene()->insert(subdivCurve);
+//  float n = 4.0;
+//  auto clelia = new my_namespace::Clelia<float>(1.0, n);
+//  clelia->toggleDefaultVisualizer();
+//  clelia->sample(200, 0);
+//  this->scene()->insert(clelia);
+
+        // BLENDINGSPLINE CURVE
+    float n = 4.0;
+    auto clelia = new my_namespace::Clelia<float>(1.0, n);
+    auto blendingspline = new my_namespace::Blendingsplinecurve<float>(clelia);
+    blendingspline->toggleDefaultVisualizer();
+    blendingspline->sample(200, 0);
+    this->scene()->insert(blendingspline);
+
+      // CLOSED BLENDINGSPLINE SURFACE
+//    auto torus = new GMlib::PTorus<float>();
+//    auto blendingSplineSurface = new my_namespace::Blendingsplinesurface<float>(torus, 4.0, 3.0);
+//    blendingSplineSurface->toggleDefaultVisualizer();
+//    blendingSplineSurface->sample(60, 60, 1, 1);
+//    this->scene()->insert(blendingSplineSurface);
+
+    // OPEN BLENDINGSPLINE SURFACE
+
+//  auto plane = new GMlib::PPlane<float>(GMlib::Point<float,3>(0, 0, 0),
+//                                        GMlib::Vector<float,3>(6, 0, 0),
+//                                        GMlib::Vector<float,3>(0, 0, 4));
+//  auto blendingSplineSurface = new my_namespace::Blendingsplinesurface<float>(plane, 4.0, 3.0);
+//  blendingSplineSurface->toggleDefaultVisualizer();
+//  blendingSplineSurface->sample(60, 60, 1, 1);
+//  this->scene()->insert(blendingSplineSurface);
+
+  // HALF OPEN BLENDINGSPLINE SURFACE
+//  auto cylinder = new GMlib::PCylinder<float>(2.0, 2.0, 5.0);
+//  auto blendingSplineSurface = new my_namespace::Blendingsplinesurface<float>(cylinder, 4.0, 3.0);
+//  blendingSplineSurface->toggleDefaultVisualizer();
+//  blendingSplineSurface->sample(60, 60, 1, 1);
+//  this->scene()->insert(blendingSplineSurface);
+
 }
 
 void Scenario::cleanupScenario() {}

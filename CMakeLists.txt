@@ -103,6 +103,14 @@ qt5_wrap_cpp( HDRS_MOC
 
   application/bspline.h
   application/subdivision.h
+  application/lissajous.h
+  application/hypotrochoids.h
+  application/clelia.h
+  application/cornoid.h
+  application/teardrop.h
+  application/blendingsplinecurve.h
+  application/PSimpleSubSurf.h
+  application/blendingsplinesurface.h
 
   scenario.h
   )
