@@ -3,12 +3,12 @@ namespace my_namespace {
 
     template <typename T>
     Blendingsplinecurve<T>::Blendingsplinecurve(GMlib::PCurve<T,3> *mc, int n, int d){
-        _mc = mc;
-        _n = n;
-        _d = d;
-        _k = d + 1;
-        _t.resize(_n + _k);
-        time = 0;
+        _mc = mc; // model curve
+        _n = n; // Set number of curves
+        _d = d; // degree
+        _k = d + 1; // order
+        _t.resize(_n + _k); // knot vector
+        _dt = 0; // for animation
         makeKnots();
         createLocalCurves();
     }
@@ -44,20 +44,19 @@ namespace my_namespace {
   template <typename T>
   void Blendingsplinecurve<T>::localSimulate(double dt) {
 
-      if (time > 1)
+      if (_dt > 1)
           increase = false;
-      else if (time < -1)
+      else if (_dt < -1)
           increase = true;
       if (increase)
-          time += dt;
+          _dt += dt;
       else
-          time -= dt;
+          _dt -= dt;
 
       for(int i = 0; i < _lc.size() - 1; i++)
       {
+          _lc[i]->translate(_dt * 0.3 * _points[i]);
           _lc[i]->rotate(dt, _points[i]);
-          _lc[i]->translate(time * 0.3 * _points[i]);
-
       }
       this->resample();
       this->setEditDone();
@@ -79,6 +78,7 @@ namespace my_namespace {
   template <typename T>
   void Blendingsplinecurve<T>::makeKnots()
   {
+      // Making knot vector for a closed curve
       for(int i = 0; i < _n + 1; i++)
       {
           _t[i + 1] = getStartP() + i * (_mc->getParDelta() / _n);
@@ -90,6 +90,7 @@ namespace my_namespace {
   template <typename T>
   void Blendingsplinecurve<T>::createLocalCurves()
   {
+      // Creating control curves
       for(int i = 0; i < _n; i++)
       {
           _lc.push_back(new GMlib::PSubCurve<T>(_mc, _t[i], _t[i + 2], _t[i + 1]));
@@ -100,6 +101,7 @@ namespace my_namespace {
           this->insert(_lc[i]);
           _points.push_back(_lc[i]->getPos());
       }
+      // First equal to last (closed curve)
       _lc.push_back(_lc[0]);
   }
 

@@ -50,12 +50,14 @@ namespace my_namespace {
   template <typename T>
   inline int BSpline<T>::getBasis(T t, T& p1, T& p2, T& p3) const
   {
+      // Find the knot value at the given interval
       int index = findIndex(t);
 
       auto w1 = findW(t, index, 1);
       auto w2 = findW(t, index - 1, 2);
       auto w2i = findW(t, index, 2);
 
+      // Basis function at the given interval
       p1 = ( 1 - w1) * (1 - w2);
       p2 = (( 1 - w1) * w2 + w1 * (1 - w2i));
       p3 = w1 * w2i;

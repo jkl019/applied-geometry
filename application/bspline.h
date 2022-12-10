@@ -25,8 +25,8 @@ namespace my_namespace {
       int _n;
 
       GMlib::DVector<GMlib::Vector<T,3>> _points;
-      GMlib::DVector<GMlib::Vector<T,3>> _c;
-      std::vector<T> _t;
+      GMlib::DVector<GMlib::Vector<T,3>> _c; // Control points
+      std::vector<T> _t; // Knot-vector
 
       int getBasis(T t, T& p1, T& p2, T& p3) const;
       void makeKnots(int n, bool closed = false);

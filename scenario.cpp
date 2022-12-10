@@ -125,14 +125,15 @@ void Scenario::initializeScenario() {
 //    this->scene()->insert(line);
 
       // SECOND CONSTRUCTOR
-//    auto circle = new GMlib::PCircle<float>(5);
+//    auto circle = new GMlib::PCircle<float>(3);
 //    circle->toggleDefaultVisualizer();
-//    circle->sample(50, 0);
+//    circle->sample(60, 0);
+//    circle->setColor(GMlib::GMcolor::blueViolet());
 //    this->scene()->insert(circle);
 
 
 //    GMlib::DVector<GMlib::Vector<float,3>> points;
-//    int number = 30;
+//    int number = 50;
 //    float dt = circle->getParDelta() / (number -1);
 
 
@@ -142,7 +143,7 @@ void Scenario::initializeScenario() {
 //    };
 //    auto spline = new my_namespace::BSpline<float>(points, 6);
 //    spline->toggleDefaultVisualizer();
-//    spline->sample(30, 0);
+//    spline->sample(60, 0);
 //    this->scene()->insert(spline);
 
     // SUBDIVISION CURVE
@@ -174,36 +175,21 @@ void Scenario::initializeScenario() {
 //    subdivCurve->sample(3, 3);
 //    this->scene()->insert(subdivCurve);
 
-    // MODEL CURVES
+    // MODEL CURVE
 
-//    auto lissajousCurve = new my_namespace::LissajousCurve<float>();
-//    lissajousCurve->toggleDefaultVisualizer();
-//    lissajousCurve->sample(50, 0);
-//    this->scene()->insert(lissajousCurve);
-
-//    auto hypotrochoid = new my_namespace::Hypotrochoids<float>();
-//    hypotrochoid->toggleDefaultVisualizer();
-//    hypotrochoid->sample(50, 0);
-//    this->scene()->insert(hypotrochoid);
-
-  float n = 4.0;
-  auto clelia = new my_namespace::Clelia<float>(1.0, n);
+//  float n = 4.0;
+//  auto clelia = new my_namespace::Clelia<float>(1.0, n);
 //  clelia->toggleDefaultVisualizer();
-//  clelia->sample(100, 0);
+//  clelia->sample(200, 0);
 //  this->scene()->insert(clelia);
 
-//  auto corniod = new my_namespace::Cornoid<float>();
-//  corniod->toggleDefaultVisualizer();
-//  corniod->sample(50, 0);
-//  this->scene()->insert(corniod);
-
         // BLENDINGSPLINE CURVE
-    //auto teardrop = new my_namespace::Teardrop<float>();
+    float n = 4.0;
+    auto clelia = new my_namespace::Clelia<float>(1.0, n);
     auto blendingspline = new my_namespace::Blendingsplinecurve<float>(clelia);
     blendingspline->toggleDefaultVisualizer();
-    blendingspline->sample(100, 0);
+    blendingspline->sample(200, 0);
     this->scene()->insert(blendingspline);
-    blendingspline->translate(GMlib::Vector<float,3>(5, 0, 0));
 
       // CLOSED BLENDINGSPLINE SURFACE
 //    auto torus = new GMlib::PTorus<float>();
